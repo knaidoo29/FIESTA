@@ -8,9 +8,13 @@ print(this_directory[:-6])
 with open(path.join(this_directory[:-6], 'README.md')) as f:
     long_description = f.read()
 
-ext1 = Extension(name = 'fiesta.grid._part2grid', sources = ['fiesta/grid/_part2grid.f90'])
-ext2 = Extension(name = 'fiesta.interp._bilinear', sources = ['fiesta/interp/_bilinear.f90'])
-ext3 = Extension(name = 'fiesta.interp._trilinear', sources = ['fiesta/interp/_trilinear.f90'])
+ext1 = Extension(name='fiesta.src.grid', sources=['fiesta/src/grid.f90'])
+ext2 = Extension(name='fiesta.src.part2gridw', sources=['fiesta/src/part2gridw.f90'])
+ext3 = Extension(name='fiesta.src.part2grid2d', sources=['fiesta/src/part2grid2d.f90'])
+ext4 = Extension(name='fiesta.src.part2grid3d', sources=['fiesta/src/part2grid3d.f90'])
+ext5 = Extension(name='fiesta.src.bilinear', sources=['fiesta/src/bilinear.f90'])
+ext6 = Extension(name='fiesta.src.trilinear', sources=['fiesta/src/trilinear.f90'])
+exts = [ext1, ext2, ext3, ext4, ext5, ext6]
 
 setup(name = 'fiesta',
       version = '0.0.0',
@@ -23,7 +27,7 @@ setup(name = 'fiesta',
       license='MIT',
       packages=setuptools.find_packages(),
       install_requires=['numpy', 'scipy'],
-      ext_modules = [ext1, ext2, ext3],
+      ext_modules = exts,
       python_requires = '>=3',
       classifiers=[
         'Development Status :: 5 - Production/Stable',

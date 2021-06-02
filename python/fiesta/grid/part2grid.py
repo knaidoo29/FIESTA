@@ -1,5 +1,5 @@
 import numpy as np
-from . import _part2grid
+from .. import src
 
 
 def part2grid2d(x, y, f, boxsize, ngrid, method='TSC'):
@@ -26,11 +26,11 @@ def part2grid2d(x, y, f, boxsize, ngrid, method='TSC'):
         Grid assigned values.
     """
     if method == 'NGP':
-        grid_value = _part2grid.part2grid_ngp_2d(x, y, f, boxsize, ngrid, len(x))
+        grid_value = src.p2g_ngp_2d(x, y, f, boxsize, ngrid, len(x))
     elif method == 'CIC':
-        grid_value = _part2grid.part2grid_cic_2d(x, y, f, boxsize, ngrid, len(x))
+        grid_value = src.p2g_cic_2d(x, y, f, boxsize, ngrid, len(x))
     elif method == 'TSC':
-        grid_value = _part2grid.part2grid_tsc_2d(x, y, f, boxsize, ngrid, len(x))
+        grid_value = src.p2g_tsc_2d(x, y, f, boxsize, ngrid, len(x))
     return grid_value
 
 
@@ -60,9 +60,9 @@ def part2grid3d(x, y, z, f, boxsize, ngrid, method='TSC'):
         Grid assigned values.
     """
     if method == 'NGP':
-        grid_value = _part2grid.part2grid_ngp(x, y, z, f, boxsize, ngrid, len(x))
+        grid_value = src.p2g_ngp_3d(x, y, z, f, boxsize, ngrid, len(x))
     elif method == 'CIC':
-        grid_value = _part2grid.part2grid_cic(x, y, z, f, boxsize, ngrid, len(x))
+        grid_value = src.p2g_cic_3d(x, y, z, f, boxsize, ngrid, len(x))
     elif method == 'TSC':
-        grid_value = _part2grid.part2grid_tsc(x, y, z, f, boxsize, ngrid, len(x))
+        grid_value = src.p2g_tsc_3d(x, y, z, f, boxsize, ngrid, len(x))
     return grid_value

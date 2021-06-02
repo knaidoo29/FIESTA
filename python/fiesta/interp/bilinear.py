@@ -18,7 +18,7 @@ def bilinear(fgrid, boxsize, x, y, fill_value=np.nan, periodic=True):
     fill_value : float, optional
         Fill outside boundary values.
     periodic : bool, optional
-        Sets whether to interpolate on a periodic grid.
+        Determines whether to interpolate on a periodic grid.
 
     Returns
     -------

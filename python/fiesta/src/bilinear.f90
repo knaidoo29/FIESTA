@@ -27,13 +27,15 @@ subroutine bilinear_periodic(fgrid, x, y, boxsize, ngrid, npart, f)
 
   implicit none
 
+  integer, parameter :: dp = kind(1.d0)
+
   ! define variables
 
   integer, intent(in) :: ngrid, npart
-  real, intent(in) :: fgrid(ngrid*ngrid), x(npart), y(npart), boxsize
-  real, intent(out) :: f(npart)
+  real(kind=dp), intent(in) :: fgrid(ngrid*ngrid), x(npart), y(npart), boxsize
+  real(kind=dp), intent(out) :: f(npart)
 
-  real :: dl, xp, yp, xg1, xg2, yg1, yg2, f11, f12, f21, f22, f1, f2
+  real(kind=dp) :: dl, xp, yp, xg1, xg2, yg1, yg2, f11, f12, f21, f22, f1, f2
   integer :: ix1, ix2, iy1, iy2, q11, q12, q21, q22
   integer :: i
 
@@ -119,14 +121,15 @@ subroutine bilinear_nonperiodic(fgrid, x, y, boxsize, ngrid, npart, f)
   !   Interpolated field values.
 
   implicit none
+  integer, parameter :: dp = kind(1.d0)
 
   ! define variables
 
   integer, intent(in) :: ngrid, npart
-  real, intent(in) :: fgrid(ngrid*ngrid), x(npart), y(npart), boxsize
-  real, intent(out) :: f(npart)
+  real(kind=dp), intent(in) :: fgrid(ngrid*ngrid), x(npart), y(npart), boxsize
+  real(kind=dp), intent(out) :: f(npart)
 
-  real :: dl, xp, yp, xg1, xg2, yg1, yg2, f11, f12, f21, f22, f1, f2
+  real(kind=dp) :: dl, xp, yp, xg1, xg2, yg1, yg2, f11, f12, f21, f22, f1, f2
   integer :: ix1, ix2, iy1, iy2, q11, q12, q21, q22
   integer :: i
 

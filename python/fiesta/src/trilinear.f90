@@ -27,17 +27,18 @@ subroutine trilinear_periodic(fgrid, x, y, z, boxsize, ngrid, npart, f)
   !   Interpolated field values.
 
   implicit none
+  integer, parameter :: dp = kind(1.d0)
 
   ! define variables
 
   integer, intent(in) :: ngrid, npart
-  real, intent(in) :: fgrid(ngrid*ngrid*ngrid)
-  real, intent(in) :: x(npart), y(npart), z(npart), boxsize
-  real, intent(out) :: f(npart)
+  real(kind=dp), intent(in) :: fgrid(ngrid*ngrid*ngrid)
+  real(kind=dp), intent(in) :: x(npart), y(npart), z(npart), boxsize
+  real(kind=dp), intent(out) :: f(npart)
 
-  real :: dl, xp, yp, zp, xg1, xg2, yg1, yg2, zg1, zg2, xd, yd, zd
-  real :: f111, f112, f121, f122, f211, f212, f221, f222
-  real :: f11, f12, f21, f22, f1, f2
+  real(kind=dp) :: dl, xp, yp, zp, xg1, xg2, yg1, yg2, zg1, zg2, xd, yd, zd
+  real(kind=dp) :: f111, f112, f121, f122, f211, f212, f221, f222
+  real(kind=dp) :: f11, f12, f21, f22, f1, f2
   integer :: q111, q112, q121, q122, q211, q212, q221, q222
   integer :: i, ix1, ix2, iy1, iy2, iz1, iz2
 
@@ -152,17 +153,18 @@ subroutine trilinear_nonperiodic(fgrid, x, y, z, boxsize, ngrid, npart, f)
   !   Interpolated field values.
 
   implicit none
+  integer, parameter :: dp = kind(1.d0)
 
   ! define variables
 
   integer, intent(in) :: ngrid, npart
-  real, intent(in) :: fgrid(ngrid*ngrid*ngrid)
-  real, intent(in) :: x(npart), y(npart), z(npart), boxsize
-  real, intent(out) :: f(npart)
+  real(kind=dp), intent(in) :: fgrid(ngrid*ngrid*ngrid)
+  real(kind=dp), intent(in) :: x(npart), y(npart), z(npart), boxsize
+  real(kind=dp), intent(out) :: f(npart)
 
-  real :: dl, xp, yp, zp, xg1, xg2, yg1, yg2, zg1, zg2, xd, yd, zd
-  real :: f111, f112, f121, f122, f211, f212, f221, f222
-  real :: f11, f12, f21, f22, f1, f2
+  real(kind=dp) :: dl, xp, yp, zp, xg1, xg2, yg1, yg2, zg1, zg2, xd, yd, zd
+  real(kind=dp) :: f111, f112, f121, f122, f211, f212, f221, f222
+  real(kind=dp) :: f11, f12, f21, f22, f1, f2
   integer :: q111, q112, q121, q122, q211, q212, q221, q222
   integer :: i, ix1, ix2, iy1, iy2, iz1, iz2
 
@@ -264,7 +266,7 @@ subroutine trilinear_nonperiodic(fgrid, x, y, z, boxsize, ngrid, npart, f)
     f2 = f21*(1-yd) + f22*yd
 
     f(i) = f1*(1-zd) + f2*zd
-    
+
   end do
 
 end subroutine trilinear_nonperiodic

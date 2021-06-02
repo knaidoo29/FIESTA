@@ -16,15 +16,16 @@ subroutine xgrid(index, dl, xg)
   !   Grid coordinate.
 
   implicit none
+  integer, parameter :: dp = kind(1.d0)
 
   ! Declare variables.
 
   integer, intent(in) :: index
-  real, intent(in) :: dl
-  real, intent(out) :: xg
+  real(kind=dp), intent(in) :: dl
+  real(kind=dp), intent(out) :: xg
 
   ! Calculate the x value on the grid.
-  
+
   xg = dl/2. + real(index) * dl
 
 end subroutine xgrid

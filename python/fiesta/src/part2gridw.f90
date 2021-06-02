@@ -18,13 +18,14 @@ subroutine weight_cic(xp, xg, dl, w)
   !   Weight
 
   implicit none
+  integer, parameter :: dp = kind(1.d0)
 
   ! define variales.
 
-  real, intent(in) :: xp, xg, dl
-  real, intent(out) :: w
+  real(kind=dp), intent(in) :: xp, xg, dl
+  real(kind=dp), intent(out) :: w
 
-  real :: dx
+  real(kind=dp) :: dx
 
   ! absolute difference between particle and grid point.
 
@@ -59,13 +60,14 @@ subroutine weight_tsc(xp, xg, dl, w)
   !   Weight
 
   implicit none
+  integer, parameter :: dp = kind(1.d0)
 
   ! define variables
 
-  real, intent(in) :: xp, xg, dl
-  real, intent(out) :: w
+  real(kind=dp), intent(in) :: xp, xg, dl
+  real(kind=dp), intent(out) :: w
 
-  real :: dx
+  real(kind=dp) :: dx
 
   ! absolute difference between particle and grid point.
 

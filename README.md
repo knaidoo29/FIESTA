@@ -80,10 +80,10 @@ You will then be able to load FIESTA in python using:
   * `boundary.buffer_periodic_particles_3d` : Periodic particles in 3D.
 
 * `grid` : Grid based functions.
-  * `grid.grid3d` : Generates a 3D grid.
   * `grid.grid2d` : Generates a 2D grid.
-  * `grid.part2grid3d` : Particle to grid assignment in 3D.
+  * `grid.grid3d` : Generates a 3D grid.
   * `grid.part2grid2d` : Particle to grid assignment in 2D.
+  * `grid.part2grid3d` : Particle to grid assignment in 3D.
 
 * `interp` : Interpolation functions.
   * `interp.bilinear` : Bilinear interpolation from a grid.

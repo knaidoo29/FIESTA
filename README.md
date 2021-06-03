@@ -10,14 +10,11 @@ Routines for Estimating a field from values based on known input points.
 
 ## Development
 
-FIESTA is in development. The plan is to implement the bulk of the code in python with Fortran subroutines for handling large datasets efficiently. At some point much of this will have to be ported to C/C++ for very large datasets and the efficient use of MPI.
+FIESTA is currently in development. The plan is to implement the bulk of the code in python with Fortran subroutines for quick computations on large datasets. At some point much of this will have to be ported to C/C++ for very large datasets and the efficient use of MPI.
 
 ### TO DO
 
-* kDTree for fast nearest neighbour search.
 * Dimensions:
-  * 2D
-  * 3D
   * Unit Sphere
   * Polar Coordinates
 * Assignment schemes:
@@ -32,13 +29,12 @@ FIESTA is in development. The plan is to implement the bulk of the code in pytho
   * Grid
   * Delaunay
 * Boundary management:
- * Periodic
- * Buffer particles
  * Buffer particles outside mask
 * Serial implementation for very large datasets
 
 ### Implemented in Python
 
+* kDTree for fast nearest neighbour search.
 * Dimensions:
   * 2D
   * 3D
@@ -47,6 +43,9 @@ FIESTA is in development. The plan is to implement the bulk of the code in pytho
 * Interpolation:
   * Bilinear
   * Trilinear
+* Boundary particles:
+  * Random buffer
+  * Periodic
 
 ## Python module
 
@@ -67,12 +66,18 @@ You will then be able to load FIESTA in python using:
 
 ### Depencies
 
-* Python 3
+* python3
 * numpy
 * scipy
 * f2py
 
 ### Functions
+
+* `boundary` : Boundary particles.
+  * `boundary.buffer_random_particles_2d` : Random buffer particles in 2D.
+  * `boundary.buffer_random_particles_3d` : Random buffer particles in 3D.
+  * `boundary.buffer_periodic_particles_2d` : Periodic particles in 2D.
+  * `boundary.buffer_periodic_particles_3d` : Periodic particles in 3D.
 
 * `grid` : Grid based functions.
   * `grid.grid3d` : Generates a 3D grid.
@@ -83,6 +88,15 @@ You will then be able to load FIESTA in python using:
 * `interp` : Interpolation functions.
   * `interp.bilinear` : Bilinear interpolation from a grid.
   * `interp.trilinear` : Trilinear interpolation from a grid.
+
+* `kdtree` : kDTree class built on `scipy`.
+  * `kdtree.KDTree2D` : Class implemented in 2D.
+  * `kdtree.KDTree3D` : Class implemented in 3D.
+
+* `randoms` : Random generation.
+  * `randoms.random_uniform` : Uniform randoms in 1D.
+  * `randoms.random_box` : Uniform randoms in 2D.
+  * `randoms.random_cube` : Uniform randoms in 3D.
 
 * `src` : Direct access to lower level Fortran source code.
   * `src.xgrid` : Computes grid point based on the grid index and grid size.

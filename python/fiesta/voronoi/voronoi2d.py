@@ -20,7 +20,7 @@ class Voronoi2D:
         self.ridge_points = None
 
 
-    def points(self, x, y):
+    def set_points(self, x, y):
         """Sets the points for voronoi cells.
 
         Parameters
@@ -50,7 +50,7 @@ class Voronoi2D:
         self.ridge_points = self.voronoi.ridge_points
 
 
-    def area(self, badval=np.nan):
+    def get_area(self, badval=np.nan):
         """Calculates the area of the voronoi cells.
 
         Parameters

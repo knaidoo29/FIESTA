@@ -20,7 +20,7 @@ class Voronoi3D:
         self.ridge_points = None
 
 
-    def points(self, x, y, z):
+    def set_points(self, x, y, z):
         """Sets the points for voronoi cells.
 
         Parameters
@@ -52,7 +52,7 @@ class Voronoi3D:
         self.ridge_points = self.voronoi.ridge_points
 
 
-    def volume(self, badval=np.nan):
+    def get_volume(self, badval=np.nan):
         """Calculates the volume of the voronoi cells.
 
         Parameters

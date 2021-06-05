@@ -20,3 +20,11 @@ from .bilinear import bilinear_nonperiodic
 
 from .trilinear import trilinear_periodic
 from .trilinear import trilinear_nonperiodic
+
+from .polygon import triangle_area
+from .polygon import sum_triangle_area
+
+from .polyhedron import tetrahedron_volume
+
+from .voronoi2d import voronoi_2d_area
+from .voronoi3d import voronoi_3d_volume

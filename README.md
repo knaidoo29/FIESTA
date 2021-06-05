@@ -46,6 +46,9 @@ FIESTA is currently in development. The plan is to implement the bulk of the cod
 * Boundary particles:
   * Random buffer
   * Periodic
+* Voronoi tesselation:
+  * area calculation in 2D.
+  * volume calculation in 3D.
 
 ## Python module
 
@@ -78,6 +81,10 @@ You will then be able to load FIESTA in python using:
   * `boundary.buffer_random_particles_3d` : Random buffer particles in 3D.
   * `boundary.buffer_periodic_particles_2d` : Periodic particles in 2D.
   * `boundary.buffer_periodic_particles_3d` : Periodic particles in 3D.
+
+* `coords` : Utility coordinate functions.
+  * `coords.xy2points` : Column stacks 2D coordinates.
+  * `coords.xyz2points` : Column stacks 3D coordinates.
 
 * `grid` : Grid based functions.
   * `grid.grid2d` : Generates a 2D grid.
@@ -116,3 +123,15 @@ You will then be able to load FIESTA in python using:
   * `src.bilinear_nonperiodic` : Bilinear interpolation from a grid with non-periodic boundaries.
   * `src.trilinear_periodic` : Trilinear interpolation from a grid with periodic boundaries.
   * `src.trilinear_nonperiodic` : Trilinear interpolation from a grid with non-periodic boundaries.
+  * `src.triangle_area` : Calculates the area of a triangle from its vertices.
+  * `src.sum_triangle_area` : Calculates the area of the sum of several triangles.
+  * `src.tetrahedron_volume` : Calculates the volume of a tetrahedron from its vertices.
+  * `src.voronoi_2d_area` : Calculates the area of voronoi cells.
+  * `src.voronoi_3d_area` : Calculates the volume of voronoi cells
+
+* `utils` : Utility functions.
+  * `utils.flat_list` : Flattens a given list.
+
+* `voronoi` : Voronoi construction and utility functions.
+  * `voronoi.Voronoi2D` : 2D voronoi construction.
+  * `voronoi.Voronoi3D` : 3D voronoi construction.

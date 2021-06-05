@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial import KDTree as scKDTree
 
+from .. import coords
 
 class KDTree2D:
 
@@ -9,28 +10,6 @@ class KDTree2D:
         """Initialises the 2D KDTree class"""
         self.points = None
         self.KD = None
-
-
-    def _xy2points(self, x, y):
-        """Column stacks input coordinates.
-
-        Parameters
-        ----------
-        x : array
-            X coordinates.
-        y : array
-            Y coordinates.
-
-        Return
-        ------
-        points : 2darray
-            Column stacked array.
-        """
-        if np.isscalar(x) == True:
-            points = np.array([[x, y]])
-        else:
-            points = np.column_stack((x, y))
-        return points
 
 
     def build_tree(self, x, y):
@@ -43,7 +22,7 @@ class KDTree2D:
         y : array
             Y coordinates.
         """
-        self.points = self._xy2points(x, y)
+        self.points = coords.xy2points(x, y)
         self.KD = scKDTree(self.points)
 
 
@@ -66,7 +45,7 @@ class KDTree2D:
         ndist : float, optional
             Distance to nearest point.
         """
-        points = self._xy2points(x, y)
+        points = coords.xy2points(x, y)
         ndist, nind = self.KD.query(points)
         if return_dist == False:
             return nind

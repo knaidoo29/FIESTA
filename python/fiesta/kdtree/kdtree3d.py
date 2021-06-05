@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.spatial import KDTree as scKDTree
 
+from .. import coords
+
 
 class KDTree3D:
 
@@ -9,30 +11,6 @@ class KDTree3D:
         """Initialises the 3D KDTree class"""
         self.points = None
         self.KD = None
-
-
-    def _xyz2points(self, x, y, z):
-        """Column stacks input coordinates.
-
-        Parameters
-        ----------
-        x : array
-            X coordinates.
-        y : array
-            Y coordinates.
-        z : array
-            Z coordinates.
-
-        Return
-        ------
-        points : 2darray
-            Column stacked array.
-        """
-        if np.isscalar(x) == True:
-            points = np.array([[x, y, z]])
-        else:
-            points = np.column_stack((x, y, z))
-        return points
 
 
     def build_tree(self, x, y, z):
@@ -47,7 +25,7 @@ class KDTree3D:
         z : array
             Z coordinates.
         """
-        self.points = self._xyz2points(x, y, z)
+        self.points = coords.xyz2points(x, y, z)
         self.KD = scKDTree(self.points)
 
 
@@ -72,7 +50,7 @@ class KDTree3D:
         ndist : float, optional
             Distance to nearest point.
         """
-        points = self._xyz2points(x, y, z)
+        points = coords.xyz2points(x, y, z)
         ndist, nind = self.KD.query(points)
         if return_dist == False:
             return nind

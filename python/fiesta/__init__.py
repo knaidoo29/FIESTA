@@ -1,6 +1,7 @@
 
 from . import boundary
 from . import coords
+from . import dtfe
 from . import grid
 from . import interp
 from . import kdtree

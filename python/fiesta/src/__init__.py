@@ -28,3 +28,9 @@ from .polyhedron import tetrahedron_volume
 
 from .voronoi2d import voronoi_2d_area
 from .voronoi3d import voronoi_3d_volume
+
+from .matrix import inv2by2
+from .matrix import inv3by3
+
+from .delaunay2d import get_delf0_2d
+from .delaunay2d import delaunay_estimate_2d

@@ -1,25 +1,24 @@
 import numpy as np
-from scipy.spatial import Voronoi as scVoronoi
+from scipy.spatial import Delaunay as scDelaunay
 
 from .. import boundary
 from .. import coords
 from .. import src
-from .. import utils
 
 
-class Voronoi2D:
+class Delaunay2D:
 
 
     def __init__(self):
-        """Initialises Voronoi2D class"""
+        """Initialises Delaunay2D class"""
         self.points = None
         self.npart = None
-        self.voronoi = None
-        self.vertices = None
-        self.cell = None
-        self.regions = None
-        self.ridge_vertices = None
-        self.ridge_points = None
+        self.delaunay = None
+        self.delaunay_simplices = None
+        self.x0 = None
+        self.y0 = None
+        self.f0 = None
+        self.delf0 = None
         self.extent = None
         self.boxsize = None
         self.buffer_length = None
@@ -28,6 +27,8 @@ class Voronoi2D:
         self.ispart = None
         self.useperiodic = False
         self.nperiodic = None
+        self.userboundary = False
+        self.nuserboundary = None
 
 
     def _extent(self):
@@ -41,7 +42,7 @@ class Voronoi2D:
             self.extent = [xmin, xmax, ymin, ymax]
 
 
-    def set_points(self, x, y):
+    def set_points(self, x, y, ispart=None):
         """Sets the points for voronoi cells.
 
         Parameters
@@ -50,9 +51,17 @@ class Voronoi2D:
             X-coordinates.
         y : array
             Y-coordinates.
+        ispart : array
+            Binary mask to indicate if input points already include boundary particles.
         """
         self.points = coords.xy2points(x, y)
-        self.npart = len(self.points)
+        if ispart is None:
+            self.npart = len(self.points)
+        else:
+            self.npart = int(np.sum(ispart))
+            self.ispart = ispart
+            self.userboundary = True
+            self.nuserboundary = len(self.points) - self.npart
 
 
     def set_buffer(self, boxsize, buffer_length):
@@ -65,6 +74,8 @@ class Voronoi2D:
         buffer_length : float
             Length of the buffer region.
         """
+        # check userboundary particles have not been predefined.
+        assert self.userboundary == False, "User defined boundary particles already defined."
         # check boxsize is consistent with particles.
         self._extent()
         assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
@@ -94,6 +105,8 @@ class Voronoi2D:
         buffer_length : float
             Length of the buffer region.
         """
+        # check userboundary particles have not been predefined.
+        assert self.userboundary == False, "User defined boundary particles already defined."
         # check boxsize is consistent with particles.
         self._extent()
         assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
@@ -114,61 +127,66 @@ class Voronoi2D:
 
 
     def construct(self):
-        """Constructs the voronoi tesselation from the input points"""
-        self.voronoi = scVoronoi(self.points)
-        # voronoi vertices
-        self.vertices = self.voronoi.vertices
-        # voronoi cells which coorespond to the index of the input points
-        self.cell = self.voronoi.point_region
-        # voronoi regions/cells
-        self.regions = self.voronoi.regions
-        # voronoi ridge vertices
-        self.ridge_vertices = self.voronoi.ridge_vertices
-        # voronoi ridge points, i.e. points connecting each face
-        self.ridge_points = self.voronoi.ridge_points
+        """Constructs Delaunay tesselation"""
+        self.delaunay = scDelaunay(self.points)
+        self.delaunay_simplices = self.delaunay.simplices
 
 
-    def get_area(self, badval=np.nan):
-        """Calculates the area of the voronoi cells.
+    def find_simplex(self, x, y):
+        """Find the simplex the coordinates lie within."""
+        points = coords.xy2points(x, y)
+        simplices = self.delaunay.find_simplex(points)
+        return simplices
+
+
+    def set_field(self, f, bufferval=0.):
+        """Sets the field values of the input points.
 
         Parameters
         ----------
-        badval : float, optional
-            Bad values for the area are set to these values.
+        f : array
+            Field values.
+        bufferval : float, optional
+            Field values to assign boundary particles.
+        """
+        lenf = len(f)
+        if self.userboundary == True:
+            assert lenf == self.npart+self.nuserboundary, "f must be equal to input points."
+        else:
+            assert lenf == self.npart, "f must be equal to input points."
+        x, y = self.points[:, 0], self.points[:, 1]
+        if self.usebuffer == True:
+            f = np.concatenate([f, bufferval*np.ones(self.nbuffer)])
+        elif self.useperiodic == True:
+            f = np.concatenate([f, bufferval*np.ones(self.nperiodic)])
+        del_vert0 = self.delaunay_simplices[:, 0]
+        del_vert1 = self.delaunay_simplices[:, 1]
+        del_vert2 = self.delaunay_simplices[:, 2]
+        self.x0 = x[del_vert0]
+        self.y0 = y[del_vert0]
+        self.f0 = f[del_vert0]
+        self.delf0 = src.get_delf0_2d(x, y, f, del_vert0, del_vert1, del_vert2, len(x), len(del_vert0))
+
+
+    def estimate(self, x, y):
+        """Estimates a field from the Delaunay tesselation.
+
+        Parameters
+        ----------
+        x : array
+            X-coordinate for the field estimation.
+        y : array
+            Y-coordinate for the field estimation.
 
         Returns
         -------
-        area : array
-            Area for each voronoi cell.
+        f_est : array
+            Estimates of the field
         """
-        # find ridge information
-        ridge_length = np.array([len(self.ridge_vertices[i]) for i in range(0, len(self.ridge_vertices))])
-        ridge_vertices = np.array(utils.flatten_list(self.ridge_vertices))
-        ridge_end = np.cumsum(ridge_length) - 1
-        ridge_start = ridge_end - ridge_length + 1
-
-        # split points and vertices to x and y components
-        xpoints = self.points[:, 0]
-        ypoints = self.points[:, 1]
-        xverts = self.vertices[:, 0]
-        yverts = self.vertices[:, 1]
-
-        # split ridge points, essentially the points that are connected by a ridge
-        ridge_point1 = self.ridge_points[:, 0]
-        ridge_point2 = self.ridge_points[:, 1]
-
-        # calculate area
-        area = src.voronoi_2d_area(xpoints, ypoints, xverts, yverts, ridge_point1, ridge_point2,
-                                   ridge_vertices, ridge_start, ridge_end, len(xpoints),
-                                   len(ridge_point1), len(xverts), len(ridge_vertices))
-
-        # remove and change bad values.
-        cond = np.where((area == -1.) | (area == 0.))[0]
-        area[cond] = badval
-        self.area = area
-        return area
+        simplices = self.find_simplex(x, y)
+        f_est = src.delaunay_estimate_2d(simplices, x, y, self.x0, self.y0, self.f0, self.delf0, len(x), len(self.x0))
+        return f_est
 
 
     def clean(self):
-        """Reinitialises the class"""
         self.__init__()

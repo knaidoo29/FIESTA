@@ -18,8 +18,10 @@ ext7 = Extension(name='fiesta.src.polygon', sources=['fiesta/src/polygon.f90'])
 ext8 = Extension(name='fiesta.src.voronoi2d', sources=['fiesta/src/voronoi2d.f90'])
 ext9 = Extension(name='fiesta.src.polyhedron', sources=['fiesta/src/polyhedron.f90'])
 ext10 = Extension(name='fiesta.src.voronoi3d', sources=['fiesta/src/voronoi3d.f90'])
+ext11 = Extension(name='fiesta.src.matrix', sources=['fiesta/src/matrix.f90'])
+ext12 = Extension(name='fiesta.src.delaunay2d', sources=['fiesta/src/delaunay2d.f90'])
 
-exts = [ext1, ext2, ext3, ext4, ext5, ext6, ext7, ext8, ext9, ext10]
+exts = [ext1, ext2, ext3, ext4, ext5, ext6, ext7, ext8, ext9, ext10, ext11, ext12]
 
 setup(name = 'fiesta',
       version = '0.0.0',

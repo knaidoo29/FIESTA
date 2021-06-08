@@ -1,9 +1,11 @@
 # FIESTA : FIeld ESTimAtor
 
-Author:         Krishna Naidoo                    
-Version:        0.0.0                               
-Homepage:       https://github.com/knaidoo29/FIESTA     
-Documentation:  tba                                  
+| | |      
+|---------|----------------|
+| Author  | Krishna Naidoo |   
+| Version | 0.0.0          |
+| Homepage | https://github.com/knaidoo29/FIESTA |
+| Documentation | TBA |                           
 
 
 Routines for Estimating a field from values based on known input points.
@@ -14,8 +16,6 @@ FIESTA is currently in development. The plan is to implement the bulk of the cod
 
 ### TO DO
 
-* DTFE:
-  * 3D
 * Dimensions:
   * Unit Sphere
   * Polar Coordinates
@@ -40,7 +40,7 @@ FIESTA is currently in development. The plan is to implement the bulk of the cod
   * area calculation in 2D.
   * volume calculation in 3D.
 * Delaunay Estimation Field Estimator:
-  * 2D
+  * 2D, 3D
 
 ## Python module
 

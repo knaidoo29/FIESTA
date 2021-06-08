@@ -34,3 +34,6 @@ from .matrix import inv3by3
 
 from .delaunay2d import get_delf0_2d
 from .delaunay2d import delaunay_estimate_2d
+
+from .delaunay3d import get_delf0_3d
+from .delaunay3d import delaunay_estimate_3d

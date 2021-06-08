@@ -14,22 +14,12 @@ FIESTA is currently in development. The plan is to implement the bulk of the cod
 
 ### TO DO
 
+* DTFE:
+  * 3D
 * Dimensions:
   * Unit Sphere
   * Polar Coordinates
-* Assignment schemes:
-  * Nearest neighbour
-* Interpolation:
-  * Delaunay Tesselation
-* Density estimates:
-  * Grid
-  * Voronoi
-* Field estimator general
-  * Nearest neighbour
-  * Grid
-  * Delaunay
-* Boundary management:
- * Buffer particles outside mask
+* Buffer particles outside mask
 * Serial implementation for very large datasets
 
 ### Implemented in Python
@@ -49,6 +39,8 @@ FIESTA is currently in development. The plan is to implement the bulk of the cod
 * Voronoi tesselation:
   * area calculation in 2D.
   * volume calculation in 3D.
+* Delaunay Estimation Field Estimator:
+  * 2D
 
 ## Python module
 
@@ -73,6 +65,7 @@ You will then be able to load FIESTA in python using:
 * numpy
 * scipy
 * f2py
+* [SHIFT](https://github.com/knaidoo29/SHIFT)
 
 ### Functions
 
@@ -86,11 +79,17 @@ You will then be able to load FIESTA in python using:
   * `coords.xy2points` : Column stacks 2D coordinates.
   * `coords.xyz2points` : Column stacks 3D coordinates.
 
+* `dtfe` : Delaunay Tesselation Field Estimator.
+  * `Delaunay2D` : DTFE in 2D.
+  * `Delaunay3D` : DTFE in 3D.
+
 * `grid` : Grid based functions.
   * `grid.grid2d` : Generates a 2D grid.
   * `grid.grid3d` : Generates a 3D grid.
   * `grid.part2grid2d` : Particle to grid assignment in 2D.
   * `grid.part2grid3d` : Particle to grid assignment in 3D.
+  * `grid.deconvolve_part2grid_2D` : Deconvolves grid assignment in Fourier space in 2D.
+  * `grid.deconvolve_part2grid_3D` : Deconvolves grid assignment in Fourier space in 3D.
 
 * `interp` : Interpolation functions.
   * `interp.bilinear` : Bilinear interpolation from a grid.
@@ -128,9 +127,15 @@ You will then be able to load FIESTA in python using:
   * `src.tetrahedron_volume` : Calculates the volume of a tetrahedron from its vertices.
   * `src.voronoi_2d_area` : Calculates the area of voronoi cells.
   * `src.voronoi_3d_area` : Calculates the volume of voronoi cells
+  * `src.get_delf0_2d` : Determines delta f0 in 2D.
+  * `src.delaunay_estimate_2d` : Delaunay estimate in 2D.
 
 * `utils` : Utility functions.
+  * `utils.complex_mult` : Multiplication of a complex array.
+  * `utils.complex_div` : Division of a complex array.
   * `utils.flat_list` : Flattens a given list.
+  * `utils.get_vector_magnitude_2D` : Returns 2D array magnitude.
+  * `utils.get_vector_magnitude_3D` : Returns 3D array magnitude.
 
 * `voronoi` : Voronoi construction and utility functions.
   * `voronoi.Voronoi2D` : 2D voronoi construction.

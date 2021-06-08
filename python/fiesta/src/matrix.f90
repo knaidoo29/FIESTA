@@ -86,13 +86,13 @@ subroutine inv3by3(m, invm)
   detM = a*aa + b*bb + c*cc
 
   invm(1) = aa / detm
-  invm(2) = bb / detm
-  invm(3) = cc / detm
-  invm(4) = dd / detm
+  invm(2) = dd / detm
+  invm(3) = gg / detm
+  invm(4) = bb / detm
   invm(5) = ee / detm
-  invm(6) = ff / detm
-  invm(7) = gg / detm
-  invm(8) = hh / detm
+  invm(6) = hh / detm
+  invm(7) = cc / detm
+  invm(8) = ff / detm
   invm(9) = ii / detm
 
 end subroutine inv3by3

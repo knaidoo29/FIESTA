@@ -85,7 +85,7 @@ subroutine get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3, 
 
     delf0(3*i-2) = invm(1)*df1 + invm(2)*df2 + invm(3)*df3
     delf0(3*i-1) = invm(4)*df1 + invm(5)*df2 + invm(6)*df3
-    delf0(3*i) = invm(7)*df1 + invm(8)*df2 + invm(9)*df3
+    delf0(3*i)   = invm(7)*df1 + invm(8)*df2 + invm(9)*df3
 
   end do
 

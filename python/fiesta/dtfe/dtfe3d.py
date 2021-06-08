@@ -98,7 +98,7 @@ class Delaunay3D:
         # concatenate points and buffer
         x_pnb = np.concatenate([self.points[:, 0], x_buffer])
         y_pnb = np.concatenate([self.points[:, 1], y_buffer])
-        z_pnb = np.concatenate([self.points[:, 2], y_buffer])
+        z_pnb = np.concatenate([self.points[:, 2], z_buffer])
         self.points = coords.xyz2points(x_pnb, y_pnb, z_pnb)
 
 
@@ -199,7 +199,7 @@ class Delaunay3D:
         simplices = self.find_simplex(x, y, z)
         f_est = src.delaunay_estimate_3d(simplices, x, y, z, self.x0, self.y0, self.z0, self.f0, self.delf0, len(x), len(self.x0))
         return f_est
-
+    
 
     def clean(self):
         self.__init__()

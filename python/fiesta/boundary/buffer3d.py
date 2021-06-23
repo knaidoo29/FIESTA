@@ -152,3 +152,122 @@ def buffer_periodic_particles_3d(x, y, z, boxsize, buffer_length):
         else:
             pass
     return xp, yp, zp
+
+
+def buffer_random_particles_3d_slice(npart, boxsize, thickness, buffer_length):
+    """Generates random buffer particles around a 3D slice.
+
+    Parameters
+    ----------
+    npart : int
+        Number of particles in the 3D box.
+    boxsize : float
+        Box size.
+    thickness : float
+        Thickness of the slice.
+    buffer_length : float
+        Length of the buffer region.
+
+    Returns
+    -------
+    x : array
+        Random x-values.
+    y : array
+        Random y-values.
+    z : array
+        Random z-values.
+    """
+    slice_vol = thickness*(boxsize**2.)
+    part_dens = npart / slice_vol
+    bufferslice_vol = thickness*((boxsize + 2.*buffer_length)**2.)
+    buffer_vol = bufferslice_vol - slice_vol
+
+    sub_vol = buffer_vol / 4.
+    sub_npart = int(part_dens * sub_vol)
+
+    zmin, zmax = 0., thickness
+
+    # box edge 1
+    xmin = 0. - buffer_length
+    xmax = boxsize
+    ymin = 0. - buffer_length
+    ymax = 0.
+    x1, y1, z1 = randoms.random_cube(sub_npart, xmin, xmax, ymin, ymax, zmin, zmax)
+
+    # box edge 2
+    xmin = boxsize
+    xmax = boxsize + buffer_length
+    ymin = 0. - buffer_length
+    ymax = boxsize
+    x2, y2, z2 = randoms.random_cube(sub_npart, xmin, xmax, ymin, ymax, zmin, zmax)
+
+    # box edge 3
+    xmin = 0.
+    xmax = boxsize + buffer_length
+    ymin = boxsize
+    ymax = boxsize + buffer_length
+    x3, y3, z3 = randoms.random_cube(sub_npart, xmin, xmax, ymin, ymax, zmin, zmax)
+
+    # box edge 4
+    xmin = 0. - buffer_length
+    xmax = 0.
+    ymin = 0.
+    ymax = boxsize + buffer_length
+    x4, y4, z4 = randoms.random_cube(sub_npart, xmin, xmax, ymin, ymax, zmin, zmax)
+
+    x = np.concatenate([x1, x2, x3, x4])
+    y = np.concatenate([y1, y2, y3, y4])
+    z = np.concatenate([z1, z2, z3, z4])
+
+    return x, y, z
+
+
+def buffer_periodic_particles_3d_slice(x, y, z, boxsize, buffer_length):
+    """Generates periodic buffer particles around a 3D box slice.
+
+    Parameters
+    ----------
+    x : array
+        X-coordinates.
+    y : array
+        Y-coordinates.
+    z : array
+        Z-coordinates.
+    boxsize : float
+        Box size.
+    buffer_length : float
+        Length of the buffer region.
+
+    Returns
+    -------
+    xp : array
+        Periodic x-values.
+    yp : array
+        Periodic y-values.
+    zp : array
+        Periodic z-values.
+    """
+    assert buffer_length < boxsize, "buffer_length must be smaller than the boxsize."
+    ix = np.array([-1, 0, 1])
+    ixs, iys = np.meshgrid(ix, ix)
+    ixs = ixs.flatten()
+    iys = iys.flatten()
+    for i in range(0, len(ixs)):
+        ix, iy = ixs[i], iys[i]
+        if ix != 0 or iy != 0:
+            xnew = np.copy(x) + ix*boxsize
+            ynew = np.copy(y) + iy*boxsize
+            znew = np.copy(z)
+            cond = np.where((xnew >= -buffer_length) & (xnew <= boxsize+buffer_length) &
+                            (ynew >= -buffer_length) & (ynew <= boxsize+buffer_length))[0]
+            if ix == -1 and iy == -1:
+                xp = xnew[cond]
+                yp = ynew[cond]
+                zp = znew[cond]
+            else:
+                xp = np.concatenate([xp, xnew[cond]])
+                yp = np.concatenate([yp, ynew[cond]])
+                zp = np.concatenate([zp, znew[cond]])
+        else:
+            pass
+    return xp, yp, zp

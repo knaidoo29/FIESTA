@@ -72,8 +72,10 @@ You will then be able to load FIESTA in python using:
 * `boundary` : Boundary particles.
   * `boundary.buffer_random_particles_2d` : Random buffer particles in 2D.
   * `boundary.buffer_random_particles_3d` : Random buffer particles in 3D.
+  * `boundary.buffer_random_particles_3d_slice` : Random buffer particles for a thick 3D slice.
   * `boundary.buffer_periodic_particles_2d` : Periodic particles in 2D.
   * `boundary.buffer_periodic_particles_3d` : Periodic particles in 3D.
+  * `boundary.buffer_periodic_particles_3d_slice` : Periodic particles for a thick 3D slice.
 
 * `coords` : Utility coordinate functions.
   * `coords.xy2points` : Column stacks 2D coordinates.
@@ -82,6 +84,7 @@ You will then be able to load FIESTA in python using:
 * `dtfe` : Delaunay Tesselation Field Estimator.
   * `Delaunay2D` : DTFE in 2D.
   * `Delaunay3D` : DTFE in 3D.
+  * `DelaunayThickSlice` : DTFE for 3D slice.
 
 * `grid` : Grid based functions.
   * `grid.grid2d` : Generates a 2D grid.
@@ -140,3 +143,4 @@ You will then be able to load FIESTA in python using:
 * `voronoi` : Voronoi construction and utility functions.
   * `voronoi.Voronoi2D` : 2D voronoi construction.
   * `voronoi.Voronoi3D` : 3D voronoi construction.
+  * `voronoi.VoronoiThickSlice` : 3D voronoi slice construction.

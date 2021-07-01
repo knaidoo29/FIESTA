@@ -167,6 +167,9 @@ class Voronoi2D:
         # remove and change bad values.
         cond = np.where((area == -1.) | (area == 0.))[0]
         area[cond] = badval
+        if self.ispart is None:
+            cond = np.where(self.ispart == 1.)[0]
+            area = area[cond]
         self.area = area
         return area
 

@@ -27,8 +27,6 @@ class Delaunay2D:
         self.ispart = None
         self.useperiodic = False
         self.nperiodic = None
-        self.userboundary = False
-        self.nuserboundary = None
 
 
     def _extent(self):
@@ -42,7 +40,7 @@ class Delaunay2D:
             self.extent = [xmin, xmax, ymin, ymax]
 
 
-    def set_points(self, x, y, ispart=None):
+    def set_points(self, x, y):
         """Sets the points for voronoi cells.
 
         Parameters
@@ -51,17 +49,9 @@ class Delaunay2D:
             X-coordinates.
         y : array
             Y-coordinates.
-        ispart : array
-            Binary mask to indicate if input points already include boundary particles.
         """
         self.points = coords.xy2points(x, y)
-        if ispart is None:
-            self.npart = len(self.points)
-        else:
-            self.npart = int(np.sum(ispart))
-            self.ispart = ispart
-            self.userboundary = True
-            self.nuserboundary = len(self.points) - self.npart
+        self.npart = len(self.points)
 
 
     def set_buffer(self, boxsize, buffer_length):
@@ -74,8 +64,6 @@ class Delaunay2D:
         buffer_length : float
             Length of the buffer region.
         """
-        # check userboundary particles have not been predefined.
-        assert self.userboundary == False, "User defined boundary particles already defined."
         # check boxsize is consistent with particles.
         self._extent()
         assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
@@ -105,8 +93,6 @@ class Delaunay2D:
         buffer_length : float
             Length of the buffer region.
         """
-        # check userboundary particles have not been predefined.
-        assert self.userboundary == False, "User defined boundary particles already defined."
         # check boxsize is consistent with particles.
         self._extent()
         assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
@@ -150,10 +136,7 @@ class Delaunay2D:
             Field values to assign boundary particles.
         """
         lenf = len(f)
-        if self.userboundary == True:
-            assert lenf == self.npart+self.nuserboundary, "f must be equal to input points."
-        else:
-            assert lenf == self.npart, "f must be equal to input points."
+        assert lenf == self.npart, "f must be equal to input points."
         x, y = self.points[:, 0], self.points[:, 1]
         if self.usebuffer == True:
             f = np.concatenate([f, bufferval*np.ones(self.nbuffer)])

@@ -82,9 +82,12 @@ You will then be able to load FIESTA in python using:
   * `coords.xyz2points` : Column stacks 3D coordinates.
 
 * `dtfe` : Delaunay Tesselation Field Estimator.
-  * `Delaunay2D` : DTFE in 2D.
-  * `Delaunay3D` : DTFE in 3D.
-  * `DelaunayThickSlice` : DTFE for 3D slice.
+  * `dtfe.Delaunay2D` : DTFE in 2D.
+  * `dtfe.Delaunay3D` : DTFE in 3D.
+  * `dtfe.DelaunayThickSlice` : DTFE for 3D slice.
+  * `dtfe.SeriesDelaunay2D` : Series implementation of the 2D DTFE for large data.
+  * `dtfe.SeriesDelaunay3D` : Series implementation of the 3D DTFE for large data.
+  * `dtfe.SeriesDelaunayThickSlice` : Series implementation of the 3D DTFE construction for large data.
 
 * `grid` : Grid based functions.
   * `grid.grid2d` : Generates a 2D grid.
@@ -144,3 +147,6 @@ You will then be able to load FIESTA in python using:
   * `voronoi.Voronoi2D` : 2D voronoi construction.
   * `voronoi.Voronoi3D` : 3D voronoi construction.
   * `voronoi.VoronoiThickSlice` : 3D voronoi slice construction.
+  * `voronoi.SeriesVoronoi2D` : Series implementation of the 2D voronoi construction for large data.
+  * `voronoi.SeriesVoronoi3D` : Series implementation of the 3D voronoi construction for large data.
+  * `voronoi.SeriesVoronoiThickSlice` : Series implementation of the 3D voronoi slice construction for large data.

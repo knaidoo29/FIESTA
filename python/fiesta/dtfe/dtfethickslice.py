@@ -10,7 +10,7 @@ class DelaunayThickSlice:
 
 
     def __init__(self):
-        """Initialises Delaunay3D class"""
+        """Initialises DelaunayThickSlice class"""
         self.points = None
         self.npart = None
         self.delaunay = None
@@ -29,8 +29,6 @@ class DelaunayThickSlice:
         self.ispart = None
         self.useperiodic = False
         self.nperiodic = None
-        self.userboundary = False
-        self.nuserboundary = None
 
 
     def _extent(self):
@@ -46,7 +44,7 @@ class DelaunayThickSlice:
             self.extent = [xmin, xmax, ymin, ymax, zmin, zmax]
 
 
-    def set_points(self, x, y, z, ispart=None):
+    def set_points(self, x, y, z):
         """Sets the points for voronoi cells.
 
         Parameters
@@ -57,17 +55,9 @@ class DelaunayThickSlice:
             Y-coordinates.
         z : array
             Z-coordinates.
-        ispart : array
-            Binary mask to indicate if input points already include boundary particles.
         """
         self.points = coords.xyz2points(x, y, z)
-        if ispart is None:
-            self.npart = len(self.points)
-        else:
-            self.npart = int(np.sum(ispart))
-            self.ispart = ispart
-            self.userboundary = True
-            self.nuserboundary = len(self.points) - self.npart
+        self.npart = len(self.points)
 
 
     def set_buffer(self, boxsize, thickness, buffer_length):
@@ -82,8 +72,6 @@ class DelaunayThickSlice:
         buffer_length : float
             Length of the buffer region.
         """
-        # check userboundary particles have not been predefined.
-        assert self.userboundary == False, "User defined boundary particles already defined."
         # check boxsize is consistent with particles.
         self._extent()
         assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
@@ -115,8 +103,6 @@ class DelaunayThickSlice:
         buffer_length : float
             Length of the buffer region.
         """
-        # check userboundary particles have not been predefined.
-        assert self.userboundary == False, "User defined boundary particles already defined."
         # check boxsize is consistent with particles.
         self._extent()
         assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
@@ -162,10 +148,7 @@ class DelaunayThickSlice:
             Field values to assign boundary particles.
         """
         lenf = len(f)
-        if self.userboundary == True:
-            assert lenf == self.npart+self.nuserboundary, "f must be equal to input points."
-        else:
-            assert lenf == self.npart, "f must be equal to input points."
+        assert lenf == self.npart, "f must be equal to input points."
         x, y, z = self.points[:, 0], self.points[:, 1], self.points[:, 2]
         if self.usebuffer == True:
             f = np.concatenate([f, bufferval*np.ones(self.nbuffer)])

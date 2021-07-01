@@ -1,25 +1,19 @@
 import numpy as np
-from scipy.spatial import Delaunay as scDelaunay
 
 from .. import boundary
 from .. import coords
-from .. import src
+
+from . import dtfe3d
 
 
-class Delaunay3D:
+class SeriesDelaunay3D:
 
 
     def __init__(self):
         """Initialises Delaunay3D class"""
         self.points = None
         self.npart = None
-        self.delaunay = None
-        self.delaunay_simplices = None
-        self.x0 = None
-        self.y0 = None
-        self.z0 = None
-        self.f0 = None
-        self.delf0 = None
+        self.f = None
         self.extent = None
         self.boxsize = None
         self.buffer_length = None
@@ -121,19 +115,6 @@ class Delaunay3D:
         self.points = coords.xyz2points(x_pnb, y_pnb, z_pnb)
 
 
-    def construct(self):
-        """Constructs Delaunay tesselation"""
-        self.delaunay = scDelaunay(self.points)
-        self.delaunay_simplices = self.delaunay.simplices
-
-
-    def find_simplex(self, x, y, z):
-        """Find the simplex the coordinates lie within."""
-        points = coords.xyz2points(x, y, z)
-        simplices = self.delaunay.find_simplex(points)
-        return simplices
-
-
     def set_field(self, f, bufferval=0.):
         """Sets the field values of the input points.
 
@@ -146,43 +127,76 @@ class Delaunay3D:
         """
         lenf = len(f)
         assert lenf == self.npart, "f must be equal to input points."
-        x, y, z = self.points[:, 0], self.points[:, 1], self.points[:, 2]
         if self.usebuffer == True:
             f = np.concatenate([f, bufferval*np.ones(self.nbuffer)])
         elif self.useperiodic == True:
             f = np.concatenate([f, bufferval*np.ones(self.nperiodic)])
-        del_vert0 = self.delaunay_simplices[:, 0]
-        del_vert1 = self.delaunay_simplices[:, 1]
-        del_vert2 = self.delaunay_simplices[:, 2]
-        del_vert3 = self.delaunay_simplices[:, 3]
-        self.x0 = x[del_vert0]
-        self.y0 = y[del_vert0]
-        self.z0 = z[del_vert0]
-        self.f0 = f[del_vert0]
-        self.delf0 = src.get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3, len(x), len(del_vert0))
+        self.f = f
 
 
-    def estimate(self, x, y, z):
+    def estimate(self, x_est, y_est, z_est, split=2):
         """Estimates a field from the Delaunay tesselation.
 
         Parameters
         ----------
-        x : array
+        x_est : array
             X-coordinate for the field estimation.
-        y : array
+        y_est : array
             Y-coordinate for the field estimation.
-        z : array
+        z_est : array
             Z-coordinate for the field estimation.
+        split : int
+            Number of divisions to perform the DTFE.
 
         Returns
         -------
         f_est : array
             Estimates of the field
         """
-        simplices = self.find_simplex(x, y, z)
-        f_est = src.delaunay_estimate_3d(simplices, x, y, z, self.x0, self.y0, self.z0, self.f0, self.delf0, len(x), len(self.x0))
+        x_data = self.points[:, 0]
+        y_data = self.points[:, 1]
+        z_data = self.points[:, 2]
+        split_edges = np.linspace(0., self.boxsize, split+1)
+        split_centers = 0.5*(split_edges[:-1] + split_edges[1:])
+        dsplit = split_edges[1] - split_edges[0]
+        x_split = split_centers
+        y_split = split_centers
+        z_split = split_centers
+        dx_est = 0.5*dsplit
+        if self.buffer_length is None:
+            dx_data = dx_est
+        else:
+            dx_data = dx_est + self.buffer_length
+        f_est = np.zeros(len(x_est))
+        D3D = dtfe3d.Delaunay3D()
+        for i in range(0, len(x_split)):
+            xcond_data = np.where((x_data >= x_split[i]-dx_data) & (x_data < x_split[i]+dx_data))[0]
+            for j in range(0, len(y_split)):
+                ycond_data = np.where((y_data[xcond_data] >= y_split[j]-dx_data) & (y_data[xcond_data] < y_split[j]+dx_data))[0]
+                for k in range(0, len(z_split)):
+                    zcond_data = np.where((z_data[xcond_data[ycond_data]] >= z_split[k]-dx_data) &
+                                          (z_data[xcond_data[ycond_data]] < z_split[k]+dx_data))[0]
+                    cond_data = xcond_data[ycond_data[zcond_data]]
+                    x_d_lim = x_data[cond_data]
+                    y_d_lim = y_data[cond_data]
+                    z_d_lim = z_data[cond_data]
+                    f_d_lim = self.f[cond_data]
+                    cond_est = np.where((x_est >= x_split[i]-dx_est) & (x_est < x_split[i]+dx_est) &
+                                        (y_est >= y_split[i]-dx_est) & (y_est < y_split[i]+dx_est) &
+                                        (z_est >= z_split[i]-dx_est) & (z_est < z_split[i]+dx_est))[0]
+                    if len(cond_est) > 0:
+                        x_e_lim = x_est[cond_est]
+                        y_e_lim = y_est[cond_est]
+                        z_e_lim = z_est[cond_est]
+                        D3D.set_points(x_d_lim, y_d_lim, z_d_lim)
+                        D3D.construct()
+                        D3D.set_field(f_d_lim)
+                        f_e_lim = D3D.estimate(x_e_lim, y_e_lim, z_e_lim)
+                        f_est[cond_est] = f_e_lim
+                        D3D.clean()
         return f_est
 
 
     def clean(self):
+        """Reinitialises the class"""
         self.__init__()

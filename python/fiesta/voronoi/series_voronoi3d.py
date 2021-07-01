@@ -1,27 +1,20 @@
 import numpy as np
-from scipy.spatial import Voronoi as scVoronoi
 
 from .. import boundary
 from .. import coords
-from .. import src
-from .. import utils
+
+from . import voronoi3d
 
 
-class VoronoiThickSlice:
+class SeriesVoronoi3D:
 
 
     def __init__(self):
-        """Initialises VoronoiThickSlice class"""
+        """Initialises Voronoi3D class"""
         self.points = None
-        self.voronoi = None
-        self.vertices = None
-        self.cell = None
-        self.regions = None
-        self.ridge_vertices = None
-        self.ridge_points = None
+        self.npart = None
         self.extent = None
         self.boxsize = None
-        self.thickness = None
         self.buffer_length = None
         self.usebuffer = None
         self.nbuffer = None
@@ -38,8 +31,9 @@ class VoronoiThickSlice:
             xmax = np.max(self.points[:, 0])
             ymin = np.min(self.points[:, 1])
             ymax = np.max(self.points[:, 1])
-            self.extent = [xmin, xmax, ymin, ymax]
-
+            zmin = np.min(self.points[:, 1])
+            zmax = np.max(self.points[:, 1])
+            self.extent = [xmin, xmax, ymin, ymax, zmin, zmax]
 
     def set_points(self, x, y, z):
         """Sets the points for voronoi cells.
@@ -57,15 +51,13 @@ class VoronoiThickSlice:
         self.npart = len(self.points)
 
 
-    def set_buffer(self, boxsize, thickness, buffer_length):
+    def set_buffer(self, boxsize, buffer_length):
         """Defines buffer particles to be placed around a given box.
 
         Parameters
         ----------
         boxsize : float
             Size of the box, assumed particles lie in the range [0., boxsize]
-        thickness : float
-            Thickness of the slice.
         buffer_length : float
             Length of the buffer region.
         """
@@ -73,12 +65,12 @@ class VoronoiThickSlice:
         self._extent()
         assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
         assert self.extent[2] >= 0. and self.extent[3] <= boxsize, "Y coordinates exceed the range of the box, check or redefine boxsize."
+        assert self.extent[4] >= 0. and self.extent[5] <= boxsize, "Z coordinates exceed the range of the box, check or redefine boxsize."
         self.boxsize = boxsize
         self.buffer_length = buffer_length
-        self.thickness = thickness
         self.usebuffer = True
         self.useperiodic = False
-        x_buffer, y_buffer, z_buffer = boundary.buffer_random_particles_3d_slice(self.npart, self.boxsize, self.thickness, self.buffer_length)
+        x_buffer, y_buffer, z_buffer = boundary.buffer_random_particles_3d(self.npart, self.boxsize, self.buffer_length)
         self.nbuffer = len(x_buffer)
         # redefine points to include buffer points and also define mask
         self.ispart = np.ones(self.npart + self.nbuffer)
@@ -104,9 +96,10 @@ class VoronoiThickSlice:
         self._extent()
         assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
         assert self.extent[2] >= 0. and self.extent[3] <= boxsize, "Y coordinates exceed the range of the box, check or redefine boxsize."
+        assert self.extent[4] >= 0. and self.extent[5] <= boxsize, "Z coordinates exceed the range of the box, check or redefine boxsize."
         self.boxsize = boxsize
         self.buffer_length = buffer_length
-        x_periodic, y_periodic, z_periodic = boundary.buffer_periodic_particles_3d_slice(self.points[:, 0], self.points[:, 1], self.points[:, 2], self.boxsize, self.buffer_length)
+        x_periodic, y_periodic, z_periodic = boundary.buffer_periodic_particles_3d(self.points[:, 0], self.points[:, 1], self.points[:, 2], self.boxsize, self.buffer_length)
         self.nperiodic = len(x_periodic)
         self.usebuffer = False
         self.useperiodic = True
@@ -120,26 +113,13 @@ class VoronoiThickSlice:
         self.points = coords.xyz2points(x_pnb, y_pnb, z_pnb)
 
 
-    def construct(self):
-        """Constructs the voronoi tesselation from the input points"""
-        self.voronoi = scVoronoi(self.points)
-        # voronoi vertices
-        self.vertices = self.voronoi.vertices
-        # voronoi cells which coorespond to the index of the input points
-        self.cell = self.voronoi.point_region
-        # voronoi regions/cells
-        self.regions = self.voronoi.regions
-        # voronoi ridge vertices
-        self.ridge_vertices = self.voronoi.ridge_vertices
-        # voronoi ridge points, i.e. points connecting each face
-        self.ridge_points = self.voronoi.ridge_points
-
-
-    def get_volume(self, badval=np.nan):
+    def get_volume(self, split=2, badval=np.nan):
         """Calculates the volume of the voronoi cells.
 
         Parameters
         ----------
+        split : int, optional
+            Split calculation along one axis, default = 1, meaning no splitting.
         badval : float, optional
             Bad values for the volume are set to these values.
 
@@ -148,33 +128,41 @@ class VoronoiThickSlice:
         volume : array
             Volume for each voronoi cell.
         """
-        # find ridge information
-        ridge_length = np.array([len(self.ridge_vertices[i]) for i in range(0, len(self.ridge_vertices))])
-        ridge_vertices = np.array(utils.flatten_list(self.ridge_vertices))
-        ridge_end = np.cumsum(ridge_length) - 1
-        ridge_start = ridge_end - ridge_length + 1
-
-        # split points and vertices to x, y and z components
-        xpoints = self.points[:, 0]
-        ypoints = self.points[:, 1]
-        zpoints = self.points[:, 2]
-        xverts = self.vertices[:, 0]
-        yverts = self.vertices[:, 1]
-        zverts = self.vertices[:, 2]
-
-        # split ridge points, essentially the points that are connected by a ridge
-        ridge_point1 = self.ridge_points[:, 0]
-        ridge_point2 = self.ridge_points[:, 1]
-
-        # calculate volume
-        volume = src.voronoi_3d_volume(xpoints, ypoints, zpoints, xverts, yverts, zverts,
-                                       ridge_point1, ridge_point2, ridge_vertices,
-                                       ridge_start, ridge_end, len(xpoints),
-                                       len(ridge_point1), len(xverts), len(ridge_vertices))
-
-        # remove and change bad values.
-        cond = np.where((volume == -1.) | (volume == 0.))[0]
-        volume[cond] = badval
+        x_data = self.points[:, 0]
+        y_data = self.points[:, 1]
+        z_data = self.points[:, 2]
+        split_edges = np.linspace(0., self.boxsize, split+1)
+        split_centers = 0.5*(split_edges[:-1] + split_edges[1:])
+        dsplit = split_edges[1] - split_edges[0]
+        x_split = split_centers
+        y_split = split_centers
+        z_split = split_centers
+        dx_est = 0.5*dsplit
+        if self.buffer_length is None:
+            dx_data = dx_est
+        else:
+            dx_data = dx_est + self.buffer_length
+        volume = np.zeros(len(x_data))
+        V3D = voronoi3d.Voronoi3D()
+        for i in range(0, len(x_split)):
+            xcond_data = np.where((x_data >= x_split[i]-dx_data) & (x_data < x_split[i]+dx_data))[0]
+            for j in range(0, len(y_split)):
+                ycond_data = np.where((y_data[xcond_data] >= y_split[j]-dx_data) & (y_data[xcond_data] < y_split[j]+dx_data))[0]
+                for k in range(0, len(z_split)):
+                    zcond_data = np.where((z_data[xcond_data[ycond_data]] >= z_split[k]-dx_data) &
+                                          (z_data[xcond_data[ycond_data]] < z_split[k]+dx_data))[0]
+                    cond_data = xcond_data[ycond_data[zcond_data]]
+                    x_d_lim = x_data[cond_data]
+                    y_d_lim = y_data[cond_data]
+                    z_d_lim = z_data[cond_data]
+                    cond_est = np.where((x_d_lim >= x_split[i]-dx_est) & (x_d_lim < x_split[i]+dx_est) &
+                                        (y_d_lim >= y_split[j]-dx_est) & (y_d_lim < y_split[j]+dx_est) &
+                                        (z_d_lim >= z_split[k]-dx_est) & (z_d_lim < z_split[k]+dx_est))[0]
+                    V3D.set_points(x_d_lim, y_d_lim, z_d_lim)
+                    V3D.construct()
+                    volume_d_lim = V3D.get_area(badval=badval)
+                    volume[cond_data[cond_est]] = volume_d_lim[cond_est]
+                    V3D.clean()
         if self.ispart is not None:
             cond = np.where(self.ispart == 1.)[0]
             volume = volume[cond]

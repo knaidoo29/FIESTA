@@ -1,24 +1,17 @@
 import numpy as np
-from scipy.spatial import Voronoi as scVoronoi
 
 from .. import boundary
 from .. import coords
-from .. import src
-from .. import utils
 
+from . import voronoithickslice
 
-class VoronoiThickSlice:
+class SeriesVoronoiThickSlice:
 
 
     def __init__(self):
         """Initialises VoronoiThickSlice class"""
         self.points = None
-        self.voronoi = None
-        self.vertices = None
-        self.cell = None
-        self.regions = None
-        self.ridge_vertices = None
-        self.ridge_points = None
+        self.npart = None
         self.extent = None
         self.boxsize = None
         self.thickness = None
@@ -120,26 +113,13 @@ class VoronoiThickSlice:
         self.points = coords.xyz2points(x_pnb, y_pnb, z_pnb)
 
 
-    def construct(self):
-        """Constructs the voronoi tesselation from the input points"""
-        self.voronoi = scVoronoi(self.points)
-        # voronoi vertices
-        self.vertices = self.voronoi.vertices
-        # voronoi cells which coorespond to the index of the input points
-        self.cell = self.voronoi.point_region
-        # voronoi regions/cells
-        self.regions = self.voronoi.regions
-        # voronoi ridge vertices
-        self.ridge_vertices = self.voronoi.ridge_vertices
-        # voronoi ridge points, i.e. points connecting each face
-        self.ridge_points = self.voronoi.ridge_points
-
-
-    def get_volume(self, badval=np.nan):
+    def get_volume(self, split=2, badval=np.nan):
         """Calculates the volume of the voronoi cells.
 
         Parameters
         ----------
+        split : int, optional
+            Split calculation along one axis, default = 1, meaning no splitting.
         badval : float, optional
             Bad values for the volume are set to these values.
 
@@ -148,33 +128,36 @@ class VoronoiThickSlice:
         volume : array
             Volume for each voronoi cell.
         """
-        # find ridge information
-        ridge_length = np.array([len(self.ridge_vertices[i]) for i in range(0, len(self.ridge_vertices))])
-        ridge_vertices = np.array(utils.flatten_list(self.ridge_vertices))
-        ridge_end = np.cumsum(ridge_length) - 1
-        ridge_start = ridge_end - ridge_length + 1
-
-        # split points and vertices to x, y and z components
-        xpoints = self.points[:, 0]
-        ypoints = self.points[:, 1]
-        zpoints = self.points[:, 2]
-        xverts = self.vertices[:, 0]
-        yverts = self.vertices[:, 1]
-        zverts = self.vertices[:, 2]
-
-        # split ridge points, essentially the points that are connected by a ridge
-        ridge_point1 = self.ridge_points[:, 0]
-        ridge_point2 = self.ridge_points[:, 1]
-
-        # calculate volume
-        volume = src.voronoi_3d_volume(xpoints, ypoints, zpoints, xverts, yverts, zverts,
-                                       ridge_point1, ridge_point2, ridge_vertices,
-                                       ridge_start, ridge_end, len(xpoints),
-                                       len(ridge_point1), len(xverts), len(ridge_vertices))
-
-        # remove and change bad values.
-        cond = np.where((volume == -1.) | (volume == 0.))[0]
-        volume[cond] = badval
+        x_data = self.points[:, 0]
+        y_data = self.points[:, 1]
+        z_data = self.points[:, 2]
+        split_edges = np.linspace(0., self.boxsize, split+1)
+        split_centers = 0.5*(split_edges[:-1] + split_edges[1:])
+        dsplit = split_edges[1] - split_edges[0]
+        x_split = np.copy(split_centers)
+        y_split = np.copy(split_centers)
+        dx_est = 0.5*dsplit
+        if self.buffer_length is None:
+            dx_data = dx_est
+        else:
+            dx_data = dx_est + self.buffer_length
+        volume = np.zeros(len(x_data))
+        VTS = voronoithickslice.VoronoiThickSlice()
+        for i in range(0, len(x_split)):
+            xcond_data = np.where((x_data >= x_split[i]-dx_data) & (x_data < x_split[i]+dx_data))[0]
+            for j in range(0, len(y_split)):
+                ycond_data = np.where((y_data[xcond_data] >= y_split[j]-dx_data) & (y_data[xcond_data] < y_split[j]+dx_data))[0]
+                cond_data = xcond_data[ycond_data]
+                x_d_lim = x_data[cond_data]
+                y_d_lim = y_data[cond_data]
+                z_d_lim = z_data[cond_data]
+                cond_est = np.where((x_d_lim >= x_split[i]-dx_est) & (x_d_lim < x_split[i]+dx_est) &
+                                    (y_d_lim >= y_split[j]-dx_est) & (y_d_lim < y_split[j]+dx_est))[0]
+                VTS.set_points(x_d_lim, y_d_lim, z_d_lim)
+                VTS.construct()
+                volume_d_lim = VTS.get_volume(badval=badval)
+                volume[cond_data[cond_est]] = volume_d_lim[cond_est]
+                VTS.clean()
         if self.ispart is not None:
             cond = np.where(self.ispart == 1.)[0]
             volume = volume[cond]

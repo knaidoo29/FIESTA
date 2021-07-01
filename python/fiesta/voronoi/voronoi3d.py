@@ -11,8 +11,9 @@ class Voronoi3D:
 
 
     def __init__(self):
-        """Initialises Voronoi2D class"""
+        """Initialises Voronoi3D class"""
         self.points = None
+        self.npart = None
         self.voronoi = None
         self.vertices = None
         self.cell = None
@@ -174,6 +175,9 @@ class Voronoi3D:
         # remove and change bad values.
         cond = np.where((volume == -1.) | (volume == 0.))[0]
         volume[cond] = badval
+        if self.ispart is not None:
+            cond = np.where(self.ispart == 1.)[0]
+            volume = volume[cond]
         self.volume = volume
         return volume
 

@@ -1,27 +1,22 @@
 import numpy as np
-from scipy.spatial import Delaunay as scDelaunay
 
 from .. import boundary
 from .. import coords
-from .. import src
+
+from . import dtfethickslice
 
 
-class Delaunay3D:
+class SeriesDelaunayThickSlice:
 
 
     def __init__(self):
-        """Initialises Delaunay3D class"""
+        """Initialises DelaunayThickSlice class"""
         self.points = None
         self.npart = None
-        self.delaunay = None
-        self.delaunay_simplices = None
-        self.x0 = None
-        self.y0 = None
-        self.z0 = None
-        self.f0 = None
-        self.delf0 = None
+        self.f = None
         self.extent = None
         self.boxsize = None
+        self.thickness = None
         self.buffer_length = None
         self.usebuffer = False
         self.nbuffer = None
@@ -59,13 +54,15 @@ class Delaunay3D:
         self.npart = len(self.points)
 
 
-    def set_buffer(self, boxsize, buffer_length):
+    def set_buffer(self, boxsize, thickness, buffer_length):
         """Defines buffer particles to be placed around a given box.
 
         Parameters
         ----------
         boxsize : float
             Size of the box, assumed particles lie in the range [0., boxsize]
+        thickness : float
+            Thickness of the slice.
         buffer_length : float
             Length of the buffer region.
         """
@@ -73,12 +70,12 @@ class Delaunay3D:
         self._extent()
         assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
         assert self.extent[2] >= 0. and self.extent[3] <= boxsize, "Y coordinates exceed the range of the box, check or redefine boxsize."
-        assert self.extent[4] >= 0. and self.extent[5] <= boxsize, "Z coordinates exceed the range of the box, check or redefine boxsize."
         self.boxsize = boxsize
         self.buffer_length = buffer_length
+        self.thickness = thickness
         self.usebuffer = True
         self.useperiodic = False
-        x_buffer, y_buffer, z_buffer = boundary.buffer_random_particles_3d(self.npart, self.boxsize, self.buffer_length)
+        x_buffer, y_buffer, z_buffer = boundary.buffer_random_particles_3d_slice(self.npart, self.boxsize, self.thickness, self.buffer_length)
         self.nbuffer = len(x_buffer)
         # redefine points to include buffer points and also define mask
         self.ispart = np.ones(self.npart + self.nbuffer)
@@ -107,7 +104,7 @@ class Delaunay3D:
         assert self.extent[4] >= 0. and self.extent[5] <= boxsize, "Z coordinates exceed the range of the box, check or redefine boxsize."
         self.boxsize = boxsize
         self.buffer_length = buffer_length
-        x_periodic, y_periodic, z_periodic = boundary.buffer_periodic_particles_3d(self.points[:, 0], self.points[:, 1], self.points[:, 2], self.boxsize, self.buffer_length)
+        x_periodic, y_periodic, z_periodic = boundary.buffer_periodic_particles_3d_slice(self.points[:, 0], self.points[:, 1], self.points[:, 2], self.boxsize, self.buffer_length)
         self.nperiodic = len(x_periodic)
         self.usebuffer = False
         self.useperiodic = True
@@ -151,36 +148,64 @@ class Delaunay3D:
             f = np.concatenate([f, bufferval*np.ones(self.nbuffer)])
         elif self.useperiodic == True:
             f = np.concatenate([f, bufferval*np.ones(self.nperiodic)])
-        del_vert0 = self.delaunay_simplices[:, 0]
-        del_vert1 = self.delaunay_simplices[:, 1]
-        del_vert2 = self.delaunay_simplices[:, 2]
-        del_vert3 = self.delaunay_simplices[:, 3]
-        self.x0 = x[del_vert0]
-        self.y0 = y[del_vert0]
-        self.z0 = z[del_vert0]
-        self.f0 = f[del_vert0]
-        self.delf0 = src.get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3, len(x), len(del_vert0))
+        self.f = f
 
 
-    def estimate(self, x, y, z):
+    def estimate(self, x_est, y_est, z_est, split=2):
         """Estimates a field from the Delaunay tesselation.
 
         Parameters
         ----------
-        x : array
+        x_est : array
             X-coordinate for the field estimation.
-        y : array
+        y_est : array
             Y-coordinate for the field estimation.
-        z : array
+        z_est : array
             Z-coordinate for the field estimation.
+        split : int, optional
+            Split calculation along one axis, default = 1, meaning no splitting.
 
         Returns
         -------
         f_est : array
             Estimates of the field
         """
-        simplices = self.find_simplex(x, y, z)
-        f_est = src.delaunay_estimate_3d(simplices, x, y, z, self.x0, self.y0, self.z0, self.f0, self.delf0, len(x), len(self.x0))
+        x_data = self.points[:, 0]
+        y_data = self.points[:, 1]
+        z_data = self.points[:, 2]
+        split_edges = np.linspace(0., self.boxsize, split+1)
+        split_centers = 0.5*(split_edges[:-1] + split_edges[1:])
+        dsplit = split_edges[1] - split_edges[0]
+        x_split = split_centers
+        y_split = split_centers
+        dx_est = 0.5*dsplit
+        if self.buffer_length is None:
+            dx_data = dx_est
+        else:
+            dx_data = dx_est + self.buffer_length
+        f_est = np.zeros(len(x_est))
+        DTS = dtfethickslice.DelaunayThickSlice()
+        for i in range(0, len(x_split)):
+            xcond_data = np.where((x_data >= x_split[i]-dx_data) & (x_data < x_split[i]+dx_data))[0]
+            for j in range(0, len(y_split)):
+                ycond_data = np.where((y_data[xcond_data] >= y_split[j]-dx_data) & (y_data[xcond_data] < y_split[j]+dx_data))[0]
+                cond_data = xcond_data[ycond_data]
+                x_d_lim = x_data[cond_data]
+                y_d_lim = y_data[cond_data]
+                z_d_lim = z_data[cond_data]
+                f_d_lim = self.f[cond_data]
+                cond_est = np.where((x_est >= x_split[i]-dx_est) & (x_est < x_split[i]+dx_est) &
+                                    (y_est >= y_split[j]-dx_est) & (y_est < y_split[j]+dx_est))[0]
+                if len(cond_est) > 0:
+                    x_e_lim = x_est[cond_est]
+                    y_e_lim = y_est[cond_est]
+                    z_e_lim = z_est[cond_est]
+                    DTS.set_points(x_d_lim, y_d_lim, z_d_lim)
+                    DTS.construct()
+                    DTS.set_field(f_d_lim)
+                    f_e_lim = DTS.estimate(x_e_lim, y_e_lim, z_e_lim)
+                    f_est[cond_est] = f_e_lim
+                    DTS.clean()
         return f_est
 
 

@@ -41,6 +41,8 @@ FIESTA is currently in development. The plan is to implement the bulk of the cod
   * volume calculation in 3D.
 * Delaunay Estimation Field Estimator:
   * 2D, 3D
+* Smooth Particle Hydrodynamics (SPH) classes
+  * 2D, 3D
 
 ## Python module
 
@@ -80,6 +82,8 @@ You will then be able to load FIESTA in python using:
 * `coords` : Utility coordinate functions.
   * `coords.xy2points` : Column stacks 2D coordinates.
   * `coords.xyz2points` : Column stacks 3D coordinates.
+  * `coords.points2xy` : Undo column stacks 2D coordinates.
+  * `coords.points2xyz` : Undo column stacks 3D coordinates.
 
 * `dtfe` : Delaunay Tesselation Field Estimator.
   * `dtfe.Delaunay2D` : DTFE in 2D.
@@ -109,6 +113,12 @@ You will then be able to load FIESTA in python using:
   * `randoms.random_uniform` : Uniform randoms in 1D.
   * `randoms.random_box` : Uniform randoms in 2D.
   * `randoms.random_cube` : Uniform randoms in 3D.
+
+* `sph` : Smooth Particle Hydrodynamics.
+  * `sph.cubic_kernel` : Cubic SPH kernel.
+  * `sph.dcubic_kernel` : Cubic derivative SPH kernel.
+  * `sph.SPH2D` : 2D SPH class.
+  * `sph.SPH3D` : 3D SPH class.
 
 * `src` : Direct access to lower level Fortran source code.
   * `src.xgrid` : Computes grid point based on the grid index and grid size.

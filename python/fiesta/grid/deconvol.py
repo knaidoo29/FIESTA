@@ -61,7 +61,7 @@ def deconvolve_part2grid_2D(field, boxsize, method='TSC'):
     p = get_deconvol_p(method)
     deconvol_factor = (sinc_x*sinc_y)**p
     fieldk = utils.complex_div(fieldk, deconvol_factor)
-    field = shift.cart.backward_fft_3D(fieldk, boxsize)
+    field = shift.cart.backward_fft_2D(fieldk, boxsize)
     return field
 
 

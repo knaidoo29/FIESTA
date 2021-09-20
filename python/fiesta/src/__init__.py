@@ -1,19 +1,24 @@
 from .grid import xgrid
+from .grid import xgrids
 
-from .part2gridw import weight_cic
-from .part2gridw import weight_tsc
+from .part2grid_pix import pix1dto2d
+from .part2grid_pix import pix1dto3d
+from .part2grid_pix import find_pix
+from .part2grid_pix import periodic_pix
+from .part2grid_pix import ngp_pix
+from .part2grid_pix import cic_pix
+from .part2grid_pix import tsc_pix
 
-from .part2grid2d import p2g_ngp_2d
-from .part2grid2d import p2g_cic_2d_periodic
-from .part2grid2d import p2g_tsc_2d_periodic
-from .part2grid2d import p2g_cic_2d_nonperiodic
-from .part2grid2d import p2g_tsc_2d_nonperiodic
+from .part2grid_wei import weight_cic
+from .part2grid_wei import weight_tsc
 
-from .part2grid3d import p2g_ngp_3d
-from .part2grid3d import p2g_cic_3d_periodic
-from .part2grid3d import p2g_tsc_3d_periodic
-from .part2grid3d import p2g_cic_3d_nonperiodic
-from .part2grid3d import p2g_tsc_3d_nonperiodic
+from .part2grid_2d import part2grid_ngp_2d
+from .part2grid_2d import part2grid_cic_2d
+from .part2grid_2d import part2grid_tsc_2d
+
+from .part2grid_3d import part2grid_ngp_3d
+from .part2grid_3d import part2grid_cic_3d
+from .part2grid_3d import part2grid_tsc_3d
 
 from .bilinear import bilinear_periodic
 from .bilinear import bilinear_nonperiodic

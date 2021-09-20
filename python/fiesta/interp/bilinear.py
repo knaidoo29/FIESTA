@@ -8,7 +8,7 @@ def bilinear(fgrid, boxsize, x, y, fill_value=np.nan, periodic=True):
     Parameter
     ---------
     fgrid : array
-        Field values on a 3D grid.
+        Field values on a 2D grid.
     boxsize : float
         Box size.
     x : array

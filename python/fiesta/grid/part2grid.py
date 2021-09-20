@@ -28,17 +28,17 @@ def part2grid2d(x, y, f, boxsize, ngrid, method='TSC', periodic=True):
         Grid assigned values.
     """
     if method == 'NGP':
-        fgrid = src.p2g_ngp_2d(x, y, f, boxsize, ngrid, len(x))
+        fgrid = src.part2grid_ngp_2d(x=x, y=y, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid)
     elif method == 'CIC':
         if periodic == True:
-            fgrid = src.p2g_cic_2d_periodic(x, y, f, boxsize, ngrid, len(x))
+            fgrid = src.part2grid_cic_2d(x=x, y=y, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=True)
         else:
-            fgrid = src.p2g_cic_2d_nonperiodic(x, y, f, boxsize, ngrid, len(x))
+            fgrid = src.part2grid_cic_2d(x=x, y=y, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=False)
     elif method == 'TSC':
         if periodic == True:
-            fgrid = src.p2g_tsc_2d_periodic(x, y, f, boxsize, ngrid, len(x))
+            fgrid = src.part2grid_tsc_2d(x=x, y=y, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=True)
         else:
-            fgrid = src.p2g_tsc_2d_nonperiodic(x, y, f, boxsize, ngrid, len(x))
+            fgrid = src.part2grid_tsc_2d(x=x, y=y, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=False)
     return fgrid
 
 
@@ -70,15 +70,15 @@ def part2grid3d(x, y, z, f, boxsize, ngrid, method='TSC', periodic=True):
         Grid assigned values.
     """
     if method == 'NGP':
-        fgrid = src.p2g_ngp_3d(x, y, z, f, boxsize, ngrid, len(x))
+        fgrid = src.part2grid_ngp_2d(x=x, y=y, z=z, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid)
     elif method == 'CIC':
         if periodic == True:
-            fgrid = src.p2g_cic_3d_periodic(x, y, z, f, boxsize, ngrid, len(x))
+            fgrid = src.part2grid_cic_3d(x=x, y=y, z=z, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=True)
         else:
-            fgrid = src.p2g_cic_3d_nonperiodic(x, y, z, f, boxsize, ngrid, len(x))
+            fgrid = src.part2grid_cic_3d(x=x, y=y, z=z, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=False)
     elif method == 'TSC':
         if periodic == True:
-            fgrid = src.p2g_tsc_3d_periodic(x, y, z, f, boxsize, ngrid, len(x))
+            fgrid = src.part2grid_tsc_3d(x=x, y=y, z=z, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=True)
         else:
-            fgrid = src.p2g_tsc_3d_nonperiodic(x, y, z, f, boxsize, ngrid, len(x))
+            fgrid = src.part2grid_tsc_3d(x=x, y=y, z=z, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=False)
     return fgrid

@@ -159,10 +159,12 @@ class Delaunay3D:
         self.y0 = y[del_vert0]
         self.z0 = z[del_vert0]
         self.f0 = f[del_vert0]
-        self.delf0 = src.get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3, len(x), len(del_vert0))
+        self.delf0 = src.get_delf0_3d(x=x, y=y, z=z, f=f, del_vert0=del_vert0,
+                                      del_vert1=del_vert1, del_vert2=del_vert2,
+                                      del_vert3=del_vert3, npart=len(x), nvert=len(del_vert0))
 
 
-    def estimate(self, x, y, z):
+    def estimate(self, x, y, z, debug=False):
         """Estimates a field from the Delaunay tesselation.
 
         Parameters
@@ -179,8 +181,17 @@ class Delaunay3D:
         f_est : array
             Estimates of the field
         """
+        if debug==True:
+            print("Start finding simplexes.")
         simplices = self.find_simplex(x, y, z)
-        f_est = src.delaunay_estimate_3d(simplices, x, y, z, self.x0, self.y0, self.z0, self.f0, self.delf0, len(x), len(self.x0))
+        if debug==True:
+            print("Found simplexes.")
+            print("Start DTFE estimation.")
+        f_est = src.delaunay_estimate_3d(simplices=simplices, x=x, y=y, z=z, x0=self.x0,
+                                         y0=self.y0, z0=self.z0, f0=self.f0, delf0=self.delf0,
+                                         npart=len(x), nsimp0=len(self.x0))
+        if debug==True:
+            print("Run DTFE estimation.")
         return f_est
 
 

@@ -39,9 +39,9 @@ def bilinear(fgrid, boxsize, x, y, fill_value=np.nan, periodic=True):
         # All particles are within the boundaries so no boundary management is necessary.
         npart = len(x)
         if periodic == True:
-            f = src.bilinear_periodic(fgrid.flatten(), x[condition], y[condition], boxsize, ngrid, npart)
+            f = src.bilinear_periodic(fgrid=fgrid.flatten(), x=x, y=y, boxsize=boxsize, ngrid=ngrid, npart=npart)
         else:
-            f = src.bilinear_nonperiodic(fgrid.flatten(), x[condition], y[condition], boxsize, ngrid, npart)
+            f = src.bilinear_nonperiodic(fgrid=fgrid.flatten(), x=x, y=y, boxsize=boxsize, ngrid=ngrid, npart=npart)
     else:
         # Some particles are outside the boundary.
         # create a mask for in and outside the boxmask = np.zeros(len(x))
@@ -52,9 +52,9 @@ def bilinear(fgrid, boxsize, x, y, fill_value=np.nan, periodic=True):
         npart = len(x[condition])
         f = np.zeros(len(x))
         if periodic == True:
-            f[condition] = src.bilinear_periodic(fgrid.flatten(), x[condition], y[condition], boxsize, ngrid, npart)
+            f[condition] = src.bilinear_periodic(fgrid=fgrid.flatten(), x=x[condition], y=y[condition], boxsize=boxsize, ngrid=ngrid, npart=npart)
         else:
-            f[condition] = src.bilinear_nonperiodic(fgrid.flatten(), x[condition], y[condition], boxsize, ngrid, npart)
+            f[condition] = src.bilinear_nonperiodic(fgrid=fgrid.flatten(), x=x[condition], y=y[condition], boxsize=boxsize, ngrid=ngrid, npart=npart)
         # fill outside boundary with fill values.
         condition = np.where(mask == 0.)[0]
         f[condition] = fill_value

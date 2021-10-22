@@ -58,7 +58,7 @@ subroutine voronoi_2d_area(xpoints, ypoints, xverts, yverts, ridge_point1, ridge
 
   ! computes the area of each voronoi cell by breaking it into triangles between
   ! points and ridges.
-  
+
   do i = 1, npoints
     area(i) = 0.
   end do

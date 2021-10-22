@@ -36,9 +36,18 @@ from .voronoi3d import voronoi_3d_volume
 
 from .matrix import inv2by2
 from .matrix import inv3by3
+from .matrix import eig2by2
+from .matrix import symeig3by3
 
 from .delaunay2d import get_delf0_2d
 from .delaunay2d import delaunay_estimate_2d
 
 from .delaunay3d import get_delf0_3d
 from .delaunay3d import delaunay_estimate_3d
+
+from .differentiate import dfdx_1d_periodic
+from .differentiate import dfdx_2d_periodic
+from .differentiate import dfdy_2d_periodic
+from .differentiate import dfdx_3d_periodic
+from .differentiate import dfdy_3d_periodic
+from .differentiate import dfdz_3d_periodic

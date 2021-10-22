@@ -39,7 +39,7 @@ def part2grid2d(x, y, f, boxsize, ngrid, method='TSC', periodic=True):
             fgrid = src.part2grid_tsc_2d(x=x, y=y, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=True)
         else:
             fgrid = src.part2grid_tsc_2d(x=x, y=y, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=False)
-    return fgrid
+    return fgrid.reshape(ngrid, ngrid)
 
 
 def part2grid3d(x, y, z, f, boxsize, ngrid, method='TSC', periodic=True):
@@ -70,7 +70,7 @@ def part2grid3d(x, y, z, f, boxsize, ngrid, method='TSC', periodic=True):
         Grid assigned values.
     """
     if method == 'NGP':
-        fgrid = src.part2grid_ngp_2d(x=x, y=y, z=z, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid)
+        fgrid = src.part2grid_ngp_3d(x=x, y=y, z=z, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid)
     elif method == 'CIC':
         if periodic == True:
             fgrid = src.part2grid_cic_3d(x=x, y=y, z=z, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=True)
@@ -81,4 +81,4 @@ def part2grid3d(x, y, z, f, boxsize, ngrid, method='TSC', periodic=True):
             fgrid = src.part2grid_tsc_3d(x=x, y=y, z=z, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=True)
         else:
             fgrid = src.part2grid_tsc_3d(x=x, y=y, z=z, f=f, boxsize=boxsize, npart=len(x), ngrid=ngrid, periodic=False)
-    return fgrid
+    return fgrid.reshape(ngrid, ngrid, ngrid)

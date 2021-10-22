@@ -4,7 +4,7 @@ from scipy.spatial import KDTree as scKDTree
 from .. import coords
 
 
-class KDTree2D:
+class KDTree1D:
 
 
     def __init__(self):
@@ -15,15 +15,13 @@ class KDTree2D:
         self.ncpu = None
 
 
-    def build_tree(self, x, y, boxsize=None, usepara=False, ncpu=4):
+    def build_tree(self, x, boxsize=None, usepara=False, ncpu=4):
         """Function for building the KDTree.
 
         Parameters
         ----------
         x : array
             X coordinates.
-        y : array
-            Y coordinates.
         boxsize : float, optional
             Periodic boundary boxsize.
         usepara : bool, optional
@@ -33,19 +31,17 @@ class KDTree2D:
         """
         self.usepara = usepara
         self.ncpu = ncpu
-        self.points = coords.xy2points(x, y)
+        self.points = coords.x2points(x)
         self.KD = scKDTree(self.points, boxsize=boxsize)
 
 
-    def nearest(self, x, y, k=1, return_dist=False):
+    def nearest(self, x, k=1, return_dist=False):
         """Returns the nearest index (and distance) of a point from the KDTree.
 
         Parameters
         ----------
         x : array
             X coordinates.
-        y : array
-            Y coordinates.
         k : int
             Number of nearest points.
         return_dist : bool, optional
@@ -58,7 +54,7 @@ class KDTree2D:
         ndist : float, optional
             Distance to nearest point.
         """
-        points = coords.xy2points(x, y)
+        points = coords.x2points(x)
         if self.usepara == False:
             ndist, nind = self.KD.query(points, k=k)
         else:
@@ -69,15 +65,13 @@ class KDTree2D:
             return nind, ndist
 
 
-    def find_points_in_r(self, x, y, r):
+    def find_points_in_r(self, x, r):
         """Returns the nearest index (and distance) of a point from the KDTree.
 
         Parameters
         ----------
         x : array
             X coordinates.
-        y : array
-            Y coordinates.
         r : float
             Radial distance to find points in KDTree from input coordinates.
 
@@ -87,7 +81,7 @@ class KDTree2D:
             Index of points in the KDTree that are within a distance r of the input
             coordinates..
         """
-        points = coords.xy2points(x, y)
+        points = coords.x2points(x)
         ind = self.KD.query_ball_point(points, r)
         return ind
 

@@ -167,10 +167,13 @@ class VoronoiThickSlice:
         ridge_point2 = self.ridge_points[:, 1]
 
         # calculate volume
-        volume = src.voronoi_3d_volume(xpoints, ypoints, zpoints, xverts, yverts, zverts,
-                                       ridge_point1, ridge_point2, ridge_vertices,
-                                       ridge_start, ridge_end, len(xpoints),
-                                       len(ridge_point1), len(xverts), len(ridge_vertices))
+        volume = src.voronoi_3d_volume(xpoints=xpoints, ypoints=ypoints, zpoints=zpoints,
+                                       xverts=xverts, yverts=yverts, zverts=zverts,
+                                       ridge_point1=ridge_point1, ridge_point2=ridge_point2,
+                                       ridge_vertices=ridge_vertices, ridge_start=ridge_start,
+                                       ridge_end=ridge_end, npoints=len(xpoints),
+                                       nridge=len(ridge_point1), nvertices=len(xverts),
+                                       nridge_vertices=len(ridge_vertices))
 
         # remove and change bad values.
         cond = np.where((volume == -1.) | (volume == 0.))[0]

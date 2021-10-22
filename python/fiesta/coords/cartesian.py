@@ -1,6 +1,43 @@
 import numpy as np
 
 
+def x2points(x):
+    """Column stacks input coordinates.
+
+    Parameters
+    ----------
+    x : array
+        X coordinates.
+
+    Return
+    ------
+    points : 1darray
+        Column stacked array.
+    """
+    if np.isscalar(x) == True:
+        points = np.array([[x]])
+    else:
+        points = np.column_stack([x])
+    return points
+
+
+def points2x(points):
+    """Unstacks input coordinates.
+
+    Parameters
+    ----------
+    points : 2darray
+        Column stacked array.
+
+    Return
+    ------
+    x : array
+        X coordinates.
+    """
+    x = points[:, 0]
+    return x
+
+
 def xy2points(x, y):
     """Column stacks input coordinates.
 
@@ -19,7 +56,7 @@ def xy2points(x, y):
     if np.isscalar(x) == True:
         points = np.array([[x, y]])
     else:
-        points = np.column_stack((x, y))
+        points = np.column_stack([x, y])
     return points
 
 
@@ -62,7 +99,7 @@ def xyz2points(x, y, z):
     if np.isscalar(x) == True:
         points = np.array([[x, y, z]])
     else:
-        points = np.column_stack((x, y, z))
+        points = np.column_stack([x, y, z])
     return points
 
 

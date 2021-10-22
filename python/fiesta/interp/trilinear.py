@@ -41,9 +41,9 @@ def trilinear(fgrid, boxsize, x, y, z, fill_value=np.nan, periodic=True):
         # All particles are within the boundaries so no boundary management is necessary.
         npart = len(x)
         if periodic == True:
-            f = src.trilinear_periodic(fgrid.flatten(), x, y, z, boxsize, ngrid, npart)
+            f = src.trilinear_periodic(fgrid=fgrid.flatten(), x=x, y=y, z=z, boxsize=boxsize, ngrid=ngrid, npart=npart)
         else:
-            f = src.trilinear_nonperiodic(fgrid.flatten(), x, y, z, boxsize, ngrid, npart)
+            f = src.trilinear_nonperiodic(fgrid=fgrid.flatten(), x=x, y=y, z=z, boxsize=boxsize, ngrid=ngrid, npart=npart)
     else:
         # Some particles are outside the boundary.
         # create a mask for in and outside the box
@@ -54,9 +54,9 @@ def trilinear(fgrid, boxsize, x, y, z, fill_value=np.nan, periodic=True):
         npart = len(x[condition])
         f = np.zeros(len(x))
         if periodic == True:
-            f[condition] = src.trilinear_periodic(fgrid.flatten(), x[condition], y[condition], z[condition], boxsize, ngrid, npart)
+            f[condition] = src.trilinear_periodic(fgrid=fgrid.flatten(), x=x[condition], y=y[condition], z=z[condition], boxsize=boxsize, ngrid=ngrid, npart=npart)
         else:
-            f[condition] = src.trilinear_nonperiodic(fgrid.flatten(), x[condition], y[condition], z[condition], boxsize, ngrid, npart)
+            f[condition] = src.trilinear_nonperiodic(fgrid=fgrid.flatten(), x=x[condition], y=y[condition], z=z[condition], boxsize=boxsize, ngrid=ngrid, npart=npart)
         # fill outside boundary with fill values.
         condition = np.where(mask == 0.)[0]
         f[condition] = fill_value

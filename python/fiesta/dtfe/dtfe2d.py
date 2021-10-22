@@ -148,7 +148,9 @@ class Delaunay2D:
         self.x0 = x[del_vert0]
         self.y0 = y[del_vert0]
         self.f0 = f[del_vert0]
-        self.delf0 = src.get_delf0_2d(x, y, f, del_vert0, del_vert1, del_vert2, len(x), len(del_vert0))
+        self.delf0 = src.get_delf0_2d(x=x, y=y, f=f, del_vert0=del_vert0,
+                                      del_vert1=del_vert1, del_vert2=del_vert2,
+                                      npart=len(x), nvert=len(del_vert0))
 
 
     def estimate(self, x, y):
@@ -167,7 +169,9 @@ class Delaunay2D:
             Estimates of the field
         """
         simplices = self.find_simplex(x, y)
-        f_est = src.delaunay_estimate_2d(simplices, x, y, self.x0, self.y0, self.f0, self.delf0, len(x), len(self.x0))
+        f_est = src.delaunay_estimate_2d(simplices=simplices, x=x, y=y, x0=self.x0,
+                                         y0=self.y0, f0=self.f0, delf0=self.delf0,
+                                         npart=len(x), nsimp0=len(self.x0))
         return f_est
 
 

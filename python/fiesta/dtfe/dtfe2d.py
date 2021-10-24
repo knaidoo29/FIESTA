@@ -12,9 +12,11 @@ class Delaunay2D:
     def __init__(self):
         """Initialises Delaunay2D class"""
         self.points = None
+        self.points_dens = None
         self.npart = None
         self.delaunay = None
         self.delaunay_simplices = None
+        self.delaunay_area = None
         self.x0 = None
         self.y0 = None
         self.f0 = None
@@ -52,6 +54,7 @@ class Delaunay2D:
         """
         self.points = coords.xy2points(x, y)
         self.npart = len(self.points)
+        self.ntotal = self.npart
 
 
     def set_buffer(self, boxsize, buffer_length):
@@ -74,6 +77,7 @@ class Delaunay2D:
         self.useperiodic = False
         x_buffer, y_buffer = boundary.buffer_random_particles_2d(self.npart, self.boxsize, self.buffer_length)
         self.nbuffer = len(x_buffer)
+        self.ntotal += self.nbuffer
         # redefine points to include buffer points and also define mask
         self.ispart = np.ones(self.npart + self.nbuffer)
         self.ispart[self.npart:] = 0.
@@ -101,6 +105,7 @@ class Delaunay2D:
         self.buffer_length = buffer_length
         x_periodic, y_periodic = boundary.buffer_periodic_particles_2d(self.points[:, 0], self.points[:, 1], self.boxsize, self.buffer_length)
         self.nperiodic = len(x_periodic)
+        self.ntotal += self.nperiodic
         self.usebuffer = False
         self.useperiodic = True
         # redefine points to include periodic points and also define mask
@@ -116,6 +121,31 @@ class Delaunay2D:
         """Constructs Delaunay tesselation"""
         self.delaunay = scDelaunay(self.points)
         self.delaunay_simplices = self.delaunay.simplices
+        self.nvert = len(self.delaunay_simplices[:, 0])
+
+
+    def get_area(self):
+        """Calculates the area of the delaunay simplex."""
+        x, y = self.points[:, 0], self.points[:, 1]
+        del_vert0 = self.delaunay_simplices[:, 0]
+        del_vert1 = self.delaunay_simplices[:, 1]
+        del_vert2 = self.delaunay_simplices[:, 2]
+        self.delaunay_area = src.delaunay_area_2d(x=x, y=y, del_vert0=del_vert0,
+            del_vert1=del_vert1, del_vert2=del_vert2, npart=self.ntotal,
+            nvert=self.nvert)
+
+
+    def get_dens(self):
+        """Calculates the density of each point in the delaunay tessellation."""
+        if self.delaunay_area is None:
+            self.get_area()
+        del_vert0 = self.delaunay_simplices[:, 0]
+        del_vert1 = self.delaunay_simplices[:, 1]
+        del_vert2 = self.delaunay_simplices[:, 2]
+        point_area = src.sum_delaunay4points_2d(delaunay_value=self.delaunay_area,
+            del_vert0=del_vert0, del_vert1=del_vert1, del_vert2=del_vert2,
+            npart=self.ntotal, nvert=self.nvert)
+        self.points_dens = 1./point_area
 
 
     def find_simplex(self, x, y):
@@ -149,8 +179,8 @@ class Delaunay2D:
         self.y0 = y[del_vert0]
         self.f0 = f[del_vert0]
         self.delf0 = src.get_delf0_2d(x=x, y=y, f=f, del_vert0=del_vert0,
-                                      del_vert1=del_vert1, del_vert2=del_vert2,
-                                      npart=len(x), nvert=len(del_vert0))
+            del_vert1=del_vert1, del_vert2=del_vert2, npart=self.ntotal,
+            nvert=self.nvert)
 
 
     def estimate(self, x, y):
@@ -170,8 +200,7 @@ class Delaunay2D:
         """
         simplices = self.find_simplex(x, y)
         f_est = src.delaunay_estimate_2d(simplices=simplices, x=x, y=y, x0=self.x0,
-                                         y0=self.y0, f0=self.f0, delf0=self.delf0,
-                                         npart=len(x), nsimp0=len(self.x0))
+            y0=self.y0, f0=self.f0, delf0=self.delf0, npart=len(x), nsimp0=len(self.x0))
         return f_est
 
 

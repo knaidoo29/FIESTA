@@ -15,6 +15,8 @@ class Voronoi2D:
         self.points = None
         self.npart = None
         self.voronoi = None
+        self.voronoi_area = None
+        self.voronoi_dens = None
         self.vertices = None
         self.cell = None
         self.regions = None
@@ -52,7 +54,9 @@ class Voronoi2D:
             Y-coordinates.
         """
         self.points = coords.xy2points(x, y)
+        self.ispart = np.ones(len(self.points))
         self.npart = len(self.points)
+        self.ntotal = self.npart
 
 
     def set_buffer(self, boxsize, buffer_length):
@@ -75,6 +79,7 @@ class Voronoi2D:
         self.useperiodic = False
         x_buffer, y_buffer = boundary.buffer_random_particles_2d(self.npart, self.boxsize, self.buffer_length)
         self.nbuffer = len(x_buffer)
+        self.ntotal += self.nbuffer
         # redefine points to include buffer points and also define mask
         self.ispart = np.ones(self.npart + self.nbuffer)
         self.ispart[self.npart:] = 0.
@@ -102,6 +107,7 @@ class Voronoi2D:
         self.buffer_length = buffer_length
         x_periodic, y_periodic = boundary.buffer_periodic_particles_2d(self.points[:, 0], self.points[:, 1], self.boxsize, self.buffer_length)
         self.nperiodic = len(x_periodic)
+        self.ntotal += self.nperiodic
         self.usebuffer = False
         self.useperiodic = True
         # redefine points to include periodic points and also define mask
@@ -160,20 +166,34 @@ class Voronoi2D:
         ridge_point2 = self.ridge_points[:, 1]
 
         # calculate area
-        area = src.voronoi_2d_area(xpoints=xpoints, ypoints=ypoints, xverts=xverts, yverts=yverts,
-                                   ridge_point1=ridge_point1, ridge_point2=ridge_point2,
-                                   ridge_vertices=ridge_vertices, ridge_start=ridge_start,
-                                   ridge_end=ridge_end, npoints=len(xpoints), nridge=len(ridge_point1),
-                                   nvertices=len(xverts), nridge_vertices=len(ridge_vertices))
+        self.voronoi_area = src.voronoi_2d_area(xpoints=xpoints, ypoints=ypoints,
+            xverts=xverts, yverts=yverts, ridge_point1=ridge_point1,
+            ridge_point2=ridge_point2, ridge_vertices=ridge_vertices,
+            ridge_start=ridge_start, ridge_end=ridge_end, npoints=len(xpoints),
+            nridge=len(ridge_point1), nvertices=len(xverts),
+            nridge_vertices=len(ridge_vertices))
 
         # remove and change bad values.
-        cond = np.where((area == -1.) | (area == 0.))[0]
-        area[cond] = badval
-        if self.ispart is None:
-            cond = np.where(self.ispart == 1.)[0]
-            area = area[cond]
-        self.area = area
-        return area
+        cond = np.where((self.voronoi_area == -1.) | (self.voronoi_area == 0.))[0]
+        self.voronoi_area[cond] = badval
+
+
+    def get_dens(self, mean_dens=np.nan):
+        """Computes the density of voronoi cells.
+
+        Parameters
+        ----------
+        mean_dens : float
+            For points where a density cannot be calculated this is set to the
+            mean_dens. However, if boxsize is set mean_dens is calculated automatically.
+        """
+        if self.voronoi_area is None:
+            self.get_area()
+        if self.boxsize is not None:
+            mean_dens = self.npart/(self.boxsize**2.)
+        self.voronoi_dens = np.ones(len(self.voronoi_area))*mean_dens
+        cond = np.where(np.isfinite(self.voronoi_area) == True)[0]
+        self.voronoi_dens[cond] = 1./self.voronoi_area[cond]
 
 
     def clean(self):

@@ -1,4 +1,118 @@
 include "matrix.f90"
+include "polyhedron.f90"
+
+
+subroutine delaunay_volume_3d(x, y, z, del_vert0, del_vert1, del_vert2, del_vert3, npart, nvert, volumes)
+
+  ! Determines the volume for each simplex.
+  !
+  ! Parameters
+  ! ----------
+  ! x : array
+  !   X-coordinates.
+  ! y : array
+  !   Y-coordinates.
+  ! z : array
+  !   Z-coordinates.
+  ! del_vert0 : array
+  !   Index for vertex 0 of each simplices.
+  ! del_vert1 : array
+  !   Index for vertex 1 of each simplices.
+  ! del_vert2 : array
+  !   Index for vertex 2 of each simplices.
+  ! del_vert3 : array
+  !   Index for vertex 3 of each simplices.
+  ! npart : int
+  !   Number of points.
+  ! nvert : int
+  !   Number of vertices.
+  !
+  ! Returns
+  ! -------
+  ! volumes : array
+  !   The volumes of each simplex.
+
+  implicit none
+  integer, parameter :: dp = kind(1.d0)
+
+  ! Declare variables.
+
+  integer, intent(in) :: npart, nvert
+  real(kind=dp), intent(in) :: x(npart), y(npart), z(npart)
+  integer, intent(in) :: del_vert0(nvert), del_vert1(nvert), del_vert2(nvert), del_vert3(nvert)
+  real(kind=dp), intent(out) :: volumes(nvert)
+
+  integer :: i, i0, i1, i2, i3
+  real(kind=dp) :: simplex_vol
+
+  do i = 1, nvert
+
+    i0 = del_vert0(i) + 1
+    i1 = del_vert1(i) + 1
+    i2 = del_vert2(i) + 1
+    i3 = del_vert3(i) + 1
+
+    call tetrahedron_volume(x(i0), y(i0), z(i0), x(i1), y(i1), z(i1), x(i2), y(i2), z(i2), x(i3), y(i3), z(i3), simplex_vol)
+
+    volumes(i) = simplex_vol
+
+  end do
+
+end subroutine delaunay_volume_3d
+
+
+subroutine sum_delaunay4points_3d(delaunay_value, del_vert0, del_vert1, del_vert2, del_vert3, npart, nvert, point_del_sum)
+
+    ! Sums the values of each Delaunay tesselation for each point.
+    !
+    ! Parameters
+    ! ----------
+    ! delaunay_value : array
+    !   Delaunay values.
+    ! del_vert0 : array
+    !   Index for vertex 0 of each simplices.
+    ! del_vert1 : array
+    !   Index for vertex 1 of each simplices.
+    ! del_vert2 : array
+    !   Index for vertex 2 of each simplices.
+    ! npart : int
+    !   Number of points.
+    ! nvert : int
+    !   Number of vertices.
+    !
+    ! Returns
+    ! -------
+    ! point_del_sum : array
+    !   Sum of delaunay value for each point.
+
+    implicit none
+    integer, parameter :: dp = kind(1.d0)
+
+    ! Declare variables.
+
+    integer, intent(in) :: npart, nvert
+    real(kind=dp), intent(in) :: delaunay_value(nvert)
+    integer, intent(in) :: del_vert0(nvert), del_vert1(nvert), del_vert2(nvert), del_vert3(nvert)
+    real(kind=dp), intent(out) :: point_del_sum(npart)
+
+    integer :: i, i0, i1, i2, i3
+
+    do i = 1, npart
+      point_del_sum(i) = 0.
+    end do
+
+    do i = 1, nvert
+      i0 = del_vert0(i) + 1
+      i1 = del_vert1(i) + 1
+      i2 = del_vert2(i) + 1
+      i3 = del_vert3(i) + 1
+      point_del_sum(i0) = point_del_sum(i0) + delaunay_value(i)/4.
+      point_del_sum(i1) = point_del_sum(i1) + delaunay_value(i)/4.
+      point_del_sum(i2) = point_del_sum(i2) + delaunay_value(i)/4.
+      point_del_sum(i3) = point_del_sum(i3) + delaunay_value(i)/4.
+    end do
+
+end subroutine sum_delaunay4points_3d
 
 
 subroutine get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3, npart, nvert, delf0)

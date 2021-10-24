@@ -15,6 +15,8 @@ class Voronoi3D:
         self.points = None
         self.npart = None
         self.voronoi = None
+        self.voronoi_volume = None
+        self.voronoi_dens = None
         self.vertices = None
         self.cell = None
         self.regions = None
@@ -167,22 +169,34 @@ class Voronoi3D:
         ridge_point2 = self.ridge_points[:, 1]
 
         # calculate volume
-        volume = src.voronoi_3d_volume(xpoints=xpoints, ypoints=ypoints, zpoints=zpoints,
-                                       xverts=xverts, yverts=yverts, zverts=zverts,
-                                       ridge_point1=ridge_point1, ridge_point2=ridge_point2,
-                                       ridge_vertices=ridge_vertices, ridge_start=ridge_start,
-                                       ridge_end=ridge_end, npoints=len(xpoints),
-                                       nridge=len(ridge_point1), nvertices=len(xverts),
-                                       nridge_vertices=len(ridge_vertices))
+        self.voronoi_volume = src.voronoi_3d_volume(xpoints=xpoints,
+            ypoints=ypoints, zpoints=zpoints, xverts=xverts, yverts=yverts,
+            zverts=zverts, ridge_point1=ridge_point1, ridge_point2=ridge_point2,
+            ridge_vertices=ridge_vertices, ridge_start=ridge_start,
+            ridge_end=ridge_end, npoints=len(xpoints), nridge=len(ridge_point1),
+            nvertices=len(xverts), nridge_vertices=len(ridge_vertices))
 
         # remove and change bad values.
-        cond = np.where((volume == -1.) | (volume == 0.))[0]
-        volume[cond] = badval
-        if self.ispart is not None:
-            cond = np.where(self.ispart == 1.)[0]
-            volume = volume[cond]
-        self.volume = volume
-        return volume
+        cond = np.where((self.voronoi_volume == -1.) | (self.voronoi_volume == 0.))[0]
+        self.voronoi_volume[cond] = badval
+
+
+    def get_dens(self, mean_dens=np.nan):
+        """Computes the density of voronoi cells.
+
+        Parameters
+        ----------
+        mean_dens : float
+            For points where a density cannot be calculated this is set to the
+            mean_dens. However, if boxsize is set mean_dens is calculated automatically.
+        """
+        if self.voronoi_volume is None:
+            self.get_volume()
+        if self.boxsize is not None:
+            mean_dens = self.npart/(self.boxsize**3.)
+        self.voronoi_dens = np.ones(len(self.voronoi_volume))*mean_dens
+        cond = np.where(np.isfinite(self.voronoi_volume) == True)[0]
+        self.voronoi_dens[cond] = 1./self.voronoi_volume[cond]
 
 
     def clean(self):

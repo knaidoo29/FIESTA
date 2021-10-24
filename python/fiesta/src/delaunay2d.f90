@@ -1,4 +1,111 @@
 include "matrix.f90"
+include "polygon.f90"
+
+
+subroutine delaunay_area_2d(x, y, del_vert0, del_vert1, del_vert2, npart, nvert, areas)
+
+  ! Determines area for each simplex.
+  !
+  ! Parameters
+  ! ----------
+  ! x : array
+  !   X-coordinates.
+  ! y : array
+  !   Y-coordinates.
+  ! del_vert0 : array
+  !   Index for vertex 0 of each simplices.
+  ! del_vert1 : array
+  !   Index for vertex 1 of each simplices.
+  ! del_vert2 : array
+  !   Index for vertex 2 of each simplices.
+  ! npart : int
+  !   Number of points.
+  ! nvert : int
+  !   Number of vertices.
+  !
+  ! Returns
+  ! -------
+  ! areas : array
+  !   The areas of each simplex.
+
+  implicit none
+  integer, parameter :: dp = kind(1.d0)
+
+  ! Declare variables.
+
+  integer, intent(in) :: npart, nvert
+  real(kind=dp), intent(in) :: x(npart), y(npart)
+  integer, intent(in) :: del_vert0(nvert), del_vert1(nvert), del_vert2(nvert)
+  real(kind=dp), intent(out) :: areas(nvert)
+
+  integer :: i, i0, i1, i2
+  real(kind=dp) :: simplex_area
+
+  do i = 1, nvert
+
+    i0 = del_vert0(i) + 1
+    i1 = del_vert1(i) + 1
+    i2 = del_vert2(i) + 1
+
+    call triangle_area(x(i0), y(i0), x(i1), y(i1), x(i2), y(i2), simplex_area)
+
+    areas(i) = simplex_area
+
+  end do
+
+end subroutine delaunay_area_2d
+
+
+subroutine sum_delaunay4points_2d(delaunay_value, del_vert0, del_vert1, del_vert2, npart, nvert, point_del_sum)
+
+    ! Sums the values of each Delaunay tesselation for each point.
+    !
+    ! Parameters
+    ! ----------
+    ! delaunay_value : array
+    !   Delaunay values.
+    ! del_vert0 : array
+    !   Index for vertex 0 of each simplices.
+    ! del_vert1 : array
+    !   Index for vertex 1 of each simplices.
+    ! del_vert2 : array
+    !   Index for vertex 2 of each simplices.
+    ! npart : int
+    !   Number of points.
+    ! nvert : int
+    !   Number of vertices.
+    !
+    ! Returns
+    ! -------
+    ! point_del_sum : array
+    !   Sum of delaunay value for each point.
+
+    implicit none
+    integer, parameter :: dp = kind(1.d0)
+
+    ! Declare variables.
+
+    integer, intent(in) :: npart, nvert
+    real(kind=dp), intent(in) :: delaunay_value(nvert)
+    integer, intent(in) :: del_vert0(nvert), del_vert1(nvert), del_vert2(nvert)
+    real(kind=dp), intent(out) :: point_del_sum(npart)
+
+    integer :: i, i0, i1, i2
+
+    do i = 1, npart
+      point_del_sum(i) = 0.
+    end do
+
+    do i = 1, nvert
+      i0 = del_vert0(i) + 1
+      i1 = del_vert1(i) + 1
+      i2 = del_vert2(i) + 1
+      point_del_sum(i0) = point_del_sum(i0) + delaunay_value(i)/3.
+      point_del_sum(i1) = point_del_sum(i1) + delaunay_value(i)/3.
+      point_del_sum(i2) = point_del_sum(i2) + delaunay_value(i)/3.
+    end do
+
+end subroutine sum_delaunay4points_2d
 
 
 subroutine get_delf0_2d(x, y, f, del_vert0, del_vert1, del_vert2, npart, nvert, delf0)

@@ -29,9 +29,12 @@ for parallelisation.
 Dependencies
 ------------
 
-FIESTA is being developed on Python 3.8 but should work on all versions >3.4. Due
-to the Fortran source code you will additionally require a fortran compiler usually
-gfortran (which will come with gcc). The following Python modules are required.
+FIESTA is being developed in Python 3.8 but should work on all versions >3.4. FIESTA
+is written mostly in python but the heavy computation is carried out in Fortran.
+Compiling the Fortran source code will require the availability of a fortran compiler
+usually gfortran (which comes with gcc).
+
+The following Python modules are required.
 
 * `numpy <http://www.numpy.org/>`_
 * `scipy <https://scipy.org/>`_
@@ -39,3 +42,48 @@ gfortran (which will come with gcc). The following Python modules are required.
 
 For testing you will require `nose <https://nose.readthedocs.io/en/latest/>`_ or
 `pytest <http://pytest.org/en/latest/>`_ .
+
+
+Installation
+------------
+
+FIESTA can be installed by cloning the github repository::
+
+    git clone https://github.com/knaidoo29/FIESTA.git
+    cd FIESTA
+    python setup.py build
+    python setup.py install
+
+Once this is done you should be able to call MiSTree from python:
+
+.. code-block:: python
+
+    import fiesta
+
+Support
+-------
+
+If you have any issues with the code or want to suggest ways to improve it please
+open a new issue (`here <https://github.com/knaidoo29/FIESTA/issues>`_)
+or (if you don't have a github account) email krishna.naidoo.11@ucl.ac.uk.
+
+Contents
+--------
+
+Version History
+---------------
+
+**Version 0.0**:
+
+  * Interpolation and field assignments for cartesian coordinates up to 3 dimensions.
+
+  * Grid based methods:
+
+      - Field assignments: Nearest Grid Point, Cloud In Cell and Triangular Shaped Cloud.
+
+      - Interpolation: bilinear and trilinear interpolation.
+
+  * Non-uniform based methods:
+
+      - Field assignments and interpolation estimation via voronoi tesselation, delaunay
+      tesselation and smooth particle hydrodynamics.

@@ -10,7 +10,7 @@ all of the MPI enabled functions by passing the MPIutils class MPI as an additio
 keyword argument.
 
 
-In-depth documentation and tutorials can be found [here](https://fiesta-docs.readthedocs.io/)
+In-depth documentation and tutorials can be found [here](https://fiesta-docs.readthedocs.io/).
 
 ## Development
 

@@ -3,16 +3,22 @@
 | | |      
 |---------|----------------|
 | Author  | Krishna Naidoo |   
-| Version | 0.0.0          |
+| Version | 0.0.1          |
 | Homepage | https://github.com/knaidoo29/FIESTA |
 | Documentation | TBA |                           
 
+FIESTA is a python library for general interpolation from uniform and non-uniform
+input points. The library is predominantly written in python with a backend of Fortran
+for speed.
 
-Routines for Estimating a field from values based on known input points.
+MPI functionality can be enabled through the installation of the python library
+mpi4py but will require the additional installation of MPIutils which handles
+all of the MPI enabled functions. The class MPI is passed as an additional argument
+for parallelisation.
 
 ## Development
 
-FIESTA is currently in development. The plan is to implement the bulk of the code in python with Fortran subroutines for quick computations on large datasets. At some point much of this will have to be ported to C/C++ for very large datasets and the efficient use of MPI.
+FIESTA is currently in development. We implement 
 
 ### TO DO
 

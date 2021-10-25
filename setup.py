@@ -4,8 +4,8 @@ from numpy.distutils.core import setup, Extension
 # read the contents of your README file
 from os import path
 this_directory = path.abspath(path.dirname(__file__))
-print(this_directory[:-6])
-with open(path.join(this_directory[:-6], 'README.md')) as f:
+
+with open(path.join(this_directory, 'README.md')) as f:
     long_description = f.read()
 
 ext1 = Extension(name='fiesta.src.grid', sources=['fiesta/src/grid.f90'])
@@ -28,7 +28,7 @@ exts = [ext1, ext2, ext3, ext4, ext5, ext6, ext7, ext8, ext9, ext10,
         ext11, ext12, ext13, ext14, ext15]
 
 setup(name = 'fiesta',
-      version = '0.0.0',
+      version = '0.0.1',
       description       = "FIeld ESTimAtor.",
       long_description  = long_description,
       long_description_content_type = 'text/markdown',

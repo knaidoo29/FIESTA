@@ -1,4 +1,4 @@
-python/build/*
-python/dist/*
-python/fiesta.egg-info/*
+build/*
+dist/*
+fiesta.egg-info/*
 *.DS_Store

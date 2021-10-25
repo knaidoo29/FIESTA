@@ -54,7 +54,7 @@ FIESTA can be installed by cloning the github repository::
     python setup.py build
     python setup.py install
 
-Once this is done you should be able to call MiSTree from python:
+Once this is done you should be able to call FIESTA from python:
 
 .. code-block:: python
 

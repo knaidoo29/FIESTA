@@ -7,7 +7,7 @@ FIeld ESTimAtor
 +---------------+-----------------------------------------+
 | Version       | 0.0.1                                   |
 +---------------+-----------------------------------------+
-| Homepage      | https://github.com/knaidoo29/FIESTA     |
+| Repository    | https://github.com/knaidoo29/FIESTA     |
 +---------------+-----------------------------------------+
 | Documentation | https://fiesta-docs.readthedocs.io/     |
 +---------------+-----------------------------------------+

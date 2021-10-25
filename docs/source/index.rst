@@ -1,14 +1,18 @@
-Welcome to Lumache's documentation!
-===================================
+FIESTA : FIeld ESTimAtor
+========================
 
-**Lumache** (/lu'make/) is a Python library for cooks and food lovers
-that creates recipes mixing random ingredients.
-It pulls data from the `Open Food Facts database <https://world.openfoodfacts.org/>`_
-and offers a *simple* and *intuitive* API.
+| | |
+|---------|----------------|
+| Author  | Krishna Naidoo |
+| Version | 0.0.1          |
+| Homepage | https://github.com/knaidoo29/FIESTA |
+| Documentation | TBA |
 
-Check out the :doc:`usage` section for further information, including
-how to :ref:`installation` the project.
+FIESTA is a python library for general interpolation from uniform and non-uniform
+input points. The library is predominantly written in python with a backend of Fortran
+for speed.
 
-.. note::
-
-   This project is under active development.
+MPI functionality can be enabled through the installation of the python library
+mpi4py but will require the additional installation of MPIutils which handles
+all of the MPI enabled functions. The class MPI is passed as an additional argument
+for parallelisation.

@@ -1,5 +1,5 @@
 
-subroutine xgrid(xpix, dx, xg)
+subroutine xgrid(xpix, dx, xmin, xg)
 
   ! Returns the grid value along one axis.
   !
@@ -9,6 +9,8 @@ subroutine xgrid(xpix, dx, xg)
   !   Index along the axis.
   ! dx : float
   !   Cell width.
+  ! xmin : float
+  !   Minimum x-coordinate.
   !
   ! Returns
   ! -------
@@ -21,16 +23,16 @@ subroutine xgrid(xpix, dx, xg)
   ! Declare variables.
 
   integer, intent(in) :: xpix
-  real(kind=dp), intent(in) :: dx
+  real(kind=dp), intent(in) :: dx, xmin
   real(kind=dp), intent(out) :: xg
 
   ! Calculate the x value on the grid.
 
-  xg = dx/2. + real(xpix) * dx
+  xg = dx/2. + real(xpix) * dx + xmin
 
 end subroutine xgrid
 
-subroutine xgrids(xpix, pixlen, dx, xg)
+subroutine xgrids(xpix, pixlen, dx, xmin, xg)
 
   ! Returns the grid value along one axis.
   !
@@ -42,6 +44,8 @@ subroutine xgrids(xpix, pixlen, dx, xg)
   !   Length of xpix.
   ! dx : float
   !   Cell width.
+  ! xmin : float
+  !   Minimum x-coordinate.
   !
   ! Returns
   ! -------
@@ -55,7 +59,7 @@ subroutine xgrids(xpix, pixlen, dx, xg)
 
   integer, intent(in) :: pixlen
   integer, intent(in) :: xpix(pixlen)
-  real(kind=dp), intent(in) :: dx
+  real(kind=dp), intent(in) :: dx, xmin
   real(kind=dp), intent(out) :: xg(pixlen)
 
   integer :: i
@@ -64,7 +68,7 @@ subroutine xgrids(xpix, pixlen, dx, xg)
 
   do i = 1, pixlen
 
-    call xgrid(xpix(i), dx, xg(i))
+    call xgrid(xpix(i), dx, xmin, xg(i))
 
   end do
 

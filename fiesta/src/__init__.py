@@ -1,9 +1,9 @@
 from .grid import xgrid
 from .grid import xgrids
 
+from .part2grid_pix import which_pix
 from .part2grid_pix import pix1dto2d
 from .part2grid_pix import pix1dto3d
-from .part2grid_pix import find_pix
 from .part2grid_pix import periodic_pix
 from .part2grid_pix import ngp_pix
 from .part2grid_pix import cic_pix
@@ -22,9 +22,11 @@ from .part2grid_3d import part2grid_tsc_3d
 
 from .bilinear import bilinear_periodic
 from .bilinear import bilinear_nonperiodic
+from .bilinear import bilinear_axisperiodic
 
 from .trilinear import trilinear_periodic
 from .trilinear import trilinear_nonperiodic
+from .trilinear import trilinear_axisperiodic
 
 from .polygon import triangle_area
 from .polygon import sum_triangle_area

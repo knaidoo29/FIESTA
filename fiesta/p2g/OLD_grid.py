@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def grid1d(boxsize, ngrid):
+def grid1D(boxsize, ngrid):
     """Returns the x coordinates of a cartesian grid.
 
     Parameters
@@ -23,7 +23,7 @@ def grid1d(boxsize, ngrid):
     return xedges, x
 
 
-def grid2d(boxsize, ngrid):
+def grid2D(boxsize, ngrid):
     """Returns the x, y coordinates of a cartesian grid.
 
     Parameters
@@ -35,17 +35,17 @@ def grid2d(boxsize, ngrid):
 
     Returns
     -------
-    x2d : array
+    x2D : array
         X coordinates on a 2D cartesian grid.
-    y2d : array
+    y2D : array
         Y coordinates on a 2D cartesian grid.
     """
-    xedges, x = grid1d(boxsize, ngrid)
-    x2d, y2d = np.meshgrid(x, x, indexing='ij')
-    return x2d, y2d
+    xedges, x = grid1D(boxsize, ngrid)
+    x2D, y2D = np.meshgrid(x, x, indexing='ij')
+    return x2D, y2D
 
 
-def grid3d(boxsize, ngrid):
+def grid3D(boxsize, ngrid):
     """Returns the x, y, z coordinates of a cartesian grid.
 
     Parameters
@@ -57,13 +57,13 @@ def grid3d(boxsize, ngrid):
 
     Returns
     -------
-    x3d : array
+    x3D : array
         X coordinates on a 3D cartesian grid.
-    y3d : array
+    y3D : array
         Y coordinates on a 3D cartesian grid.
-    z3d : array
+    z3D : array
         Z coordinates on a 3D cartesian grid.
     """
-    xedges, x = grid1d(boxsize, ngrid)
-    x3d, y3d, z3d = np.meshgrid(x, x, x, indexing='ij')
-    return x3d, y3d, z3d
+    xedges, x = grid1D(boxsize, ngrid)
+    x3D, y3D, z3D = np.meshgrid(x, x, x, indexing='ij')
+    return x3D, y3D, z3D

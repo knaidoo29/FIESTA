@@ -24,11 +24,10 @@ ext13 = Extension(name='fiesta.src.delaunay2d', sources=['fiesta/src/delaunay2d.
 ext14 = Extension(name='fiesta.src.delaunay3d', sources=['fiesta/src/delaunay3d.f90'])
 ext15 = Extension(name='fiesta.src.differentiate', sources=['fiesta/src/differentiate.f90'])
 
-exts = [ext1, ext2, ext3, ext4, ext5, ext6, ext7, ext8, ext9, ext10,
-        ext11, ext12, ext13, ext14, ext15]
+exts = [ext1, ext2, ext3, ext4, ext5, ext6, ext7, ext8, ext9, ext10, ext11, ext12, ext13, ext14, ext15]
 
 setup(name = 'fiesta',
-      version = '0.0.1',
+      version = '0.0.2',
       description       = "FIeld ESTimAtor.",
       long_description  = long_description,
       long_description_content_type = 'text/markdown',

@@ -1,20 +1,62 @@
 # FIESTA : FIeld ESTimAtor
 
-FIESTA is a python library for general interpolation from uniform and non-uniform
-input points. The library is predominantly written in python with a backend of Fortran
-for speed.
+|               |                                       |
+|---------------|---------------------------------------|
+| Author        | Krishna Naidoo                        |          
+| Version       | 0.1.0                                 |
+| Repository    | https://github.com/knaidoo29/fiesta   |
+| Documentation | https://fiesta-docs.readthedocs.io/    |
 
-MPI functionality can be enabled through the installation of the python library
-mpi4py but will require the additional installation of MPIutils which handles
-all of the MPI enabled functions by passing the MPIutils class MPI as an additional
-keyword argument.
+> **_WARNING:_** This is the development branch of FIESTA used to develop and build new functions and classes. Users should clone the main branch for their uses.
 
+## Introduction
 
-In-depth documentation and tutorials can be found [here](https://fiesta-docs.readthedocs.io/).
+FIESTA is a python library for general interpolation from uniform and non-uniform input points. The library is predominantly written in python with a backend of Fortran for speed.
 
-## Development
+> **_NOTE:_** MPI functionality can be enabled through the installation of the python library mpi4py but will require the additional installation of MPIutils which handles all of the MPI enabled functions by passing the MPIutils class MPI as an additional keyword argument.
 
-FIESTA is currently in development. We implement
+## Dependencies
+
+FIESTA is developed in Python 3.9 but should work on all versions >=3.4. FIESTA is written mostly in python with some heavy computation carried out in Fortran. Compiling the Fortran source code will require the availability of a Fortran compiler such as gfortran or ifort.
+
+The following Python modules are required:
+
+* [numpy](http://www.numpy.org/)
+* [scipy](http://scipy.org/)
+* [healpy](https://healpy.readthedocs.io/)
+* [magpie-pkg](https://magpie-doc.readthedocs.io/)
+* [SHIFT](https://github.com/knaidoo29/SHIFT) <- dependency may be removed.
+
+For testing you will require [nose](https://nose.readthedocs.io/en/latest/) or [pytest](http://pytest.org/en/latest/).
+
+## Installation
+
+FIESTA currently can only be installed by cloning the repository, `conda` and `pip` installs will be added later.
+
+1. By cloning the github repository:
+
+  ```
+      git clone https://github.com/knaidoo29/fiesta.git
+      cd FIESTA
+      python setup.py build
+      python setup.py install
+  ```
+
+Once this is done you should be able to call `fiesta` from python:
+
+```
+    import fiesta
+```
+
+## Support
+
+If you have any issues with the code or want to suggest ways to improve it please open a new issue ([here](https://github.com/knaidoo29/FIESTA/issues)) or (if you don't have a github account) email _krishna.naidoo.11@ucl.ac.uk_.
+
+## Version History
+
+* **Version 0.1**:
+
+# Old README:
 
 ### TO DO
 
@@ -45,31 +87,6 @@ FIESTA is currently in development. We implement
   * 2D, 3D
 * Smooth Particle Hydrodynamics (SPH) classes
   * 2D, 3D
-
-## Python module
-
-### Installation
-
-Clone or download FIESTA. Navigate to the python directory in a terminal and install using the following:
-
-```
-    python setup.py build
-    python setup.py install
-```
-
-You will then be able to load FIESTA in python using:
-
-```
-  import fiesta
-```
-
-### Depencies
-
-* python3
-* numpy
-* scipy
-* f2py
-* [SHIFT](https://github.com/knaidoo29/SHIFT)
 
 ### Functions
 

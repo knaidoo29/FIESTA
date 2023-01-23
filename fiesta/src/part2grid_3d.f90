@@ -229,20 +229,20 @@ subroutine part2grid_tsc_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin &
     call tsc_pix(xp, dx, xmin, xpix)
     call tsc_pix(yp, dy, ymin, ypix)
     call tsc_pix(zp, dz, zmin, zpix)
-    call xgrids(xpix, 3, dx, zmin, xg)
+    call xgrids(xpix, 3, dx, xmin, xg)
     call xgrids(ypix, 3, dy, ymin, yg)
     call xgrids(zpix, 3, dz, zmin, zg)
-    
+
     if (periodx .EQV. .TRUE.) then
-      call periodic_pix(xpix, 2, nxgrid)
+      call periodic_pix(xpix, 3, nxgrid)
     end if
 
     if (periody .EQV. .TRUE.) then
-      call periodic_pix(ypix, 2, nygrid)
+      call periodic_pix(ypix, 3, nygrid)
     end if
 
     if (periodz .EQV. .TRUE.) then
-      call periodic_pix(zpix, 2, nzgrid)
+      call periodic_pix(zpix, 3, nzgrid)
     end if
 
     do j1 = 1, 3

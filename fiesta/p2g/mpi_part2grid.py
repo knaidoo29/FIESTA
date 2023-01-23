@@ -72,7 +72,7 @@ def mpi_part2grid2D(x, y, f, boxsize, ngrid, MPI, method='TSC', periodic=True,
         xmin -= dx
         xmax += dx
         nxgrid += 2
-        xlength = xmax - xmin
+    xlength = xmax - xmin
     if method == 'NGP':
         fgrid = src.part2grid_ngp_2d(x=x, y=y, f=f, xlength=xlength, ylength=ylength,
                                      xmin=xmin, ymin=ymin, npart=len(x), nxgrid=nxgrid,
@@ -169,12 +169,12 @@ def mpi_part2grid3D(x, y, z, f, boxsize, ngrid, MPI, method='TSC', periodic=True
         xmin -= dx
         xmax += dx
         nxgrid += 2
-        xlength = xmax - xmin
+    xlength = xmax - xmin
     if method == 'NGP':
         fgrid = src.part2grid_ngp_3d(x=x, y=y, z=z, f=f, xlength=xlength,
-                                     ylength=ylength, zlength=zlength, xmin=0.,
-                                     ymin=0., zmin=0., npart=len(x),
-                                     nxgrid=False, nygrid=nygrid, nzgrid=nzgrid)
+                                     ylength=ylength, zlength=zlength, xmin=xmin,
+                                     ymin=ymin, zmin=zmin, npart=len(x),
+                                     nxgrid=nxgrid, nygrid=nygrid, nzgrid=nzgrid)
     elif method == 'CIC':
         fgrid = src.part2grid_cic_3d(x=x, y=y, z=z, f=f, xlength=xlength,
                                      ylength=ylength, zlength=zlength,

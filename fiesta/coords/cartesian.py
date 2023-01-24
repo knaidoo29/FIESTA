@@ -122,3 +122,23 @@ def points2xyz(points):
     """
     x, y, z = points[:, 0], points[:, 1], points[:, 2]
     return x, y, z
+
+
+def coord2points(xlist):
+    """Column stacks input coordinates.
+
+    Parameters
+    ----------
+    xlist : array
+        List of coordinates and extra informations.
+
+    Return
+    ------
+    data : 2darray
+        Column stacked data array.
+    """
+    if np.isscalar(xlist[0]) == True:
+        data = np.array([xlist])
+    else:
+        data = np.column_stack(xlist)
+    return data

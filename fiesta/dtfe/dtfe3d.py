@@ -62,7 +62,7 @@ class Delaunay3D:
         self.ntotal = self.npart
 
 
-    def set_buffer(self, boxsize, buffer_length):
+    def set_buffer(self, boxsize, buffer_length, buffer_val=0.):
         """Defines buffer particles to be placed around a given box.
 
         Parameters
@@ -81,7 +81,7 @@ class Delaunay3D:
         self.buffer_length = buffer_length
         self.usebuffer = True
         self.useperiodic = False
-        x_buffer, y_buffer, z_buffer = boundary.buffer_random_3d(self.npart, self.boxsize, self.buffer_length)
+        x_buffer, y_buffer, z_buffer = boundary.buffer_random_3D(self.npart, self.boxsize, self.buffer_length)
         points_buffer = coords.coord2points([x_buffer, y_buffer, z_buffer, buffer_val*np.ones(len(x_buffer))])
         self.nbuffer = len(x_buffer)
         self.ntotal += self.nbuffer
@@ -168,10 +168,6 @@ class Delaunay3D:
             assert lenf == len(self.points), "f must be equal to input points."
             self.points[:, 3] = f
         x, y, z, f = self.points[:, 0], self.points[:, 1], self.points[:, 2], self.points[:, 3]
-        if self.usebuffer == True:
-            f = np.concatenate([f, bufferval*np.ones(self.nbuffer)])
-        elif self.useperiodic == True:
-            f = np.concatenate([f, bufferval*np.ones(self.nperiodic)])
         del_vert0 = self.delaunay_simplices[:, 0]
         del_vert1 = self.delaunay_simplices[:, 1]
         del_vert2 = self.delaunay_simplices[:, 2]

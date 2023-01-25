@@ -8,7 +8,7 @@ from .. import src
 
 class Delaunay2D:
 
-    
+
     def __init__(self):
         """Initialises Delaunay2D class"""
         self.points = None
@@ -199,7 +199,7 @@ class Delaunay2D:
         f_est = src.delaunay_estimate_2d(simplices=simplices, x=x, y=y, x0=self.x0,
             y0=self.y0, f0=self.f0, delf0=self.delf0, npart=len(x), nsimp0=len(self.x0))
         return f_est
-
+    
 
     def clean(self):
         self.__init__()

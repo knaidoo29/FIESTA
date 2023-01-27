@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pylab as plt
 
 import shift
 
@@ -25,7 +26,7 @@ def mean_separation_2D(npart, boxsize):
         area = boxsize**2.
     else:
         area = boxsize[0]*boxsize[1]
-    mean_sep = np.sqrt(npart/area)
+    mean_sep = np.sqrt(area/npart)
     return mean_sep
 
 
@@ -48,12 +49,12 @@ def mean_separation_3D(npart, boxsize):
         vol = boxsize**3.
     else:
         vol = boxsize[0]*boxsize[1]*boxsize[2]
-    mean_sep = (npart/vol)**(1./3.)
+    mean_sep = (vol/npart)**(1./3.)
     return mean_sep
 
 
-def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
-                buffer_val=0., subsampling=4, useperiodic=False, outputgrid=False):
+def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_type=None,
+                buffer_factor=2, buffer_val=0., subsampling=4, outputgrid=False):
     """Returns the Delaunay tesselation density or field on a grid.
 
     Parameters
@@ -68,6 +69,11 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
         Field values, if None assumed output is density.
     origin : float or list, optional
         Origin for grid.
+    buffer_type : str, optional
+        Buffer particle type, either:
+            - 'random' for random buffer particles.
+            - 'periodic' for periodic buffer particles.
+            - None for no buffer particles.
     buffer_factor : float, optional
         Buffer length given as a multiple of the interparticle separation.
     buffer_val : float, optional
@@ -76,8 +82,6 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
         The pixel subsampling rate. Each pixel is evaluated subsampling^2 points
         on a grid within each pixel. This is to ensure each pixel is assigned a
         mean pixel value and not the value at the center.
-    useperiodic : bool, optional
-        If true particles in the buffer region will assume periodic boundary conditions.
     outputgrid : bool, optional
         Outputs coordinate grid.
 
@@ -113,8 +117,10 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
     dx2d, dy2d = shift.cart.grid2D([dx, dy], [dnxgrid, dnygrid], origin=[-dx/2., -dy/2.])
     dx2d, dy2d = dx2d.flatten(), dy2d.flatten()
     # calculate buffer length based on mean separation length
-    buffer_length = buffer_factor*mean_separation_2D(len(x), boxsize)
-    print(buffer_length)
+    if buffer_type is not None:
+        buffer_length = buffer_factor*mean_separation_2D(len(x), boxsize)
+    else:
+        buffer_length = 0.
     # initialise Delaunay tesselation
     D2D = dtfe2d.Delaunay2D()
     # add points
@@ -123,9 +129,9 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
     else:
         D2D.set_points(x, y, f)
     # set boundary buffer points, either periodic or random buffer points
-    if useperiodic:
+    if buffer_type == 'periodic':
         D2D.set_periodic(boxsize, buffer_length)
-    else:
+    elif buffer_type == 'random':
         D2D.set_buffer(boxsize, buffer_length, buffer_val=buffer_val)
     # construct delaunay tesselation triangles
     D2D.construct()
@@ -149,9 +155,9 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
         return f2d.reshape(nxgrid, nygrid)
 
 
-
-def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
-                buffer_val=0., subsampling=4, useperiodic=False, outputgrid=False):
+def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_factor=4,
+                buffer_val=0., buffer_type=None, subsampling=4, useperiodic=False,
+                outputgrid=False):
     """Returns the Delaunay tesselation density or field on a grid.
 
     Parameters
@@ -166,6 +172,11 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
         Field values, if None assumed output is density.
     origin : float or list, optional
         Origin for grid.
+    buffer_type : str, optional
+        Buffer particle type, either:
+            - 'random' for random buffer particles.
+            - 'periodic' for periodic buffer particles.
+            - None for no buffer particles.
     buffer_factor : float, optional
         Buffer length given as a multiple of the interparticle separation.
     buffer_val : float, optional
@@ -174,8 +185,6 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
         The pixel subsampling rate. Each pixel is evaluated subsampling^2 points
         on a grid within each pixel. This is to ensure each pixel is assigned a
         mean pixel value and not the value at the center.
-    useperiodic : bool, optional
-        If true particles in the buffer region will assume periodic boundary conditions.
     outputgrid : bool, optional
         Outputs coordinate grid.
 
@@ -195,7 +204,7 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
     if np.isscalar(ngrid):
         nxgrid, nygrid, nzgrid = ngrid, ngrid, ngrid
     else:
-        nxgrid, nygrid = ngrid[0], ngrid[1], ngrid[2]
+        nxgrid, nygrid, nzgrid = ngrid[0], ngrid[1], ngrid[2]
     # define subsampling rate for each pixel across each axis
     if np.isscalar(subsampling):
         dnxgrid, dnygrid, dnzgrid = subsampling, subsampling, subsampling
@@ -213,7 +222,6 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
     dx3d, dy3d, dz3d = dx3d.flatten(), dy3d.flatten(), dz3d.flatten()
     # calculate buffer length based on mean separation length
     buffer_length = buffer_factor*mean_separation_3D(len(x), boxsize)
-    print(buffer_length)
     # initialise Delaunay tesselation
     D3D = dtfe3d.Delaunay3D()
     # add points
@@ -222,9 +230,9 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_factor=2,
     else:
         D3D.set_points(x, y, z, f)
     # set boundary buffer points, either periodic or random buffer points
-    if useperiodic:
+    if buffer_type == 'periodic':
         D3D.set_periodic(boxsize, buffer_length)
-    else:
+    elif buffer_type == 'random':
         D3D.set_buffer(boxsize, buffer_length, buffer_val=buffer_val)
     # construct delaunay tesselation triangles
     D3D.construct()

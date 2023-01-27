@@ -8,9 +8,50 @@ from .. import boundary
 from . import dtfe4grid
 
 
-def mpi_dtfe4grid2D(x, y, ngrid, boxsize, MPI, MPI_ngrid, f=None, origin=0.,
+def mpi_dtfe4grid2D(x, y, ngrid, boxsize, MPI, MPI_split, f=None, origin=0.,
                     buffer_type=None, buffer_factor=2, buffer_val=0., subsampling=4,
                     outputgrid=False):
+    """Returns the Delaunay tesselation density or field on a grid.
+
+    Parameters
+    ----------
+    x, y : array
+        Coordinates of particles.
+    ngrid : int or int list
+        Grid dimensions.
+    boxsize : float or list
+        Dimensions of the grid.
+    MPI : class object
+        MPIutils MPI class object.
+    MPI_split : int or int list
+        Determines how to split each axis for serial DTFE calculations.
+    f : array, optional
+        Field values, if None assumed output is density.
+    origin : float or list, optional
+        Origin for grid.
+    buffer_type : str, optional
+        Buffer particle type, either:
+            - 'random' for random buffer particles.
+            - 'periodic' for periodic buffer particles.
+            - None for no buffer particles.
+    buffer_factor : float, optional
+        Buffer length given as a multiple of the interparticle separation.
+    buffer_val : float, optional
+        Value given to random buffer particles.
+    subsampling : int, optional
+        The pixel subsampling rate. Each pixel is evaluated subsampling^2 points
+        on a grid within each pixel. This is to ensure each pixel is assigned a
+        mean pixel value and not the value at the center.
+    outputgrid : bool, optional
+        Outputs coordinate grid.
+
+    Returns
+    -------
+    f2D : ndarray
+        Field values on a grid.
+    x2D, y2D : ndarray, optional
+        Pixel coordinate points.
+    """
     if np.isscalar(ngrid):
         nxgrid, nygrid = ngrid, ngrid
     else:
@@ -90,12 +131,12 @@ def mpi_dtfe4grid2D(x, y, ngrid, boxsize, MPI, MPI_ngrid, f=None, origin=0.,
     shape = np.shape(x2D)
     nxgrid, nygrid = shape[0], shape[1]
     f2D = np.zeros((nxgrid, nygrid))
-    if np.isscalar(MPI_ngrid):
+    if np.isscalar(MPI_split):
         xs1, xs2 = 0, len(xgrid)
-        ys1, ys2 = MPI.split(len(ygrid), size=MPI_ngrid)
+        ys1, ys2 = MPI.split(len(ygrid), size=MPI_split)
     else:
-        xs1, xs2 = MPI.split(len(xgrid), size=MPI_ngrid[0])
-        ys1, ys2 = MPI.split(len(ygrid), size=MPI_ngrid[1])
+        xs1, xs2 = MPI.split(len(xgrid), size=MPI_split[0])
+        ys1, ys2 = MPI.split(len(ygrid), size=MPI_split[1])
     xs1, ys1 = np.meshgrid(xs1, ys1, indexing='ij')
     xs1, ys1 = xs1.flatten(), ys1.flatten()
     xs2, ys2 = np.meshgrid(xs2, ys2, indexing='ij')
@@ -123,9 +164,50 @@ def mpi_dtfe4grid2D(x, y, ngrid, boxsize, MPI, MPI_ngrid, f=None, origin=0.,
         return f2D
 
 
-def mpi_dtfe4grid3D(x, y, z, ngrid, boxsize, MPI, MPI_ngrid, f=None, origin=0.,
+def mpi_dtfe4grid3D(x, y, z, ngrid, boxsize, MPI, MPI_split, f=None, origin=0.,
                     buffer_type=None, buffer_factor=6, buffer_val=0., subsampling=4,
                     outputgrid=False):
+    """Returns the Delaunay tesselation density or field on a grid.
+
+    Parameters
+    ----------
+    x, y, z : array
+        Coordinates of particles.
+    ngrid : int or int list
+        Grid dimensions.
+    boxsize : float or list
+        Dimensions of the grid.
+    MPI : class object
+        MPIutils MPI class object.
+    MPI_split : int or int list
+        Determines how to split each axis for serial DTFE calculations.
+    f : array, optional
+        Field values, if None assumed output is density.
+    origin : float or list, optional
+        Origin for grid.
+    buffer_type : str, optional
+        Buffer particle type, either:
+            - 'random' for random buffer particles.
+            - 'periodic' for periodic buffer particles.
+            - None for no buffer particles.
+    buffer_factor : float, optional
+        Buffer length given as a multiple of the interparticle separation.
+    buffer_val : float, optional
+        Value given to random buffer particles.
+    subsampling : int, optional
+        The pixel subsampling rate. Each pixel is evaluated subsampling^2 points
+        on a grid within each pixel. This is to ensure each pixel is assigned a
+        mean pixel value and not the value at the center.
+    outputgrid : bool, optional
+        Outputs coordinate grid.
+
+    Returns
+    -------
+    f3D : ndarray
+        Field values on a grid.
+    x3D, y3D, z3D : ndarray, optional
+        Pixel coordinate points.
+    """
     if np.isscalar(ngrid):
         nxgrid, nygrid, nzgrid = ngrid, ngrid, ngrid
     else:
@@ -208,14 +290,14 @@ def mpi_dtfe4grid3D(x, y, z, ngrid, boxsize, MPI, MPI_ngrid, f=None, origin=0.,
     shape = np.shape(x3D)
     nxgrid, nygrid, nzgrid = shape[0], shape[1], shape[2]
     f3D = np.zeros((nxgrid, nygrid, nzgrid))
-    if np.isscalar(MPI_ngrid):
+    if np.isscalar(MPI_split):
         xs1, xs2 = 0, len(xgrid)
-        ys1, ys2 = MPI.split(len(ygrid), size=MPI_ngrid)
-        zs1, zs2 = MPI.split(len(zgrid), size=MPI_ngrid)
+        ys1, ys2 = MPI.split(len(ygrid), size=MPI_split)
+        zs1, zs2 = MPI.split(len(zgrid), size=MPI_split)
     else:
-        xs1, xs2 = MPI.split(len(xgrid), size=MPI_ngrid[0])
-        ys1, ys2 = MPI.split(len(ygrid), size=MPI_ngrid[1])
-        zs1, zs2 = MPI.split(len(zgrid), size=MPI_ngrid[2])
+        xs1, xs2 = MPI.split(len(xgrid), size=MPI_split[0])
+        ys1, ys2 = MPI.split(len(ygrid), size=MPI_split[1])
+        zs1, zs2 = MPI.split(len(zgrid), size=MPI_split[2])
     xs1, ys1, zs1 = np.meshgrid(xs1, ys1, zs1, indexing='ij')
     xs1, ys1, zs1 = xs1.flatten(), ys1.flatten(), zs1.flatten()
     xs2, ys2, zs2 = np.meshgrid(xs2, ys2, zs2, indexing='ij')

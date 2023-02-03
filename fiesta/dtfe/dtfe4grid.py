@@ -54,7 +54,7 @@ def mean_separation_3D(npart, boxsize):
 
 
 def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_type=None,
-                buffer_factor=2, buffer_val=0., subsampling=4, outputgrid=False):
+                buffer_length=0., buffer_val=0., subsampling=4, outputgrid=False):
     """Returns the Delaunay tesselation density or field on a grid.
 
     Parameters
@@ -74,8 +74,8 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_type=None,
             - 'random' for random buffer particles.
             - 'periodic' for periodic buffer particles.
             - None for no buffer particles.
-    buffer_factor : float, optional
-        Buffer length given as a multiple of the interparticle separation.
+    buffer_length : float, optional
+        Buffer length.
     buffer_val : float, optional
         Value given to random buffer particles.
     subsampling : int, optional
@@ -116,11 +116,6 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_type=None,
     # define subsampling points for each pixel
     dx2d, dy2d = shift.cart.grid2D([dx, dy], [dnxgrid, dnygrid], origin=[-dx/2., -dy/2.])
     dx2d, dy2d = dx2d.flatten(), dy2d.flatten()
-    # calculate buffer length based on mean separation length
-    if buffer_type is not None:
-        buffer_length = buffer_factor*mean_separation_2D(len(x), boxsize)
-    else:
-        buffer_length = 0.
     # initialise Delaunay tesselation
     D2D = dtfe2d.Delaunay2D()
     # add points
@@ -155,7 +150,7 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_type=None,
         return f2d.reshape(nxgrid, nygrid)
 
 
-def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_factor=4,
+def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_length=0.,
                 buffer_val=0., buffer_type=None, subsampling=4, useperiodic=False,
                 outputgrid=False):
     """Returns the Delaunay tesselation density or field on a grid.
@@ -177,8 +172,8 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_factor=4,
             - 'random' for random buffer particles.
             - 'periodic' for periodic buffer particles.
             - None for no buffer particles.
-    buffer_factor : float, optional
-        Buffer length given as a multiple of the interparticle separation.
+    buffer_length : float, optional
+        Buffer length.
     buffer_val : float, optional
         Value given to random buffer particles.
     subsampling : int, optional
@@ -220,8 +215,6 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_factor=4,
     # define subsampling points for each pixel
     dx3d, dy3d, dz3d = shift.cart.grid3D([dx, dy, dz], [dnxgrid, dnygrid, dnzgrid], origin=[-dx/2., -dy/2., -dz/2.])
     dx3d, dy3d, dz3d = dx3d.flatten(), dy3d.flatten(), dz3d.flatten()
-    # calculate buffer length based on mean separation length
-    buffer_length = buffer_factor*mean_separation_3D(len(x), boxsize)
     # initialise Delaunay tesselation
     D3D = dtfe3d.Delaunay3D()
     # add points

@@ -3,6 +3,7 @@ import numpy as np
 import shift
 
 from . import points
+from .. import src
 
 
 def split_limits_by_grid(boxsize, origin, ngrid, MPI):
@@ -276,6 +277,82 @@ class MPI_SortByX:
                     _data4limit = self.MPI.recv(0, tag=10+i)
             self.MPI.wait()
         return _data4limit
+
+
+    def distribute_grid2D(self, x2d, y2d, f2d):
+        if x2d is not None:
+            data = np.column_stack([x2d.flatten(), y2d.flatten(), f2d.flatten()])
+        else:
+            data = None
+        self.input(data)
+        data = self.distribute()
+        if np.isscalar(self.boxsize):
+            xbox = self.boxsize
+            ybox = self.boxsize
+        else:
+            xbox = self.boxsize[0]
+            ybox = self.boxsize[1]
+        if np.isscalar(self.ngrid):
+            nxgrid = self.ngrid
+            nygrid = self.ngrid
+        else:
+            nxgrid = self.ngrid[0]
+            nygrid = self.ngrid[1]
+        if np.isscalar(self.origin):
+            xorigin = self.origin
+            yorigin = self.origin
+        else:
+            xorigin = self.origin[0]
+            yorigin = self.origin[1]
+        dx = (self.limits[1]-self.limits[0])/float(self.ngrid_rank)
+        dy = ybox/float(nygrid)
+        xpixs = src.which_pixs(x=data[:,0], dx=dx, xmin=self.limits[0], npix=len(data))
+        ypixs = src.which_pixs(x=data[:,1], dx=dy, xmin=yorigin, npix=len(data))
+        f = np.zeros((self.ngrid_rank, nygrid))
+        f[xpixs, ypixs] = data[:,2]
+        return f
+
+
+    def distribute_grid3D(self, x3d, y3d, z3d, f3d):
+        if x3d is not None:
+            data = np.column_stack([x3d.flatten(), y3d.flatten(), z3d.flatten(), f3d.flatten()])
+        else:
+            data = None
+        self.input(data)
+        data = self.distribute()
+        if np.isscalar(self.boxsize):
+            xbox = self.boxsize
+            ybox = self.boxsize
+            zbox = self.boxsize
+        else:
+            xbox = self.boxsize[0]
+            ybox = self.boxsize[1]
+            zbox = self.boxsize[2]
+        if np.isscalar(self.ngrid):
+            nxgrid = self.ngrid
+            nygrid = self.ngrid
+            nzgrid = self.ngrid
+        else:
+            nxgrid = self.ngrid[0]
+            nygrid = self.ngrid[1]
+            nzgrid = self.ngrid[2]
+        if np.isscalar(self.origin):
+            xorigin = self.origin
+            yorigin = self.origin
+            zorigin = self.origin
+        else:
+            xorigin = self.origin[0]
+            yorigin = self.origin[1]
+            zorigin = self.origin[2]
+        dx = (self.limits[1]-self.limits[0])/float(self.ngrid_rank)
+        dy = ybox/float(nygrid)
+        dz = zbox/float(nzgrid)
+        xpixs = src.which_pixs(x=data[:,0], dx=dx, xmin=self.limits[0], npix=len(data))
+        ypixs = src.which_pixs(x=data[:,1], dx=dy, xmin=yorigin, npix=len(data))
+        zpixs = src.which_pixs(x=data[:,2], dx=dz, xmin=zorigin, npix=len(data))
+        f = np.zeros((self.ngrid_rank, nygrid, nzgrid))
+        f[xpixs, ypixs, zpixs] = data[:,3]
+        return f
 
 
     def clean(self):

@@ -2,6 +2,7 @@ from .grid import xgrid
 from .grid import xgrids
 
 from .part2grid_pix import which_pix
+from .part2grid_pix import which_pixs
 from .part2grid_pix import pix1dto2d
 from .part2grid_pix import pix1dto3d
 from .part2grid_pix import periodic_pix

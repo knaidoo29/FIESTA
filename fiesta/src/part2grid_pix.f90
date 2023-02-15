@@ -35,6 +35,46 @@ subroutine which_pix(x, dx, xmin, pix)
 end subroutine which_pix
 
 
+subroutine which_pixs(x, dx, xmin, npix, pixs)
+
+  ! Find pixel along a defined grid.
+  !
+  ! Parameters
+  ! ----------
+  ! xmin : float
+  !   Minimum along the grid.
+  ! dx : float
+  !   pixel width.
+  ! x : float
+  !   A point for which we would like to determine
+  !
+  !
+  ! Returns
+  ! -------
+  ! pix : int
+  !   The pixel the point corresponds to.
+
+  implicit none
+
+  ! Parameter declarations
+
+  integer, parameter :: dp = kind(1.d0)
+
+  integer, intent(in) :: npix
+  real(kind=dp), intent(in) :: xmin, dx, x(npix)
+  integer, intent(out) :: pixs(npix)
+
+  integer :: i
+
+  ! Main
+
+  do i=1, npix
+    call which_pix(x(i), dx, xmin, pixs(i))
+  end do
+
+end subroutine which_pixs
+
+
 subroutine pix1dto2d(xpix, ypix, xlen, ylen, ygrid, pix)
 
   ! Maps pixels given along a single axis in x and y onto a 2d grid flattened.

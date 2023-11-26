@@ -1,9 +1,58 @@
 import numpy as np
 
-import shift
-
 from . import points
 from .. import src
+
+
+def _grid1D(boxsize, ngrid, origin=0.):
+    """Returns the x coordinates of a cartesian grid.
+
+    Parameters
+    ----------
+    boxsize : float
+        Box size.
+    ngrid : int
+        Grid division along one axis.
+    origin : float, optional
+        Start point of the grid.
+
+    Returns
+    -------
+    xedges : array
+        x coordinate bin edges.
+    x : array
+        X coordinates bin centers.
+    """
+    xedges = np.linspace(0., boxsize, ngrid + 1) + origin
+    x = 0.5*(xedges[1:] + xedges[:-1])
+    return xedges, x
+
+
+def _mpi_grid1D(boxsize, ngrid, MPI, origin=0.):
+    """Returns the x coordinates of a cartesian grid.
+
+    Parameters
+    ----------
+    boxsize : float
+        Box size.
+    ngrid : int
+        Grid division along one axis.
+    origin : float, optional
+        Start point of the grid.
+
+    Returns
+    -------
+    xedges : array
+        x coordinate bin edges.
+    x : array
+        X coordinates bin centers.
+    """
+    xedges = np.linspace(0., boxsize, ngrid + 1) + origin
+    x = 0.5*(xedges[1:] + xedges[:-1])
+    split1, split2 = MPI.split(len(x))
+    x = x[split1[MPI.rank]:split2[MPI.rank]]
+    xedges = xedges[split1[MPI.rank]:split2[MPI.rank]+1]
+    return xedges, x
 
 
 def split_limits_by_grid(boxsize, origin, ngrid, MPI):
@@ -25,7 +74,7 @@ def split_limits_by_grid(boxsize, origin, ngrid, MPI):
     limits : float list
         Range.
     """
-    edges, grid = shift.cart.grid1D(boxsize, ngrid, origin=origin)
+    edges, grid = _grid1D(boxsize, ngrid, origin=origin)
     s1, s2 = MPI.split(len(grid))
     limits = [edges[s1[MPI.rank]], edges[s2[MPI.rank]]]
     return limits
@@ -224,12 +273,20 @@ class MPI_SortByX:
         self.data = None
         self.limits = None
         self.all_limits = None
+        self.buffer_length = 0.
+        self.subboxsize = None
+        self.subbox_origin = None
 
 
-    def settings(self, boxsize, ngrid, origin=0.):
+    def settings(self, boxsize, ngrid, origin=0., buffer_type='periodic',
+        buffer_length=0., subboxsize=None, subbox_origin=None):
         self.boxsize = boxsize
         self.ngrid = ngrid
         self.origin = origin
+        assert buffer_length >= 0., "buffer_length cannot be < 0."
+        self.buffer_length = buffer_length
+        self.subboxsize = subboxsize
+        self.subbox_origin = subbox_origin
 
 
     def input(self, data):
@@ -237,7 +294,7 @@ class MPI_SortByX:
 
 
     def limits4grid(self):
-        xedges, xgrid = shift.cart.mpi_grid1D(self.boxsize, self.ngrid, self.MPI, origin=self.origin)
+        xedges, xgrid = _mpi_grid1D(self.boxsize, self.ngrid, self.MPI, origin=self.origin)
         self.limits = [xedges[0], xedges[-1]]
         self.ngrid_rank = len(xgrid)
         all_limits = self.MPI.collect(self.limits, outlist=True)
@@ -249,34 +306,66 @@ class MPI_SortByX:
         self.all_limits = all_limits
 
 
-    def distribute(self):
-        for i in range(0, self.MPI.size):
-            if self.data is not None:
-                cond = np.where((self.data[:,0] >= self.all_limits[i,0]) &
-                                (self.data[:,0] < self.all_limits[i,1]))[0]
-                _data = self.data[cond]
-                _hasdata = True
+    def _checkifdist(self):
+        if self.data is None:
+            check = False
+        else:
+            xmin, xmax = np.min(self.data[:,0]) - self.buffer_length, np.max(self.data[:,0]) + self.buffer_length
+            if self.limits[0] <= xmin and self.limits[1] >= xmax:
+                check = True
             else:
-                _data = None
-                _hasdata = False
-            _data = self.MPI.collect(_data, outlist=True)
-            _hasdata = self.MPI.collect(_hasdata, outlist=True)
-            if self.MPI.rank == 0:
-                _hasdata = np.array(_hasdata).flatten()
-                cond = np.where(_hasdata == True)[0]
-                if len(cond) != 0:
-                    _data = np.vstack([_data[c] for c in cond])
+                check = False
+        checks = self.MPI.collect(check)
+        if self.MPI.rank == 0:
+            cond = np.where(checks == False)[0]
+            if len(cond) != 0:
+                ifdist = False
+            else:
+                ifdist = True
+            self.MPI.send(ifdist, tag=11)
+        else:
+            ifdist = self.MPI.recv(0, tag=11)
+        self.MPI.wait()
+        return ifdist
+
+    def distribute(self):
+        if self._checkifdist() is False:
+            for i in range(0, self.MPI.size):
+                if self.data is not None:
+                    if i == 0:
+                        cond = np.where((self.data[:,0] >= self.all_limits[i,0] - self.buffer_length) &
+                                        (self.data[:,0] < self.all_limits[i,1] + self.buffer_length))[0]
+                    elif i == self.MPI.size - 1:
+                        cond = np.where((self.data[:,0] >= self.all_limits[i,0] - self.buffer_length) &
+                                        (self.data[:,0] <= self.all_limits[i,1] + self.buffer_length))[0]
+                    else:
+                        cond = np.where((self.data[:,0] >= self.all_limits[i,0] - self.buffer_length) &
+                                        (self.data[:,0] < self.all_limits[i,1] + self.buffer_length))[0]
+                    _data = self.data[cond]
+                    _hasdata = True
                 else:
                     _data = None
-                if i == 0:
-                    _data4limit = np.copy(_data)
+                    _hasdata = False
+                _data = self.MPI.collect(_data, outlist=True)
+                _hasdata = self.MPI.collect(_hasdata, outlist=True)
+                if self.MPI.rank == 0:
+                    _hasdata = np.array(_hasdata).flatten()
+                    cond = np.where(_hasdata == True)[0]
+                    if len(cond) != 0:
+                        _data = np.vstack([_data[c] for c in cond])
+                    else:
+                        _data = None
+                    if i == 0:
+                        _data4limit = np.copy(_data)
+                    else:
+                        self.MPI.send(_data, to_rank=i, tag=10+i)
                 else:
-                    self.MPI.send(_data, to_rank=i, tag=10+i)
-            else:
-                if i != 0 and i == self.MPI.rank:
-                    _data4limit = self.MPI.recv(0, tag=10+i)
-            self.MPI.wait()
-        return _data4limit
+                    if i != 0 and i == self.MPI.rank:
+                        _data4limit = self.MPI.recv(0, tag=10+i)
+                self.MPI.wait()
+            return _data4limit
+        else:
+            return self.data
 
 
     def distribute_grid2D(self, x2d, y2d, f2d):

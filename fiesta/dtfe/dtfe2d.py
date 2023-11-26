@@ -42,7 +42,7 @@ class Delaunay2D:
             self.extent = [xmin, xmax, ymin, ymax]
 
 
-    def set_points(self, x, y, f):
+    def set_points(self, x, y, f, mass=None):
         """Sets the points for voronoi cells.
 
         Parameters
@@ -51,13 +51,18 @@ class Delaunay2D:
             X and Y-coordinates.
         f : array
             Field values
+        mass : array, optional
+            For calculating density fields.
         """
-        self.points = coords.coord2points([x, y, f])
+        if mass is None:
+            self.points = coords.coord2points([x, y, f])
+        else:
+            self.points = coords.coord2points([x, y, f, mass])
         self.npart = len(self.points)
         self.ntotal = self.npart
 
 
-    def set_buffer(self, boxsize, buffer_length, buffer_val=0.):
+    def set_buffer(self, boxsize, buffer_length, buffer_val=0., buffer_mass=None):
         """Defines buffer particles to be placed around a given box.
 
         Parameters
@@ -68,6 +73,8 @@ class Delaunay2D:
             Length of the buffer region.
         buffer_val : float, optional
             Buffer value.
+        buffer_mass : float, optional
+            Must be provided if mass is provided.
         """
         # check boxsize is consistent with particles.
         self._extent()
@@ -78,7 +85,10 @@ class Delaunay2D:
         self.usebuffer = True
         self.useperiodic = False
         x_buffer, y_buffer = boundary.buffer_random_2D(self.npart, self.boxsize, self.buffer_length)
-        points_buffer = coords.coord2points([x_buffer, y_buffer, buffer_val*np.ones(len(x_buffer))])
+        if len(self.points[0]) == 3:
+            points_buffer = coords.coord2points([x_buffer, y_buffer, buffer_val*np.ones(len(x_buffer))])
+        else:
+            points_buffer = coords.coord2points([x_buffer, y_buffer, buffer_val*np.ones(len(x_buffer)), buffer_mass*np.ones(len(x_buffer))])
         self.nbuffer = len(x_buffer)
         self.ntotal += self.nbuffer
         # redefine points to include buffer points and also define mask
@@ -144,7 +154,10 @@ class Delaunay2D:
         point_area = src.sum_delaunay4points_2d(delaunay_value=self.delaunay_area,
             del_vert0=del_vert0, del_vert1=del_vert1, del_vert2=del_vert2,
             npart=self.ntotal, nvert=self.nvert)
-        self.points_dens = 1./point_area
+        if len(self.points) == 3:
+            self.points_dens = 1./point_area
+        else:
+            self.points_dens = self.points[:,3]/point_area
 
 
     def set_field(self, f=None, bufferval=0.):

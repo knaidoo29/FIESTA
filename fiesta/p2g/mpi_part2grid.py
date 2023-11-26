@@ -56,18 +56,18 @@ def mpi_part2grid2D(x, y, f, boxsize, ngrid, MPI, method='TSC', periodic=True,
     xmin, xmax = xedges[0], xedges[-1]
     dx = xedges[1]-xedges[0]
     nxgrid = len(xgrid)
-    xmins = MPI.collect(xmin)
-    xmaxs = MPI.collect(xmax)
-    if MPI.rank == 0:
-        for i in range(1, MPI.size):
-            cond = np.where((x >= xmins[i]) & (x < xmaxs[i]))[0]
-            MPI.send(np.column_stack([x[cond], y[cond], f[cond]]), to_rank=i, tag=10+i)
-        cond = np.where((x >= xmins[0]) & (x < xmaxs[0]))[0]
-        x, y, f = x[cond], y[cond], f[cond]
-    else:
-        data = MPI.recv(0, tag=10+MPI.rank)
-        x, y, f = data[:,0], data[:,1], data[:,2]
-    MPI.wait()
+    # xmins = MPI.collect(xmin)
+    # xmaxs = MPI.collect(xmax)
+    # if MPI.rank == 0:
+    #     for i in range(1, MPI.size):
+    #         cond = np.where((x >= xmins[i]) & (x < xmaxs[i]))[0]
+    #         MPI.send(np.column_stack([x[cond], y[cond], f[cond]]), to_rank=i, tag=10+i)
+    #     cond = np.where((x >= xmins[0]) & (x < xmaxs[0]))[0]
+    #     x, y, f = x[cond], y[cond], f[cond]
+    # else:
+    #     data = MPI.recv(0, tag=10+MPI.rank)
+    #     x, y, f = data[:,0], data[:,1], data[:,2]
+    # MPI.wait()
     if method != 'NGP':
         xmin -= dx
         xmax += dx
@@ -153,18 +153,18 @@ def mpi_part2grid3D(x, y, z, f, boxsize, ngrid, MPI, method='TSC', periodic=True
     xmin, xmax = xedges[0], xedges[-1]
     dx = xedges[1]-xedges[0]
     nxgrid = len(xgrid)
-    xmins = MPI.collect(xmin)
-    xmaxs = MPI.collect(xmax)
-    if MPI.rank == 0:
-        for i in range(1, MPI.size):
-            cond = np.where((x >= xmins[i]) & (x < xmaxs[i]))[0]
-            MPI.send(np.column_stack([x[cond], y[cond], z[cond], f[cond]]), to_rank=i, tag=10+i)
-        cond = np.where((x >= xmins[0]) & (x < xmaxs[0]))[0]
-        x, y, z, f = x[cond], y[cond], z[cond], f[cond]
-    else:
-        data = MPI.recv(0, tag=10+MPI.rank)
-        x, y, z, f = data[:,0], data[:,1], data[:,2], data[:,3]
-    MPI.wait()
+    # xmins = MPI.collect(xmin)
+    # xmaxs = MPI.collect(xmax)
+    # if MPI.rank == 0:
+    #     for i in range(1, MPI.size):
+    #         cond = np.where((x >= xmins[i]) & (x < xmaxs[i]))[0]
+    #         MPI.send(np.column_stack([x[cond], y[cond], z[cond], f[cond]]), to_rank=i, tag=10+i)
+    #     cond = np.where((x >= xmins[0]) & (x < xmaxs[0]))[0]
+    #     x, y, z, f = x[cond], y[cond], z[cond], f[cond]
+    # else:
+    #     data = MPI.recv(0, tag=10+MPI.rank)
+    #     x, y, z, f = data[:,0], data[:,1], data[:,2], data[:,3]
+    # MPI.wait()
     if method != 'NGP':
         xmin -= dx
         xmax += dx

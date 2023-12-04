@@ -112,7 +112,7 @@ subroutine sum_delaunay_vol_4_points_3d(delaunay_value, del_vert0, del_vert1, de
       point_vol(i3) = point_vol(i3) + delaunay_value(i)/4.
     end do
 
-end subroutine sum_delaunay4points_3d
+end subroutine sum_delaunay_vol_4_points_3d
 
 
 subroutine get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3, npart, nvert, delf0)

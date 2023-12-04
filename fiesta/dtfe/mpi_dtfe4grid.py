@@ -1,7 +1,7 @@
 import subprocess
 import numpy as np
 
-from ... import shift
+import shift
 
 from .. import coords
 from .. import boundary

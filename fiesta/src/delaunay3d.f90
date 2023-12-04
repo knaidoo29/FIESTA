@@ -61,7 +61,7 @@ subroutine delaunay_volume_3d(x, y, z, del_vert0, del_vert1, del_vert2, del_vert
 end subroutine delaunay_volume_3d
 
 
-subroutine sum_delaunay_vol_4_points_3d(delaunay_value, del_vert0, del_vert1, del_vert2, del_vert3, npart, nvert, point_vol)
+subroutine sum_delaunay_vol_4_points_3d(delaunay_vol, del_vert0, del_vert1, del_vert2, del_vert3, npart, nvert, point_vol)
 
     ! Finds the Delaunay volume for each point.
     !
@@ -91,7 +91,7 @@ subroutine sum_delaunay_vol_4_points_3d(delaunay_value, del_vert0, del_vert1, de
     ! Declare variables.
 
     integer, intent(in) :: npart, nvert
-    real(kind=dp), intent(in) :: delaunay_value(nvert)
+    real(kind=dp), intent(in) :: delaunay_vol(nvert)
     integer, intent(in) :: del_vert0(nvert), del_vert1(nvert), del_vert2(nvert), del_vert3(nvert)
     real(kind=dp), intent(out) :: point_vol(npart)
 
@@ -106,10 +106,10 @@ subroutine sum_delaunay_vol_4_points_3d(delaunay_value, del_vert0, del_vert1, de
       i1 = del_vert1(i) + 1
       i2 = del_vert2(i) + 1
       i3 = del_vert3(i) + 1
-      point_vol(i0) = point_vol(i0) + delaunay_value(i)/4.
-      point_vol(i1) = point_vol(i1) + delaunay_value(i)/4.
-      point_vol(i2) = point_vol(i2) + delaunay_value(i)/4.
-      point_vol(i3) = point_vol(i3) + delaunay_value(i)/4.
+      point_vol(i0) = point_vol(i0) + delaunay_vol(i)/4.
+      point_vol(i1) = point_vol(i1) + delaunay_vol(i)/4.
+      point_vol(i2) = point_vol(i2) + delaunay_vol(i)/4.
+      point_vol(i3) = point_vol(i3) + delaunay_vol(i)/4.
     end do
 
 end subroutine sum_delaunay_vol_4_points_3d

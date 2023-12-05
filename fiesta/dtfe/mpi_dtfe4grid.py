@@ -391,7 +391,7 @@ def mpi_dtfe4grid3D(x, y, z, ngrid, boxsize, MPI, MPI_split, f=None, mass=None,
         if verbose:
             MPI.mpi_print_zero(verbose_prefix+"DTFE subgrid:", "%i/%i" % (i+1,len(xs1)))
     if flush:
-        subprocess.call('rm -v temp_dtfe_MPI_%i_*.npz' % MPI.rank, shell=True)
+        subprocess.call('rm temp_dtfe_MPI_%i_*.npz' % MPI.rank, shell=True)
     if outputgrid:
         return x3D, y3D, z3D, f3D
     else:

@@ -289,6 +289,12 @@ def mpi_dtfe4grid3D(x, y, z, ngrid, boxsize, MPI, MPI_split, f=None, mass=None,
         _f = _data[:,3]
         if len(data[0]) == 5:
             _m = _data[:,4]
+    elif buffer_type == 'internal':
+        _data = boundary.mpi_buffer_internal_3D(data, boxsize, buffer_length, MPI, origin=origin)
+        _x, _y, _z = _data[:,0], _data[:,1], _data[:,2]
+        _f = _data[:,3]
+        if len(data[0]) == 5:
+            _m = _data[:,4]
     else:
         _x, _y, _z = data[:,0], data[:,1], data[:,2]
         _f = data[:,3]

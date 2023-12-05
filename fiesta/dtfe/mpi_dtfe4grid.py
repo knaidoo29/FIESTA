@@ -174,7 +174,7 @@ def mpi_dtfe4grid2D(x, y, ngrid, boxsize, MPI, MPI_split, f=None, mass=None,
 
 
 def mpi_dtfe4grid3D(x, y, z, ngrid, boxsize, MPI, MPI_split, f=None, mass=None,
-    buffer_type=None, buffer_length=0., buffer_val=0., origin=0., subsampling=4,
+    buffer_type=None, buffer_length=0., buffer_val=0., buffer_mass=1., origin=0., subsampling=4,
     outputgrid=False, calcdens=True, flush=True, verbose=False, verbose_prefix="",):
     """Returns the Delaunay tesselation density or field on a grid.
 
@@ -203,6 +203,8 @@ def mpi_dtfe4grid3D(x, y, z, ngrid, boxsize, MPI, MPI_split, f=None, mass=None,
         Buffer length.
     buffer_val : float, optional
         Value given to random buffer particles.
+    buffer_mass : float, optional
+        Mass of buffer particles.
     subsampling : int, optional
         The pixel subsampling rate. Each pixel is evaluated subsampling^2 points
         on a grid within each pixel. This is to ensure each pixel is assigned a

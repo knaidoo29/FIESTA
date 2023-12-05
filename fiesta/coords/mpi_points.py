@@ -226,7 +226,7 @@ class MPI_SortByX:
         self.all_limits = None
         self.buffer_length = 0.
 
-    
+
     def settings(self, boxsize, ngrid, origin=0., buffer_type='periodic',
         buffer_length=0.):
         self.boxsize = boxsize
@@ -275,19 +275,30 @@ class MPI_SortByX:
         self.MPI.wait()
         return ifdist
 
-    def distribute(self):
+    def distribute(self, include_internalbuffer=False):
         if self._checkifdist() is False:
             for i in range(0, self.MPI.size):
                 if self.data is not None:
-                    if i == 0:
-                        cond = np.where((self.data[:,0] >= self.all_limits[i,0] - self.buffer_length) &
-                                        (self.data[:,0] < self.all_limits[i,1] + self.buffer_length))[0]
-                    elif i == self.MPI.size - 1:
-                        cond = np.where((self.data[:,0] >= self.all_limits[i,0] - self.buffer_length) &
-                                        (self.data[:,0] <= self.all_limits[i,1] + self.buffer_length))[0]
+                    if include_internalbuffer:
+                        if i == 0:
+                            cond = np.where((self.data[:,0] >= self.all_limits[i,0] - self.buffer_length) &
+                                            (self.data[:,0] < self.all_limits[i,1] + self.buffer_length))[0]
+                        elif i == self.MPI.size - 1:
+                            cond = np.where((self.data[:,0] >= self.all_limits[i,0] - self.buffer_length) &
+                                            (self.data[:,0] <= self.all_limits[i,1] + self.buffer_length))[0]
+                        else:
+                            cond = np.where((self.data[:,0] >= self.all_limits[i,0] - self.buffer_length) &
+                                            (self.data[:,0] < self.all_limits[i,1] + self.buffer_length))[0]
                     else:
-                        cond = np.where((self.data[:,0] >= self.all_limits[i,0] - self.buffer_length) &
-                                        (self.data[:,0] < self.all_limits[i,1] + self.buffer_length))[0]
+                        if i == 0:
+                            cond = np.where((self.data[:,0] >= self.all_limits[i,0] - self.buffer_length) &
+                                            (self.data[:,0] < self.all_limits[i,1]))[0]
+                        elif i == self.MPI.size - 1:
+                            cond = np.where((self.data[:,0] >= self.all_limits[i,0]) &
+                                            (self.data[:,0] <= self.all_limits[i,1] + self.buffer_length))[0]
+                        else:
+                            cond = np.where((self.data[:,0] >= self.all_limits[i,0]) &
+                                            (self.data[:,0] < self.all_limits[i,1]))[0]
                     _data = self.data[cond]
                     _hasdata = True
                 else:

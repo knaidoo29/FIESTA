@@ -267,10 +267,10 @@ def mpi_dtfe4grid3D(x, y, z, ngrid, boxsize, MPI, MPI_split, f=None, mass=None,
     MPI.wait()
     # sort coordinates and distribute by coordinate system
     MPI_SBX = coords.MPI_SortByX(MPI)
-    MPI_SBX.settings(xboxsize, nxgrid, origin=xorigin, buffer_length=buffer_length)
-    MPI_SBX.input(data)
+    MPI_SBX.settings(xboxsize, nxgrid, origin=xorigin)
+    #MPI_SBX.input(data)
     MPI_SBX.limits4grid()
-    data = MPI_SBX.distribute(include_internalbuffer=True)
+    #data = MPI_SBX.distribute(include_internalbuffer=True)
     limits = [MPI_SBX.limits[0], MPI_SBX.limits[1], yorigin, yorigin+yboxsize, zorigin, zorigin+zboxsize]
     # add buffer particles.
     if buffer_type == 'random':

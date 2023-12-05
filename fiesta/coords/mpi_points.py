@@ -225,19 +225,15 @@ class MPI_SortByX:
         self.limits = None
         self.all_limits = None
         self.buffer_length = 0.
-        self.subboxsize = None
-        self.subbox_origin = None
 
-
+    
     def settings(self, boxsize, ngrid, origin=0., buffer_type='periodic',
-        buffer_length=0., subboxsize=None, subbox_origin=None):
+        buffer_length=0.):
         self.boxsize = boxsize
         self.ngrid = ngrid
         self.origin = origin
         assert buffer_length >= 0., "buffer_length cannot be < 0."
         self.buffer_length = buffer_length
-        self.subboxsize = subboxsize
-        self.subbox_origin = subbox_origin
 
 
     def input(self, data):

@@ -118,16 +118,16 @@ def mpi_buffer_internal_3D(data, boxsize, buffer_length, MPI, origin=0.):
         xboxsize = boxsize
     else:
         xboxsize = boxsize[0]
-    cond = np.where(datap[:,0] <= xorigin+buffer_length)[0]
-    data_send_down = MPI.send_down(datap[cond])
-    cond = np.where(datap[:,0] >= xorigin+xboxsize-buffer_length)[0]
-    data_send_up = MPI.send_up(datap[cond])
+    cond = np.where(data[:,0] <= xorigin+buffer_length)[0]
+    data_send_down = MPI.send_down(data[cond])
+    cond = np.where(data[:,0] >= xorigin+xboxsize-buffer_length)[0]
+    data_send_up = MPI.send_up(data[cond])
     if MPI.rank == 0:
         #data_send_up[:,0] -= xboxsize
-        datap = np.vstack([datap, data_send_down])
+        datap = np.vstack([data, data_send_down])
     elif MPI.rank == MPI.size - 1:
         #data_send_down[:,0] += xboxsize
-        datap = np.vstack([datap, data_send_up])
+        datap = np.vstack([data, data_send_up])
     else:
-        datap = np.vstack([datap, data_send_down, data_send_up])
+        datap = np.vstack([data, data_send_down, data_send_up])
     return datap

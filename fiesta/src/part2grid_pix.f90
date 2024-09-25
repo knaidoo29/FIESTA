@@ -405,3 +405,50 @@ subroutine tsc_pix(x, dx, xmin, pix)
   pix(3) = xpix + 1
 
 end subroutine tsc_pix
+
+subroutine pcs_pix(x, dx, xmin, pix)
+
+  ! Piecewise-Cubic-Spline pixel index.
+  !
+  ! Parameters
+  ! ----------
+  ! x : array(float)
+  !   Array of x-coordinates.
+  ! dx : float
+  !   Grid size.
+  ! xmin : float
+  !   Minimum along the grid.
+  !
+  ! Returns
+  ! -------
+  ! pix : array(int)
+  !   Cloud-in-cell pixel index array.
+
+  implicit none
+
+  ! Parameter declarations
+
+  integer, parameter :: dp = kind(1.d0)
+  real(kind=dp), intent(in) :: x, dx, xmin
+  integer, intent(out) :: pix(4)
+  integer :: xpix
+  real(kind=dp) :: xg
+
+  ! Main
+
+  call which_pix(x, dx, xmin, xpix)
+  call xgrid(xpix, dx, xmin, xg)
+
+  if (x .LT. xg) then
+    pix(1) = xpix - 2
+    pix(2) = xpix - 1
+    pix(3) = xpix
+    pix(4) = xpix + 1
+  else
+    pix(1) = xpix - 1
+    pix(2) = xpix
+    pix(3) = xpix + 1
+    pix(4) = xpix + 2
+  end if
+
+end subroutine pcs_pix

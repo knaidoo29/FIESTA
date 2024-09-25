@@ -267,3 +267,100 @@ subroutine part2grid_tsc_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin &
   end do
 
 end subroutine part2grid_tsc_3d
+
+
+subroutine part2grid_pcs_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin &
+  , zmin, npart, nxgrid, nygrid, nzgrid, periodx, periody, periodz, fgrid)
+
+  ! Piecewise-Cubic-Spline assignment in 3D.
+  !
+  ! Parameters
+  ! ----------
+  ! x, y, z : array
+  !   Cartesian coordinate system.
+  ! f : array
+  !   Field values are x, y & z coordinates.
+  ! xlength, ylength, zlength : float
+  !   Length of the box along the x, y & z coordinates.
+  ! xmin, ymin, zmin : float
+  !   Minimum values along the x, y & z axis.
+  ! npart : int
+  !   Number of x, y & z coordinates.
+  ! nxgrid, nygrid, nzgrid : int
+  !   Number of grids along x, y & z coordinates.
+  ! periodx, periody, periodz : bool
+  !   Periodic boundary conditions.
+  ! fgrid : array
+  !   TSC field assignments.
+
+  implicit none
+
+  ! Parameter declarations
+
+  integer, parameter :: dp = kind(1.d0)
+
+  integer, intent(in) :: npart, nxgrid, nygrid, nzgrid
+  logical, intent(in) :: periodx, periody, periodz
+  real(kind=dp), intent(in) :: x(npart), y(npart), z(npart), f(npart)
+  real(kind=dp), intent(in) :: xlength, ylength, zlength, xmin, ymin, zmin
+  real(kind=dp), intent(out) :: fgrid(nxgrid*nygrid*nzgrid)
+
+  integer :: i, j1, j2, j3, xpix(4), ypix(4), zpix(4), pix
+  real(kind=dp) :: wx, wy, wz, dx, dy, dz, xp, yp, zp, xg(4), yg(4), zg(4), fp
+
+  dx = xlength / real(nxgrid)
+  dy = ylength / real(nygrid)
+  dz = zlength / real(nzgrid)
+
+  do i = 1, nxgrid*nygrid*nzgrid
+    fgrid(i) = 0.
+  end do
+
+  do i = 1, npart
+
+    xp = x(i)
+    yp = y(i)
+    zp = z(i)
+    fp = f(i)
+
+    call pcs_pix(xp, dx, xmin, xpix)
+    call pcs_pix(yp, dy, ymin, ypix)
+    call pcs_pix(zp, dz, zmin, zpix)
+    call xgrids(xpix, 4, dx, xmin, xg)
+    call xgrids(ypix, 4, dy, ymin, yg)
+    call xgrids(zpix, 4, dz, zmin, zg)
+
+    if (periodx .EQV. .TRUE.) then
+      call periodic_pix(xpix, 4, nxgrid)
+    end if
+
+    if (periody .EQV. .TRUE.) then
+      call periodic_pix(ypix, 4, nygrid)
+    end if
+
+    if (periodz .EQV. .TRUE.) then
+      call periodic_pix(zpix, 4, nzgrid)
+    end if
+
+    do j1 = 1, 4
+      do j2 = 1, 4
+        do j3 = 1, 4
+          if ((xpix(j1) .GE. 0) .AND. (xpix(j1) .LT. nxgrid) &
+            .AND. (ypix(j2) .GE. 0) .AND. (ypix(j2) .LT. nygrid) &
+            .AND. (zpix(j3) .GE. 0) .AND. (zpix(j3) .LT. nzgrid)) then
+
+            call pix1dto3d_scalar(xpix(j1), ypix(j2), zpix(j3), nygrid, nzgrid, pix)
+            call weight_pcs(xp, xg(j1), dx, wx)
+            call weight_pcs(yp, yg(j2), dx, wy)
+            call weight_pcs(zp, zg(j3), dx, wz)
+
+            fgrid(pix+1) = fgrid(pix+1) + fp*wx*wy*wz
+
+          end if
+        end do
+      end do
+    end do
+
+  end do
+
+end subroutine part2grid_pcs_3d

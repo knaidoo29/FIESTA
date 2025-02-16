@@ -1,10 +1,10 @@
-import setuptools
+from setuptools import setup, find_packages
 from numpy.distutils.core import setup, Extension
 
 # read the contents of your README file
 from os import path
-this_directory = path.abspath(path.dirname(__file__))
 
+this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md')) as f:
     long_description = f.read()
 
@@ -35,7 +35,7 @@ setup(name = 'fiesta',
       author            = "Krishna Naidoo",
       author_email      = "krishna.naidoo.11@ucl.ac.uk",
       license='MIT',
-      packages=setuptools.find_packages(),
+      packages=find_packages(),
       install_requires=['numpy', 'scipy'],
       ext_modules = exts,
       python_requires = '>=3',

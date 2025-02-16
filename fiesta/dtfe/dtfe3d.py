@@ -158,7 +158,7 @@ class Delaunay3D:
         point_volume = src.sum_delaunay_vol_4_points_3d(delaunay_vol=self.delaunay_volume,
             del_vert0=del_vert0, del_vert1=del_vert1, del_vert2=del_vert2,
             del_vert3=del_vert3, npart=self.ntotal, nvert=self.nvert)
-        if len(self.points) == 4:
+        if len(self.points[0]) == 4:
             self.points_dens = 1./point_volume
         else:
             self.points_dens = self.points[:, 4]/point_volume

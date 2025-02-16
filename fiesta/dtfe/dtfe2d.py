@@ -154,7 +154,7 @@ class Delaunay2D:
         point_area = src.sum_delaunay_area_4_points_2d(delaunay_area=self.delaunay_area,
             del_vert0=del_vert0, del_vert1=del_vert1, del_vert2=del_vert2,
             npart=self.ntotal, nvert=self.nvert)
-        if len(self.points) == 3:
+        if len(self.points[0]) == 3:
             self.points_dens = 1./point_area
         else:
             self.points_dens = self.points[:,3]/point_area

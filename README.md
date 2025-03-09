@@ -23,9 +23,6 @@ The following Python modules are required:
 
 * [numpy](http://www.numpy.org/)
 * [scipy](http://scipy.org/)
-* [healpy](https://healpy.readthedocs.io/)
-* [magpie-pkg](https://magpie-doc.readthedocs.io/)
-* [SHIFT](https://github.com/knaidoo29/SHIFT) <- dependency may be removed.
 
 For testing you will require [nose](https://nose.readthedocs.io/en/latest/) or [pytest](http://pytest.org/en/latest/).
 

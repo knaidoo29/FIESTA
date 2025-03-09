@@ -3,7 +3,7 @@
 |               |                                       |
 |---------------|---------------------------------------|
 | Author        | Krishna Naidoo                        |          
-| Version       | 0.1.0                                 |
+| Version       | 0.2.0                                 |
 | Repository    | https://github.com/knaidoo29/fiesta   |
 | Documentation | https://fiesta-docs.readthedocs.io/    |
 

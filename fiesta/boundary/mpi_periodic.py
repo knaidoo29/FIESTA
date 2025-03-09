@@ -1,7 +1,6 @@
 import numpy as np
 
 from . import periodic
-from .. import randoms
 
 
 def mpi_buffer_periodic_2D(data, boxsize, buffer_length, MPI, origin=0.):

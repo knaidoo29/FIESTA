@@ -1,6 +1,4 @@
 numpy
-matplotlib
-healpy
-magpie-pkg
+scipy
 nose
 pytest

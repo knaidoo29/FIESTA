@@ -2,8 +2,7 @@ include "part2grid_pix.f90"
 include "part2grid_wei.f90"
 
 
-subroutine part2grid_ngp_2d(x, y, f, xlength, ylength, xmin, ymin, npart &
-  , nxgrid, nygrid, fgrid)
+subroutine part2grid_ngp_2d(x, y, f, xlength, ylength, xmin, ymin, npart, nxgrid, nygrid, fgrid)
 
   ! Nearest-grid-point assignment in 2D.
   !

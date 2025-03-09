@@ -289,7 +289,7 @@ subroutine bilinear_axisperiodic(fgrid, x, y, xbox, ybox, perix, periy, ngridx, 
         call xgrid(ix2, dx, minx, xg2)
       end if
     end if
-    if (perix == 1) then
+    if (periy == 1) then
       if (yp - dy/2. < 0.) then
         yp = yp + ybox
       end if

@@ -139,9 +139,7 @@ class Delaunay2D:
         del_vert0 = self.delaunay_simplices[:, 0]
         del_vert1 = self.delaunay_simplices[:, 1]
         del_vert2 = self.delaunay_simplices[:, 2]
-        self.delaunay_area = src.delaunay_area_2d(x=x, y=y, del_vert0=del_vert0,
-            del_vert1=del_vert1, del_vert2=del_vert2, npart=self.ntotal,
-            nvert=self.nvert)
+        self.delaunay_area = src.delaunay_area_2d(x, y, del_vert0, del_vert1=del_vert1, del_vert2=del_vert2)
 
 
     def get_dens(self):
@@ -151,9 +149,7 @@ class Delaunay2D:
         del_vert0 = self.delaunay_simplices[:, 0]
         del_vert1 = self.delaunay_simplices[:, 1]
         del_vert2 = self.delaunay_simplices[:, 2]
-        point_area = src.sum_delaunay_area_4_points_2d(delaunay_area=self.delaunay_area,
-            del_vert0=del_vert0, del_vert1=del_vert1, del_vert2=del_vert2,
-            npart=self.ntotal, nvert=self.nvert)
+        point_area = src.sum_delaunay_area_4_points_2d(self.delaunay_area, del_vert0, del_vert1, del_vert2, self.ntotal)
         if len(self.points[0]) == 3:
             self.points_dens = 1./point_area
         else:
@@ -181,10 +177,7 @@ class Delaunay2D:
         self.x0 = x[del_vert0]
         self.y0 = y[del_vert0]
         self.f0 = f[del_vert0]
-        self.delf0 = src.get_delf0_2d(x=x, y=y, f=f, del_vert0=del_vert0,
-            del_vert1=del_vert1, del_vert2=del_vert2, npart=self.ntotal,
-            nvert=self.nvert)
-
+        self.delf0 = src.get_delf0_2d(x, y, f, del_vert0, del_vert1, del_vert2)
 
     def find_simplex(self, x, y):
         """Find the simplex the coordinates lie within."""
@@ -209,8 +202,7 @@ class Delaunay2D:
             Estimates of the field
         """
         simplices = self.find_simplex(x, y)
-        f_est = src.delaunay_estimate_2d(simplices=simplices, x=x, y=y, x0=self.x0,
-            y0=self.y0, f0=self.f0, delf0=self.delf0, npart=len(x), nsimp0=len(self.x0))
+        f_est = src.delaunay_estimate_2d(simplices, x, y, self.x0, self.y0, self.f0, self.delf0)
         return f_est
 
 

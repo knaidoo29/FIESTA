@@ -53,15 +53,9 @@ def trilinear(fgrid, boxsize, x, y, z, origin=0., fill_value=np.nan, periodic=Tr
         npart = len(_x)
         if np.isscalar(periodic):
             if periodic == True:
-                f = src.trilinear_periodic(fgrid=fgrid.flatten(), x=_x, y=_y, z=_z,
-                                           xbox=xbox, ybox=ybox, zbox=zbox,
-                                           ngridx=ngrids[0], ngridy=ngrids[1],
-                                           ngridz=ngrids[2], npart=npart)
+                f = src.trilinear_periodic(fgrid.flatten(), _x, _y, _z, xbox, ybox, zbox, ngrids[0], ngrids[1], ngrids[2])
             else:
-                f = src.trilinear_nonperiodic(fgrid=fgrid.flatten(), x=_x, y=_y, z=_z,
-                                              xbox=xbox, ybox=ybox, zbox=zbox,
-                                              ngridx=ngrids[0], ngridy=ngrids[1],
-                                              ngridz=ngrids[2], npart=npart)
+                f = src.trilinear_nonperiodic(fgrid.flatten(), _x, _y, _z, xbox, ybox, zbox, ngrids[0], ngrids[1], ngrids[2])
         else:
             if periodic[0] is True:
                 perix = 1
@@ -75,11 +69,9 @@ def trilinear(fgrid, boxsize, x, y, z, origin=0., fill_value=np.nan, periodic=Tr
                 periz = 1
             else:
                 periz = 0
-            f = src.trilinear_axisperiodic(fgrid=fgrid.flatten(), x=_x, y=_y, z=_z,
-                                           xbox=xbox, ybox=ybox, zbox=zbox,
-                                           perix=perix, periy=periy, periz=periz,
-                                           ngridx=ngrids[0], ngridy=ngrids[1],
-                                           ngridz=ngrids[2], npart=npart)
+            f = src.trilinear_axisperiodic(fgrid.flatten(), _x, _y, _z,
+                                           xbox, ybox, zbox, perix, periy, periz,
+                                           ngrids[0], ngrids[1], ngrids[2])
     else:
         # Some particles are outside the boundary.
         # create a mask for in and outside the box
@@ -91,18 +83,9 @@ def trilinear(fgrid, boxsize, x, y, z, origin=0., fill_value=np.nan, periodic=Tr
         f = np.zeros(len(_x))
         if np.isscalar(periodic):
             if periodic == True:
-                f[cond] = src.trilinear_periodic(fgrid=fgrid.flatten(), x=_x[cond],
-                                                 y=_y[cond], z=_z[cond], xbox=xbox,
-                                                 ybox=ybox, zbox=zbox,
-                                                 ngridx=ngrids[0], ngridy=ngrids[1],
-                                                 ngridz=ngrids[2], npart=npart)
+                f[cond] = src.trilinear_periodic(fgrid.flatten(), _x[cond], _y[cond], _z[cond], xbox, ybox, zbox, ngrids[0], ngrids[1], ngrids[2])
             else:
-                f[cond] = src.trilinear_nonperiodic(fgrid=fgrid.flatten(),
-                                                    x=_x[cond], y=_y[cond],
-                                                    z=_z[cond], xbox=xbox,
-                                                    ybox=ybox, zbox=zbox,
-                                                    ngridx=ngrids[0], ngridy=ngrids[1],
-                                                    ngridz=ngrids[2], npart=npart)
+                f[cond] = src.trilinear_nonperiodic(fgrid.flatten(), _x[cond], _y[cond], _z[cond], xbox, ybox, zbox, ngrids[0], ngrids[1], ngrids[2])
         else:
             if periodic[0] is True:
                 perix = 1
@@ -116,11 +99,7 @@ def trilinear(fgrid, boxsize, x, y, z, origin=0., fill_value=np.nan, periodic=Tr
                 periz = 1
             else:
                 periz = 0
-            f[cond] = src.trilinear_axisperiodic(fgrid=fgrid.flatten(), x=_x[cond],
-                                                 y=_y[cond], z=_z[cond], xbox=xbox,
-                                                 ybox=ybox, zbox=zbox, perix=perix,
-                                                 periy=periy, periz=periz, ngridx=ngrids[0],
-                                                 ngridy=ngrids[1], ngridz=ngrids[2], npart=npart)
+            f[cond] = src.trilinear_axisperiodic(fgrid.flatten(), _x[cond], _y[cond], _z[cond], xbox, ybox, zbox, perix, periy, periz, ngrids[0], ngrids[1], ngrids[2])
         # fill outside boundary with fill values.
         cond = np.where(mask == 0.)[0]
         f[cond] = fill_value

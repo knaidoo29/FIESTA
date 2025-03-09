@@ -354,8 +354,8 @@ class MPI_SortByX:
             yorigin = self.origin[1]
         dx = (self.limits[1]-self.limits[0])/float(self.ngrid_rank)
         dy = ybox/float(nygrid)
-        xpixs = src.which_pixs(x=data[:,0], dx=dx, xmin=self.limits[0], npix=len(data))
-        ypixs = src.which_pixs(x=data[:,1], dx=dy, xmin=yorigin, npix=len(data))
+        xpixs = src.which_pixs(data[:,0], dx, self.limits[0])
+        ypixs = src.which_pixs(data[:,1], dy, yorigin)
         f = np.zeros((self.ngrid_rank, nygrid))
         f[xpixs, ypixs] = data[:,2]
         return f
@@ -395,9 +395,9 @@ class MPI_SortByX:
         dx = (self.limits[1]-self.limits[0])/float(self.ngrid_rank)
         dy = ybox/float(nygrid)
         dz = zbox/float(nzgrid)
-        xpixs = src.which_pixs(x=data[:,0], dx=dx, xmin=self.limits[0], npix=len(data))
-        ypixs = src.which_pixs(x=data[:,1], dx=dy, xmin=yorigin, npix=len(data))
-        zpixs = src.which_pixs(x=data[:,2], dx=dz, xmin=zorigin, npix=len(data))
+        xpixs = src.which_pixs(data[:,0], dx, self.limits[0])
+        ypixs = src.which_pixs(data[:,1], dy, yorigin)
+        zpixs = src.which_pixs(data[:,2], dz, zorigin)
         f = np.zeros((self.ngrid_rank, nygrid, nzgrid))
         f[xpixs, ypixs, zpixs] = data[:,3]
         return f

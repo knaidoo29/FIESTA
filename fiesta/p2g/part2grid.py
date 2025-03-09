@@ -48,20 +48,13 @@ def part2grid2D(x, y, f, boxsize, ngrid, method='TSC', periodic=True, origin=0.)
     else:
         periodx, periody = periodic[0], periodic[1]
     if method == 'NGP':
-        fgrid = src.part2grid_ngp_2d(x=x, y=y, f=f, xlength=xlength, ylength=ylength,
-            xmin=xmin, ymin=ymin, npart=len(x), nxgrid=nxgrid, nygrid=nygrid)
+        fgrid = src.part2grid_ngp_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid)
     elif method == 'CIC':
-        fgrid = src.part2grid_cic_2d(x=x, y=y, f=f, xlength=xlength, ylength=ylength,
-            xmin=xmin, ymin=ymin, npart=len(x), nxgrid=nxgrid, nygrid=nygrid,
-            periodx=periodx, periody=periody)
+        fgrid = src.part2grid_cic_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody)
     elif method == 'TSC':
-        fgrid = src.part2grid_tsc_2d(x=x, y=y, f=f, xlength=xlength, ylength=ylength,
-            xmin=xmin, ymin=ymin, npart=len(x), nxgrid=nxgrid, nygrid=nygrid,
-            periodx=periodx, periody=periody)
+        fgrid = src.part2grid_tsc_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody)
     elif method == 'PCS':
-        fgrid = src.part2grid_pcs_2d(x=x, y=y, f=f, xlength=xlength, ylength=ylength,
-            xmin=xmin, ymin=ymin, npart=len(x), nxgrid=nxgrid, nygrid=nygrid,
-            periodx=periodx, periody=periody)
+        fgrid = src.part2grid_pcs_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody)
     return fgrid.reshape(nxgrid, nygrid)
 
 
@@ -115,18 +108,11 @@ def part2grid3D(x, y, z, f, boxsize, ngrid, method='TSC', periodic=True, origin=
     else:
         periodx, periody, periodz = periodic[0], periodic[1], periodic[2]
     if method == 'NGP':
-        fgrid = src.part2grid_ngp_3d(x=x, y=y, z=z, f=f, xlength=xlength, ylength=ylength, zlength=zlength,
-            xmin=0., ymin=0., zmin=0., npart=len(x), nxgrid=nxgrid, nygrid=nygrid, nzgrid=nzgrid)
+        fgrid = src.part2grid_ngp_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid)
     elif method == 'CIC':
-        fgrid = src.part2grid_cic_3d(x=x, y=y, z=z, f=f, xlength=xlength, ylength=ylength, zlength=zlength,
-            xmin=xmin, ymin=ymin, zmin=zmin, npart=len(x),nxgrid=nxgrid, nygrid=nygrid, nzgrid=nzgrid,
-            periodx=periodx, periody=periody, periodz=periodz)
+        fgrid = src.part2grid_cic_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid, periodx, periody, periodz)
     elif method == 'TSC':
-        fgrid = src.part2grid_tsc_3d(x=x, y=y, z=z, f=f, xlength=xlength, ylength=ylength, zlength=zlength,
-            xmin=xmin, ymin=ymin, zmin=zmin, npart=len(x), nxgrid=nxgrid, nygrid=nygrid, nzgrid=nzgrid,
-            periodx=periodx, periody=periody, periodz=periodz)
+        fgrid = src.part2grid_tsc_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid, periodx, periody, periodz)
     elif method == 'PCS':
-        fgrid = src.part2grid_pcs_3d(x=x, y=y, z=z, f=f, xlength=xlength, ylength=ylength, zlength=zlength,
-            xmin=xmin, ymin=ymin, zmin=zmin, npart=len(x), nxgrid=nxgrid, nygrid=nygrid, nzgrid=nzgrid,
-            periodx=periodx, periody=periody, periodz=periodz)
+        fgrid = src.part2grid_pcs_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid, periodx, periody, periodz)
     return fgrid.reshape(nxgrid, nygrid, nzgrid)

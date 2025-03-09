@@ -9,6 +9,5 @@ from . import kdtree
 from . import randoms
 from . import sph
 from . import src
-from . import srcpy
 from . import utils
 from . import voronoi

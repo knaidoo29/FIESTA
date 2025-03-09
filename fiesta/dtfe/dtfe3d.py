@@ -142,9 +142,8 @@ class Delaunay3D:
         del_vert1 = self.delaunay_simplices[:, 1]
         del_vert2 = self.delaunay_simplices[:, 2]
         del_vert3 = self.delaunay_simplices[:, 3]
-        self.delaunay_volume = src.delaunay_volume_3d(x=x, y=y, z=z,
-            del_vert0=del_vert0, del_vert1=del_vert1, del_vert2=del_vert2,
-            del_vert3=del_vert3, npart=self.ntotal, nvert=self.nvert)
+        self.delaunay_volume = src.delaunay_volume_3d(x, y, z,
+            del_vert0, del_vert1, del_vert2, del_vert3)
 
 
     def get_dens(self):
@@ -155,9 +154,8 @@ class Delaunay3D:
         del_vert1 = self.delaunay_simplices[:, 1]
         del_vert2 = self.delaunay_simplices[:, 2]
         del_vert3 = self.delaunay_simplices[:, 3]
-        point_volume = src.sum_delaunay_vol_4_points_3d(delaunay_vol=self.delaunay_volume,
-            del_vert0=del_vert0, del_vert1=del_vert1, del_vert2=del_vert2,
-            del_vert3=del_vert3, npart=self.ntotal, nvert=self.nvert)
+        point_volume = src.sum_delaunay_vol_4_points_3d(self.delaunay_volume,
+            del_vert0, del_vert1, del_vert2, del_vert3, npart=self.ntotal)
         if len(self.points[0]) == 4:
             self.points_dens = 1./point_volume
         else:
@@ -187,9 +185,7 @@ class Delaunay3D:
         self.y0 = y[del_vert0]
         self.z0 = z[del_vert0]
         self.f0 = f[del_vert0]
-        self.delf0 = src.get_delf0_3d(x=x, y=y, z=z, f=f, del_vert0=del_vert0,
-            del_vert1=del_vert1, del_vert2=del_vert2, del_vert3=del_vert3,
-            npart=len(x), nvert=len(del_vert0))
+        self.delf0 = src.get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3)
 
 
     def find_simplex(self, x, y, z):
@@ -217,9 +213,8 @@ class Delaunay3D:
             Estimates of the field
         """
         simplices = self.find_simplex(x, y, z)
-        f_est = src.delaunay_estimate_3d(simplices=simplices, x=x, y=y, z=z, x0=self.x0,
-            y0=self.y0, z0=self.z0, f0=self.f0, delf0=self.delf0, npart=len(x),
-            nsimp0=len(self.x0))
+        f_est = src.delaunay_estimate_3d(simplices, x, y, z, 
+            self.x0, self.y0, self.z0, self.f0, self.delf0)
         return f_est
 
 

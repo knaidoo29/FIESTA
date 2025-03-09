@@ -166,12 +166,9 @@ class Voronoi2D:
         ridge_point2 = self.ridge_points[:, 1]
 
         # calculate area
-        self.voronoi_area = src.voronoi_2d_area(xpoints=xpoints, ypoints=ypoints,
-            xverts=xverts, yverts=yverts, ridge_point1=ridge_point1,
-            ridge_point2=ridge_point2, ridge_vertices=ridge_vertices,
-            ridge_start=ridge_start, ridge_end=ridge_end, npoints=len(xpoints),
-            nridge=len(ridge_point1), nvertices=len(xverts),
-            nridge_vertices=len(ridge_vertices))
+        self.voronoi_area = src.voronoi_2d_area(xpoints, ypoints,
+            xverts, yverts, ridge_point1, ridge_point2, ridge_vertices,
+            ridge_start, ridge_end)
 
         # remove and change bad values.
         cond = np.where((self.voronoi_area == -1.) | (self.voronoi_area == 0.))[0]

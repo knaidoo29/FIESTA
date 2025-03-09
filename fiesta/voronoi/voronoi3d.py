@@ -169,12 +169,8 @@ class Voronoi3D:
         ridge_point2 = self.ridge_points[:, 1]
 
         # calculate volume
-        self.voronoi_volume = src.voronoi_3d_volume(xpoints=xpoints,
-            ypoints=ypoints, zpoints=zpoints, xverts=xverts, yverts=yverts,
-            zverts=zverts, ridge_point1=ridge_point1, ridge_point2=ridge_point2,
-            ridge_vertices=ridge_vertices, ridge_start=ridge_start,
-            ridge_end=ridge_end, npoints=len(xpoints), nridge=len(ridge_point1),
-            nvertices=len(xverts), nridge_vertices=len(ridge_vertices))
+        self.voronoi_volume = src.voronoi_3d_volume(xpoints, ypoints, zpoints, xverts, yverts, zverts,
+            ridge_point1, ridge_point2, ridge_vertices, ridge_start, ridge_end)
 
         # remove and change bad values.
         cond = np.where((self.voronoi_volume == -1.) | (self.voronoi_volume == 0.))[0]

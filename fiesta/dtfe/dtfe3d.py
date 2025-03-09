@@ -45,24 +45,27 @@ class Delaunay3D:
             self.extent = [xmin, xmax, ymin, ymax, zmin, zmax]
 
 
-    def set_points(self, x, y, z):
+    def set_points(self, x, y, z, f, mass=None):
         """Sets the points for voronoi cells.
 
         Parameters
         ----------
-        x : array
-            X-coordinates.
-        y : array
-            Y-coordinates.
-        z : array
-            Z-coordinates.
+        x, y, z : array
+            X, Y and Z-coordinates.
+        f : array
+            Field values
+        mass : array, optional
+            For calculating density fields.
         """
-        self.points = coords.xyz2points(x, y, z)
+        if mass is None:
+            self.points = coords.coord2points([x, y, z, f])
+        else:
+            self.points = coords.coord2points([x, y, z, f, mass])
         self.npart = len(self.points)
         self.ntotal = self.npart
 
 
-    def set_buffer(self, boxsize, buffer_length):
+    def set_buffer(self, boxsize, buffer_length, buffer_val=0., buffer_mass=None):
         """Defines buffer particles to be placed around a given box.
 
         Parameters
@@ -71,6 +74,8 @@ class Delaunay3D:
             Size of the box, assumed particles lie in the range [0., boxsize]
         buffer_length : float
             Length of the buffer region.
+        buffer_mass : float, optional
+            Must be provided if mass is provided.
         """
         # check boxsize is consistent with particles.
         self._extent()
@@ -81,17 +86,18 @@ class Delaunay3D:
         self.buffer_length = buffer_length
         self.usebuffer = True
         self.useperiodic = False
-        x_buffer, y_buffer, z_buffer = boundary.buffer_random_particles_3d(self.npart, self.boxsize, self.buffer_length)
+        x_buffer, y_buffer, z_buffer = boundary.buffer_random_3D(self.npart, self.boxsize, self.buffer_length)
+        if len(self.points[0]) == 4:
+            points_buffer = coords.coord2points([x_buffer, y_buffer, z_buffer, buffer_val*np.ones(len(x_buffer))])
+        else:
+            points_buffer = coords.coord2points([x_buffer, y_buffer, z_buffer, buffer_val*np.ones(len(x_buffer)), buffer_mass*np.ones(len(x_buffer))])
         self.nbuffer = len(x_buffer)
         self.ntotal += self.nbuffer
         # redefine points to include buffer points and also define mask
         self.ispart = np.ones(self.npart + self.nbuffer)
         self.ispart[self.npart:] = 0.
         # concatenate points and buffer
-        x_pnb = np.concatenate([self.points[:, 0], x_buffer])
-        y_pnb = np.concatenate([self.points[:, 1], y_buffer])
-        z_pnb = np.concatenate([self.points[:, 2], z_buffer])
-        self.points = coords.xyz2points(x_pnb, y_pnb, z_pnb)
+        self.points = np.vstack([self.points, points_buffer])
 
 
     def set_periodic(self, boxsize, buffer_length):
@@ -111,8 +117,8 @@ class Delaunay3D:
         assert self.extent[4] >= 0. and self.extent[5] <= boxsize, "Z coordinates exceed the range of the box, check or redefine boxsize."
         self.boxsize = boxsize
         self.buffer_length = buffer_length
-        x_periodic, y_periodic, z_periodic = boundary.buffer_periodic_particles_3d(self.points[:, 0], self.points[:, 1], self.points[:, 2], self.boxsize, self.buffer_length)
-        self.nperiodic = len(x_periodic)
+        points_periodic = boundary.buffer_periodic_3D(self.points, self.boxsize, self.buffer_length)
+        self.nperiodic = len(points_periodic)
         self.ntotal += self.nperiodic
         self.usebuffer = False
         self.useperiodic = True
@@ -120,15 +126,11 @@ class Delaunay3D:
         self.ispart = np.ones(self.npart + self.nperiodic)
         self.ispart[self.npart:] = 0.
         # concatenate points and buffer
-        x_pnb = np.concatenate([self.points[:, 0], x_periodic])
-        y_pnb = np.concatenate([self.points[:, 1], y_periodic])
-        z_pnb = np.concatenate([self.points[:, 2], z_periodic])
-        self.points = coords.xyz2points(x_pnb, y_pnb, z_pnb)
-
+        self.points = np.vstack([self.points, points_periodic])
 
     def construct(self):
         """Constructs Delaunay tesselation"""
-        self.delaunay = scDelaunay(self.points)
+        self.delaunay = scDelaunay(self.points[:,:3])
         self.delaunay_simplices = self.delaunay.simplices
         self.nvert = len(self.delaunay_simplices[:, 0])
 
@@ -140,9 +142,8 @@ class Delaunay3D:
         del_vert1 = self.delaunay_simplices[:, 1]
         del_vert2 = self.delaunay_simplices[:, 2]
         del_vert3 = self.delaunay_simplices[:, 3]
-        self.delaunay_volume = src.delaunay_volume_3d(x=x, y=y, z=z,
-            del_vert0=del_vert0, del_vert1=del_vert1, del_vert2=del_vert2,
-            del_vert3=del_vert3, npart=self.ntotal, nvert=self.nvert)
+        self.delaunay_volume = src.delaunay_volume_3d(x, y, z,
+            del_vert0, del_vert1, del_vert2, del_vert3)
 
 
     def get_dens(self):
@@ -153,20 +154,15 @@ class Delaunay3D:
         del_vert1 = self.delaunay_simplices[:, 1]
         del_vert2 = self.delaunay_simplices[:, 2]
         del_vert3 = self.delaunay_simplices[:, 3]
-        point_volume = src.sum_delaunay4points_3d(delaunay_value=self.delaunay_volume,
-            del_vert0=del_vert0, del_vert1=del_vert1, del_vert2=del_vert2,
-            del_vert3=del_vert3, npart=self.ntotal, nvert=self.nvert)
-        self.points_dens = 1./point_volume
+        point_volume = src.sum_delaunay_vol_4_points_3d(self.delaunay_volume,
+            del_vert0, del_vert1, del_vert2, del_vert3, npart=self.ntotal)
+        if len(self.points[0]) == 4:
+            self.points_dens = 1./point_volume
+        else:
+            self.points_dens = self.points[:, 4]/point_volume
 
 
-    def find_simplex(self, x, y, z):
-        """Find the simplex the coordinates lie within."""
-        points = coords.xyz2points(x, y, z)
-        simplices = self.delaunay.find_simplex(points)
-        return simplices
-
-
-    def set_field(self, f, bufferval=0.):
+    def set_field(self, f=None, bufferval=0.):
         """Sets the field values of the input points.
 
         Parameters
@@ -176,13 +172,11 @@ class Delaunay3D:
         bufferval : float, optional
             Field values to assign boundary particles.
         """
-        lenf = len(f)
-        assert lenf == self.npart, "f must be equal to input points."
-        x, y, z = self.points[:, 0], self.points[:, 1], self.points[:, 2]
-        if self.usebuffer == True:
-            f = np.concatenate([f, bufferval*np.ones(self.nbuffer)])
-        elif self.useperiodic == True:
-            f = np.concatenate([f, bufferval*np.ones(self.nperiodic)])
+        if f is not None:
+            lenf = len(f)
+            assert lenf == len(self.points), "f must be equal to input points."
+            self.points[:, 3] = f
+        x, y, z, f = self.points[:, 0], self.points[:, 1], self.points[:, 2], self.points[:, 3]
         del_vert0 = self.delaunay_simplices[:, 0]
         del_vert1 = self.delaunay_simplices[:, 1]
         del_vert2 = self.delaunay_simplices[:, 2]
@@ -191,12 +185,17 @@ class Delaunay3D:
         self.y0 = y[del_vert0]
         self.z0 = z[del_vert0]
         self.f0 = f[del_vert0]
-        self.delf0 = src.get_delf0_3d(x=x, y=y, z=z, f=f, del_vert0=del_vert0,
-            del_vert1=del_vert1, del_vert2=del_vert2, del_vert3=del_vert3,
-            npart=len(x), nvert=len(del_vert0))
+        self.delf0 = src.get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3)
 
 
-    def estimate(self, x, y, z, debug=False):
+    def find_simplex(self, x, y, z):
+        """Find the simplex the coordinates lie within."""
+        points = coords.xyz2points(x, y, z)
+        simplices = self.delaunay.find_simplex(points)
+        return simplices
+
+
+    def estimate(self, x, y, z):
         """Estimates a field from the Delaunay tesselation.
 
         Parameters
@@ -213,17 +212,9 @@ class Delaunay3D:
         f_est : array
             Estimates of the field
         """
-        if debug==True:
-            print("Start finding simplexes.")
         simplices = self.find_simplex(x, y, z)
-        if debug==True:
-            print("Found simplexes.")
-            print("Start DTFE estimation.")
-        f_est = src.delaunay_estimate_3d(simplices=simplices, x=x, y=y, z=z, x0=self.x0,
-            y0=self.y0, z0=self.z0, f0=self.f0, delf0=self.delf0, npart=len(x),
-            nsimp0=len(self.x0))
-        if debug==True:
-            print("Run DTFE estimation.")
+        f_est = src.delaunay_estimate_3d(simplices, x, y, z, 
+            self.x0, self.y0, self.z0, self.f0, self.delf0)
         return f_est
 
 

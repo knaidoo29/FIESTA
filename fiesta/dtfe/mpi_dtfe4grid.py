@@ -353,8 +353,7 @@ def mpi_dtfe4grid3D(x, y, z, ngrid, boxsize, MPI, MPI_split, f=None, mass=None,
                     np.savez('temp_dtfe_MPI_%i_%i.npz'%(MPI.rank, i),
                         _xx=_xx, _yy=_yy, _zz=_zz, _ff=_ff, _mm=_mm)
                     if verbose:
-                        MPI.mpi_print_zero(verbose_prefix+"Saving partitioned particles:", "%i/%i" % (i+1,int(xshape[0]
-*xshape[1]*xshape[1])), "Npart=%i" % len(_xx))
+                        MPI.mpi_print_zero(verbose_prefix+"Saving partitioned particles:", "%i/%i" % (i+1,int(xshape[0]*xshape[1]*xshape[1])), "Npart=%i" % len(_xx))
         del _x
         del _y
         del _z

@@ -53,7 +53,8 @@ def mean_separation_3D(npart, boxsize):
 
 
 def dtfe4grid2D(x, y, ngrid, boxsize, f=None, mass=None, origin=0., buffer_type=None,
-                buffer_length=0., buffer_val=0., buffer_mass=None, subsampling=4, outputgrid=False):
+                buffer_length=0., buffer_val=0., buffer_mass=None, subsampling=4, 
+                outputgrid=False, calcdens=True):
     """Returns the Delaunay tesselation density or field on a grid.
 
     Parameters
@@ -87,6 +88,8 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, mass=None, origin=0., buffer_type=
         mean pixel value and not the value at the center.
     outputgrid : bool, optional
         Outputs coordinate grid.
+    calcdens : bool, optional
+        Calculates density.
 
     Returns
     -------
@@ -146,7 +149,7 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, mass=None, origin=0., buffer_type=
     # construct delaunay tesselation triangles
     D2D.construct()
     # calculate delaunay tesselation field, if f is None we compute the density
-    if f is None:
+    if calcdens:
         D2D.get_dens()
         D2D.set_field(f=D2D.points_dens)
     else:
@@ -167,7 +170,7 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, mass=None, origin=0., buffer_type=
 
 def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, mass=None, origin=0., buffer_length=0.,
                 buffer_val=0., buffer_mass=None, buffer_type=None, subsampling=4, useperiodic=False,
-                outputgrid=False):
+                outputgrid=False, calcdens=True):
     """Returns the Delaunay tesselation density or field on a grid.
 
     Parameters
@@ -201,6 +204,8 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, mass=None, origin=0., buffer_le
         mean pixel value and not the value at the center.
     outputgrid : bool, optional
         Outputs coordinate grid.
+    calcdens : bool, optional
+        Calculates density.
 
     Returns
     -------
@@ -261,7 +266,12 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, mass=None, origin=0., buffer_le
     # construct delaunay tesselation triangles
     D3D.construct()
     # calculate delaunay tesselation field, if f is None we compute the density
-    if f is None:
+    # if f is None:
+    #     D3D.get_dens()
+    #     D3D.set_field(f=D3D.points_dens)
+    # else:
+    #     D3D.set_field()
+    if calcdens:
         D3D.get_dens()
         D3D.set_field(f=D3D.points_dens)
     else:

@@ -52,8 +52,9 @@ def mean_separation_3D(npart, boxsize):
     return mean_sep
 
 
-def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_type=None,
-                buffer_length=0., buffer_val=0., subsampling=4, outputgrid=False):
+def dtfe4grid2D(x, y, ngrid, boxsize, f=None, mass=None, origin=0., buffer_type=None,
+                buffer_length=0., buffer_val=0., buffer_mass=None, subsampling=4, 
+                outputgrid=False, calcdens=True):
     """Returns the Delaunay tesselation density or field on a grid.
 
     Parameters
@@ -66,6 +67,8 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_type=None,
         Dimensions of the grid.
     f : array, optional
         Field values, if None assumed output is density.
+    mass : array, optional
+        Mass of the particles.
     origin : float or list, optional
         Origin for grid.
     buffer_type : str, optional
@@ -77,12 +80,16 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_type=None,
         Buffer length.
     buffer_val : float, optional
         Value given to random buffer particles.
+    buffer_mass : float, optional
+        Must be provided if mass is provided and buffer particles are provided.
     subsampling : int, optional
         The pixel subsampling rate. Each pixel is evaluated subsampling^2 points
         on a grid within each pixel. This is to ensure each pixel is assigned a
         mean pixel value and not the value at the center.
     outputgrid : bool, optional
         Outputs coordinate grid.
+    calcdens : bool, optional
+        Calculates density.
 
     Returns
     -------
@@ -118,19 +125,31 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_type=None,
     # initialise Delaunay tesselation
     D2D = dtfe2d.Delaunay2D()
     # add points
-    if f is None:
-        D2D.set_points(x, y, np.ones(len(x)))
+    if mass is None:
+        if f is None:
+            D2D.set_points(x, y, np.ones(len(x)))
+        else:
+            D2D.set_points(x, y, f)
     else:
-        D2D.set_points(x, y, f)
+        if f is None:
+            D2D.set_points(x, y, np.ones(len(x)), mass=mass)
+        else:
+            D2D.set_points(x, y, f, mass=mass)
     # set boundary buffer points, either periodic or random buffer points
     if buffer_type == 'periodic':
         D2D.set_periodic(boxsize, buffer_length)
     elif buffer_type == 'random':
-        D2D.set_buffer(boxsize, buffer_length, buffer_val=buffer_val)
+        if mass is None:
+            D2D.set_buffer(boxsize, buffer_length, buffer_val=buffer_val)
+        else:
+            if buffer_mass is not None:
+                D2D.set_buffer(boxsize, buffer_length, buffer_val=buffer_val, buffer_mass=buffer_mass)
+            else:
+                assert False, "buffer_mass must be defined."
     # construct delaunay tesselation triangles
     D2D.construct()
     # calculate delaunay tesselation field, if f is None we compute the density
-    if f is None:
+    if calcdens:
         D2D.get_dens()
         D2D.set_field(f=D2D.points_dens)
     else:
@@ -149,9 +168,9 @@ def dtfe4grid2D(x, y, ngrid, boxsize, f=None, origin=0., buffer_type=None,
         return f2d.reshape(nxgrid, nygrid)
 
 
-def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_length=0.,
-                buffer_val=0., buffer_type=None, subsampling=4, useperiodic=False,
-                outputgrid=False):
+def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, mass=None, origin=0., buffer_length=0.,
+                buffer_val=0., buffer_mass=None, buffer_type=None, subsampling=4,
+                outputgrid=False, calcdens=True):
     """Returns the Delaunay tesselation density or field on a grid.
 
     Parameters
@@ -164,6 +183,8 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_length=0.,
         Dimensions of the grid.
     f : array, optional
         Field values, if None assumed output is density.
+    mass : array, optional
+        Mass of the particles.
     origin : float or list, optional
         Origin for grid.
     buffer_type : str, optional
@@ -175,12 +196,16 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_length=0.,
         Buffer length.
     buffer_val : float, optional
         Value given to random buffer particles.
+    buffer_mass : float, optional
+        Must be provided if mass is provided and buffer particles are provided.
     subsampling : int, optional
         The pixel subsampling rate. Each pixel is evaluated subsampling^2 points
         on a grid within each pixel. This is to ensure each pixel is assigned a
         mean pixel value and not the value at the center.
     outputgrid : bool, optional
         Outputs coordinate grid.
+    calcdens : bool, optional
+        Calculates density.
 
     Returns
     -------
@@ -217,19 +242,36 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_length=0.,
     # initialise Delaunay tesselation
     D3D = dtfe3d.Delaunay3D()
     # add points
-    if f is None:
-        D3D.set_points(x, y, z, np.ones(len(x)))
+    if mass is None:
+        if f is None:
+            D3D.set_points(x, y, z, np.ones(len(x)))
+        else:
+            D3D.set_points(x, y, z, f)
     else:
-        D3D.set_points(x, y, z, f)
+        if f is None:
+            D3D.set_points(x, y, z, np.ones(len(x)), mass=mass)
+        else:
+            D3D.set_points(x, y, z, f, mass=mass)
     # set boundary buffer points, either periodic or random buffer points
     if buffer_type == 'periodic':
         D3D.set_periodic(boxsize, buffer_length)
     elif buffer_type == 'random':
-        D3D.set_buffer(boxsize, buffer_length, buffer_val=buffer_val)
+        if mass is None:
+            D3D.set_buffer(boxsize, buffer_length, buffer_val=buffer_val)
+        else:
+            if buffer_mass is not None:
+                D3D.set_buffer(boxsize, buffer_length, buffer_val=buffer_val, buffer_mass=buffer_mass)
+            else:
+                assert False, "buffer_mass must be defined."
     # construct delaunay tesselation triangles
     D3D.construct()
     # calculate delaunay tesselation field, if f is None we compute the density
-    if f is None:
+    # if f is None:
+    #     D3D.get_dens()
+    #     D3D.set_field(f=D3D.points_dens)
+    # else:
+    #     D3D.set_field()
+    if calcdens:
         D3D.get_dens()
         D3D.set_field(f=D3D.points_dens)
     else:
@@ -243,6 +285,6 @@ def dtfe4grid3D(x, y, z, ngrid, boxsize, f=None, origin=0., buffer_length=0.,
             f3d += _f3d
     # ouput the field on a grid
     if outputgrid:
-        return x3d.reshape(nxgrid, nygrid, nzgrid), y3d.reshape(nxgrid, nygrid, nzgrid), f3d.reshape(nxgrid, nygrid, nzgrid)
+        return x3d.reshape(nxgrid, nygrid, nzgrid), y3d.reshape(nxgrid, nygrid, nzgrid), z3d.reshape(nxgrid, nygrid, nzgrid), f3d.reshape(nxgrid, nygrid, nzgrid)
     else:
         return f3d.reshape(nxgrid, nygrid, nzgrid)

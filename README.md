@@ -1,4 +1,4 @@
-# FIESTA : FIeld ESTimAtor
+![biglogo](docs/source/_static/FiEsta_logo_large_github.jpg)
 
 |               |                                       |
 |---------------|---------------------------------------|

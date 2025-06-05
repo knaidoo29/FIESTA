@@ -10,4 +10,4 @@ from . import randoms
 from . import sph
 from . import src
 from . import utils
-from . import voronoi
+from . import vefe

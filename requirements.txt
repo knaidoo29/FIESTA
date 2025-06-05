@@ -1,4 +1,4 @@
+numba
 numpy
 scipy
-nose
-pytest
+git+https://github.com/knaidoo29/SHIFT.git

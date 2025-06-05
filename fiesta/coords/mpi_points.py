@@ -1,9 +1,58 @@
 import numpy as np
 
-import shift
-
 from . import points
 from .. import src
+
+
+def _grid1D(boxsize, ngrid, origin=0.):
+    """Returns the x coordinates of a cartesian grid.
+
+    Parameters
+    ----------
+    boxsize : float
+        Box size.
+    ngrid : int
+        Grid division along one axis.
+    origin : float, optional
+        Start point of the grid.
+
+    Returns
+    -------
+    xedges : array
+        x coordinate bin edges.
+    x : array
+        X coordinates bin centers.
+    """
+    xedges = np.linspace(0., boxsize, ngrid + 1) + origin
+    x = 0.5*(xedges[1:] + xedges[:-1])
+    return xedges, x
+
+
+def _mpi_grid1D(boxsize, ngrid, MPI, origin=0.):
+    """Returns the x coordinates of a cartesian grid.
+
+    Parameters
+    ----------
+    boxsize : float
+        Box size.
+    ngrid : int
+        Grid division along one axis.
+    origin : float, optional
+        Start point of the grid.
+
+    Returns
+    -------
+    xedges : array
+        x coordinate bin edges.
+    x : array
+        X coordinates bin centers.
+    """
+    xedges = np.linspace(0., boxsize, ngrid + 1) + origin
+    x = 0.5*(xedges[1:] + xedges[:-1])
+    split1, split2 = MPI.split(len(x))
+    x = x[split1[MPI.rank]:split2[MPI.rank]]
+    xedges = xedges[split1[MPI.rank]:split2[MPI.rank]+1]
+    return xedges, x
 
 
 def split_limits_by_grid(boxsize, origin, ngrid, MPI):
@@ -25,7 +74,7 @@ def split_limits_by_grid(boxsize, origin, ngrid, MPI):
     limits : float list
         Range.
     """
-    edges, grid = shift.cart.grid1D(boxsize, ngrid, origin=origin)
+    edges, grid = _grid1D(boxsize, ngrid, origin=origin)
     s1, s2 = MPI.split(len(grid))
     limits = [edges[s1[MPI.rank]], edges[s2[MPI.rank]]]
     return limits
@@ -241,7 +290,7 @@ class MPI_SortByX:
 
 
     def limits4grid(self):
-        xedges, xgrid = shift.cart.mpi_grid1D(self.boxsize, self.ngrid, self.MPI, origin=self.origin)
+        xedges, xgrid = _mpi_grid1D(self.boxsize, self.ngrid, self.MPI, origin=self.origin)
         self.limits = [xedges[0], xedges[-1]]
         self.ngrid_rank = len(xgrid)
         all_limits = self.MPI.collect(self.limits, outlist=True)

@@ -1,2 +1,5 @@
+numba>=0.57,<0.59
+numpy>=1.22,<1.27
+scipy>=1.8,<1.13
 sphinx-simplepdf
 furo

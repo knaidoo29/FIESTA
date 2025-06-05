@@ -1,5 +1,8 @@
 build/*
+build/
 dist/*
-fiesta.egg-info/*
+dist/
 *__pycache__
 *.DS_Store
+*.egg-info/*
+*.egg-info/

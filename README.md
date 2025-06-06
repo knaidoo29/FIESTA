@@ -17,14 +17,12 @@ FIESTA is a python library for general interpolation from uniform and non-unifor
 
 ## Dependencies
 
-FIESTA is developed in Python 3.9 but should work on all versions >=3.4. FIESTA is written mostly in python with some heavy computation carried out in Fortran. Compiling the Fortran source code will require the availability of a Fortran compiler such as gfortran or ifort.
-
-The following Python modules are required:
-
+* [numba](https://numba.pydata.org/)
 * [numpy](http://www.numpy.org/)
 * [scipy](http://scipy.org/)
+* [SHIFT](https://github.com/knaidoo29/SHIFT.git)
+* [mpi4py](https://mpi4py.readthedocs.io/en/stable/) [Optional: enables MPI parallelism]
 
-For testing you will require [nose](https://nose.readthedocs.io/en/latest/) or [pytest](http://pytest.org/en/latest/).
 
 ## Installation
 

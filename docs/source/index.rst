@@ -38,20 +38,11 @@ for parallelisation.
 Dependencies
 ------------
 
-FIESTA is being developed in Python 3.8 but should work on all versions >3.4. FIESTA
-is written mostly in python but the heavy computation is carried out in Fortran.
-Compiling the Fortran source code will require the availability of a fortran compiler
-usually gfortran (which comes with gcc).
-
-The following Python modules are required.
-
+* `numba <https://numba.pydata.org/>`_
 * `numpy <http://www.numpy.org/>`_
 * `scipy <https://scipy.org/>`_
 * `SHIFT <https://github.com/knaidoo29/SHIFT>`_
-
-For testing you will require `nose <https://nose.readthedocs.io/en/latest/>`_ or
-`pytest <http://pytest.org/en/latest/>`_ .
-
+* `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`_ [Optional: enables MPI parallelism]
 
 Installation
 ------------

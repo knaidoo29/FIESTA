@@ -7,7 +7,7 @@ import vinfo
 
 # -- Project information
 
-project = 'FiEsta'
+project = 'FIESTA'
 copyright = '2021-2025, Krishna Naidoo'
 author = 'Krishna Naidoo'
 

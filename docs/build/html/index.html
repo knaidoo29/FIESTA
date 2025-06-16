@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>FiEsta documentation</title>
+        <title>FIESTA documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">FiEsta  documentation</div></a>
+      <a href="#"><div class="brand">FIESTA  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -194,7 +194,7 @@
     <img class="sidebar-logo only-dark" src="_static/FiEsta_logo_small_black.jpg" alt="Dark Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">FiEsta  documentation</span>
+  <span class="sidebar-brand-text">FIESTA  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -243,8 +243,8 @@
         <article role="main" id="furo-main-content">
           <img alt="_images/FiEsta_logo_large_white.jpg" class="only-light align-center" src="_images/FiEsta_logo_large_white.jpg" />
 <img alt="_images/FiEsta_logo_large_black.jpg" class="only-dark align-center" src="_images/FiEsta_logo_large_black.jpg" />
-<section id="field-estimator">
-<h1>FIeld ESTimAtor<a class="headerlink" href="#field-estimator" title="Link to this heading">¶</a></h1>
+<section id="field-interpolation-and-estimation-using-spatial-techniques-and-algorithms">
+<h1>Field Interpolation and Estimation using Spatial Techniques and Algorithms<a class="headerlink" href="#field-interpolation-and-estimation-using-spatial-techniques-and-algorithms" title="Link to this heading">¶</a></h1>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <tbody>
@@ -275,18 +275,13 @@ for parallelisation.</p>
 </section>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h2>
-<p>FIESTA is being developed in Python 3.8 but should work on all versions &gt;3.4. FIESTA
-is written mostly in python but the heavy computation is carried out in Fortran.
-Compiling the Fortran source code will require the availability of a fortran compiler
-usually gfortran (which comes with gcc).</p>
-<p>The following Python modules are required.</p>
 <ul class="simple">
+<li><p><a class="reference external" href="https://numba.pydata.org/">numba</a></p></li>
 <li><p><a class="reference external" href="http://www.numpy.org/">numpy</a></p></li>
 <li><p><a class="reference external" href="https://scipy.org/">scipy</a></p></li>
 <li><p><a class="reference external" href="https://github.com/knaidoo29/SHIFT">SHIFT</a></p></li>
+<li><p><a class="reference external" href="https://mpi4py.readthedocs.io/en/stable/">mpi4py</a> [Optional: enables MPI parallelism]</p></li>
 </ul>
-<p>For testing you will require <a class="reference external" href="https://nose.readthedocs.io/en/latest/">nose</a> or
-<a class="reference external" href="http://pytest.org/en/latest/">pytest</a> .</p>
 </section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
@@ -370,7 +365,7 @@ or (if you don’t have a github account) email <a class="reference external" hr
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">FIeld ESTimAtor</a><ul>
+<li><a class="reference internal" href="#">Field Interpolation and Estimation using Spatial Techniques and Algorithms</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
 <li><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>

@@ -1,5 +1,7 @@
 ![biglogo](docs/source/_static/FiEsta_logo_large_github.jpg)
 
+# Field Interpolation and Estimation using Spatial Techniques and Algorithms
+
 |               |                                       |
 |---------------|---------------------------------------|
 | Author        | Krishna Naidoo                        |          

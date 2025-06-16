@@ -7,9 +7,8 @@
    :class: only-dark
 
 
-FIeld ESTimAtor
-===============
-
+Field Interpolation and Estimation using Spatial Techniques and Algorithms
+==========================================================================
 
 +---------------+-----------------------------------------+
 | Author        | Krishna Naidoo                          |

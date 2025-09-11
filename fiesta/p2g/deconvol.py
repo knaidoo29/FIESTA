@@ -39,6 +39,76 @@ def get_deconvol_p(method):
         p = 4.
     return p
 
+# Note: this is not deconvolution but rather the removal of the window function C(k)
+# from https://arxiv.org/pdf/2403.13561v1, these functions should be revised to adjust
+# for this.
+
+# def deconvolve_part2grid_2D(field, boxsize, method='TSC'):
+#     """Deconvolve the grid assignment scheme in Fourier space.
+#
+#     Parameters
+#     ----------
+#     field : ndarray
+#         Grid assigned field.
+#     boxsize : float
+#         Box size.
+#     method : str
+#         grid assignment scheme, either NGP, CIC, TSC or PCS.
+#     """
+#     fieldk = shift.cart.fft2D(field, boxsize)
+#     ngrid = len(fieldk)
+#     kx3d, ky3d = shift.cart.kgrid2D(boxsize, ngrid)
+#     kn = shift.cart.get_kn(boxsize, ngrid)
+#     if method == 'NGP':
+#         C = 1.
+#     elif method == 'CIC':
+#         C  = 1.-(2./3.)*(np.sin(np.pi*kx3d/(2*kn)))**2.
+#         C *= 1.-(2./3.)*(np.sin(np.pi*ky3d/(2*kn)))**2.
+#     elif method == 'TSC':
+#         C  = 1.-(np.sin(np.pi*kx3d/(2*kn)))**2. + (2./15.)*(np.sin(np.pi*kx3d/(2*kn)))**4.
+#         C *= 1.-(np.sin(np.pi*ky3d/(2*kn)))**2. + (2./15.)*(np.sin(np.pi*ky3d/(2*kn)))**4.
+#     elif method == 'PCS':
+#         C  = 1.-(4./3.)*(np.sin(np.pi*kx3d/(2*kn)))**2. + (2./5.)*(np.sin(np.pi*kx3d/(2*kn)))**4. - (4./315.)*(np.sin(np.pi*kx3d/(2*kn)))**6.
+#         C *= 1.-(4./3.)*(np.sin(np.pi*ky3d/(2*kn)))**2. + (2./5.)*(np.sin(np.pi*ky3d/(2*kn)))**4. - (4./315.)*(np.sin(np.pi*ky3d/(2*kn)))**6.
+#     fieldk /= np.sqrt(C)
+#     field = shift.cart.ifft2D(fieldk, boxsize)
+#     return field
+
+
+# def deconvolve_part2grid_3D(field, boxsize, method='TSC'):
+#     """Deconvolve the grid assignment scheme in Fourier space.
+#
+#     Parameters
+#     ----------
+#     field : ndarray
+#         Grid assigned field.
+#     boxsize : float
+#         Box size.
+#     method : str
+#         grid assignment scheme, either NGP, CIC, TSC or PCS.
+#     """
+#     fieldk = shift.cart.fft3D(field, boxsize)
+#     ngrid = len(fieldk)
+#     kx3d, ky3d, kz3d = shift.cart.kgrid3D(boxsize, ngrid)
+#     kn = shift.cart.get_kn(boxsize, ngrid)
+#     if method == 'NGP':
+#         C = 1.
+#     elif method == 'CIC':
+#         C  = 1.-(2./3.)*(np.sin(np.pi*kx3d/(2*kn)))**2.
+#         C *= 1.-(2./3.)*(np.sin(np.pi*ky3d/(2*kn)))**2.
+#         C *= 1.-(2./3.)*(np.sin(np.pi*kz3d/(2*kn)))**2.
+#     elif method == 'TSC':
+#         C  = 1.-(np.sin(np.pi*kx3d/(2*kn)))**2. + (2./15.)*(np.sin(np.pi*kx3d/(2*kn)))**4.
+#         C *= 1.-(np.sin(np.pi*ky3d/(2*kn)))**2. + (2./15.)*(np.sin(np.pi*ky3d/(2*kn)))**4.
+#         C *= 1.-(np.sin(np.pi*kz3d/(2*kn)))**2. + (2./15.)*(np.sin(np.pi*kz3d/(2*kn)))**4.
+#     elif method == 'PCS':
+#         C  = 1.-(4./3.)*(np.sin(np.pi*kx3d/(2*kn)))**2. + (2./5.)*(np.sin(np.pi*kx3d/(2*kn)))**4. - (4./315.)*(np.sin(np.pi*kx3d/(2*kn)))**6.
+#         C *= 1.-(4./3.)*(np.sin(np.pi*ky3d/(2*kn)))**2. + (2./5.)*(np.sin(np.pi*ky3d/(2*kn)))**4. - (4./315.)*(np.sin(np.pi*ky3d/(2*kn)))**6.
+#         C *= 1.-(4./3.)*(np.sin(np.pi*kz3d/(2*kn)))**2. + (2./5.)*(np.sin(np.pi*kz3d/(2*kn)))**4. - (4./315.)*(np.sin(np.pi*kz3d/(2*kn)))**6.
+#     fieldk /= np.sqrt(C)
+#     field = shift.cart.ifft3D(fieldk, boxsize)
+#     return field
+
 
 def deconvolve_part2grid_2D(field, boxsize, method='TSC'):
     """Deconvolve the grid assignment scheme in Fourier space.
@@ -54,20 +124,18 @@ def deconvolve_part2grid_2D(field, boxsize, method='TSC'):
     """
     fieldk = shift.cart.fft2D(field, boxsize)
     ngrid = len(fieldk)
-    kx3d, ky3d = shift.cart.kgrid2D(boxsize, ngrid)
+    kx2d, ky2d = shift.cart.kgrid2D(boxsize, ngrid)
     kn = shift.cart.get_kn(boxsize, ngrid)
+    Wk = get_sinc(np.pi*kx2d/(2*kn))*get_sinc(np.pi*ky2d/(2*kn))
     if method == 'NGP':
-        C = 1.
+        p = 1
     elif method == 'CIC':
-        C  = 1.-(2./3.)*(np.sin(np.pi*kx3d/(2*kn)))**2.
-        C *= 1.-(2./3.)*(np.sin(np.pi*ky3d/(2*kn)))**2.
+        p = 2
     elif method == 'TSC':
-        C  = 1.-(np.sin(np.pi*kx3d/(2*kn)))**2. + (2./15.)*(np.sin(np.pi*kx3d/(2*kn)))**4.
-        C *= 1.-(np.sin(np.pi*ky3d/(2*kn)))**2. + (2./15.)*(np.sin(np.pi*ky3d/(2*kn)))**4.
+        p = 3
     elif method == 'PCS':
-        C  = 1.-(4./3.)*(np.sin(np.pi*kx3d/(2*kn)))**2. + (2./5.)*(np.sin(np.pi*kx3d/(2*kn)))**4. - (4./315.)*(np.sin(np.pi*kx3d/(2*kn)))**6.
-        C *= 1.-(4./3.)*(np.sin(np.pi*ky3d/(2*kn)))**2. + (2./5.)*(np.sin(np.pi*ky3d/(2*kn)))**4. - (4./315.)*(np.sin(np.pi*ky3d/(2*kn)))**6.
-    fieldk /= np.sqrt(C)
+        p = 4
+    fieldk /= Wk**p
     field = shift.cart.ifft2D(fieldk, boxsize)
     return field
 
@@ -88,20 +156,15 @@ def deconvolve_part2grid_3D(field, boxsize, method='TSC'):
     ngrid = len(fieldk)
     kx3d, ky3d, kz3d = shift.cart.kgrid3D(boxsize, ngrid)
     kn = shift.cart.get_kn(boxsize, ngrid)
+    Wk = get_sinc(np.pi*kx3d/(2*kn))*get_sinc(np.pi*ky3d/(2*kn))*get_sinc(np.pi*kz3d/(2*kn))
     if method == 'NGP':
-        C = 1.
+        p = 1
     elif method == 'CIC':
-        C  = 1.-(2./3.)*(np.sin(np.pi*kx3d/(2*kn)))**2.
-        C *= 1.-(2./3.)*(np.sin(np.pi*ky3d/(2*kn)))**2.
-        C *= 1.-(2./3.)*(np.sin(np.pi*kz3d/(2*kn)))**2.
+        p = 2
     elif method == 'TSC':
-        C  = 1.-(np.sin(np.pi*kx3d/(2*kn)))**2. + (2./15.)*(np.sin(np.pi*kx3d/(2*kn)))**4.
-        C *= 1.-(np.sin(np.pi*ky3d/(2*kn)))**2. + (2./15.)*(np.sin(np.pi*ky3d/(2*kn)))**4.
-        C *= 1.-(np.sin(np.pi*kz3d/(2*kn)))**2. + (2./15.)*(np.sin(np.pi*kz3d/(2*kn)))**4.
+        p = 3
     elif method == 'PCS':
-        C  = 1.-(4./3.)*(np.sin(np.pi*kx3d/(2*kn)))**2. + (2./5.)*(np.sin(np.pi*kx3d/(2*kn)))**4. - (4./315.)*(np.sin(np.pi*kx3d/(2*kn)))**6.
-        C *= 1.-(4./3.)*(np.sin(np.pi*ky3d/(2*kn)))**2. + (2./5.)*(np.sin(np.pi*ky3d/(2*kn)))**4. - (4./315.)*(np.sin(np.pi*ky3d/(2*kn)))**6.
-        C *= 1.-(4./3.)*(np.sin(np.pi*kz3d/(2*kn)))**2. + (2./5.)*(np.sin(np.pi*kz3d/(2*kn)))**4. - (4./315.)*(np.sin(np.pi*kz3d/(2*kn)))**6.
-    fieldk /= np.sqrt(C)
+        p = 4
+    fieldk /= Wk**p
     field = shift.cart.ifft3D(fieldk, boxsize)
     return field

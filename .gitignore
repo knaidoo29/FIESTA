@@ -1,8 +1,5 @@
-build/*
-build/
-dist/*
-dist/
+*build/
+*dist/
 *__pycache__
 *.DS_Store
-*.egg-info/*
 *.egg-info/

@@ -6,44 +6,46 @@
    :align: center
    :class: only-dark
 
-<p align="center">
-  <a href="https://github.com/knaidoo29/FIESTA/actions/workflows/tests.yml">
-  <img src="https://github.com/knaidoo29/FIESTA/actions/workflows/tests.yml/badge.svg" alt="Python Tests">
-  </a>
-  <a href="https://codecov.io/gh/knaidoo29/FIESTA" > 
-  <img src="https://codecov.io/gh/knaidoo29/FIESTA/graph/badge.svg?token=HX4OB31MS3"/> 
-  </a>
-  <a href="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue">
-  <img src="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue" alt="Python Version Support">
-  </a>
-  <a href="https://img.shields.io/github/v/release/knaidoo29/FIESTA">  
-  <img src="https://img.shields.io/github/v/release/knaidoo29/FIESTA" alt="Version">
-  </a>
-  <a href="https://pypi.org/project/fiesta-pkg/">
-  <img src="https://img.shields.io/pypi/v/fiesta-pkg.svg" alt="PyPI version">
-  </a>
-  <a href="https://fiesta-docs.readthedocs.io/">
-  <img src="https://readthedocs.org/projects/fiesta-docs/badge/?version=latest" alt="Documentation Status">
-  </a>
-  <a href="https://github.com/knaidoo29/FIESTA">
-  <img src="https://img.shields.io/badge/GitHub-repo-blue?logo=github" alt="GitHub repository">
-  </a>
-  <a href="https://img.shields.io/github/stars/knaidoo29/fiesta">
-  <img src="https://img.shields.io/github/stars/knaidoo29/fiesta" alt="github: stars">
-  </a>
-  <a href="https://img.shields.io/github/stars/knaidoo29/fiesta">
-  <img src="https://img.shields.io/github/forks/knaidoo29/fiesta" alt="github: forks">
-  </a>
-  <a href="https://opensource.org/licenses/MIT">
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
-  </a>
-  <a href="https://github.com/psf/black">
-  <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black">
-  </a>
-  <!-- <a href="https://doi.org/10.5281/zenodo.17093446">
-  <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.17093446.svg" alt="zenodo: DOI">
-  </a> -->
-</p>
+.. raw:: html
+    
+  <p align="center">
+    <a href="https://github.com/knaidoo29/FIESTA/actions/workflows/tests.yml">
+    <img src="https://github.com/knaidoo29/FIESTA/actions/workflows/tests.yml/badge.svg" alt="Python Tests">
+    </a>
+    <a href="https://codecov.io/gh/knaidoo29/FIESTA" > 
+    <img src="https://codecov.io/gh/knaidoo29/FIESTA/graph/badge.svg?token=HX4OB31MS3"/> 
+    </a>
+    <a href="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue">
+    <img src="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue" alt="Python Version Support">
+    </a>
+    <a href="https://img.shields.io/github/v/release/knaidoo29/FIESTA">  
+    <img src="https://img.shields.io/github/v/release/knaidoo29/FIESTA" alt="Version">
+    </a>
+    <a href="https://pypi.org/project/fiesta-pkg/">
+    <img src="https://img.shields.io/pypi/v/fiesta-pkg.svg" alt="PyPI version">
+    </a>
+    <a href="https://fiesta-docs.readthedocs.io/">
+    <img src="https://readthedocs.org/projects/fiesta-docs/badge/?version=latest" alt="Documentation Status">
+    </a>
+    <a href="https://github.com/knaidoo29/FIESTA">
+    <img src="https://img.shields.io/badge/GitHub-repo-blue?logo=github" alt="GitHub repository">
+    </a>
+    <a href="https://img.shields.io/github/stars/knaidoo29/fiesta">
+    <img src="https://img.shields.io/github/stars/knaidoo29/fiesta" alt="github: stars">
+    </a>
+    <a href="https://img.shields.io/github/stars/knaidoo29/fiesta">
+    <img src="https://img.shields.io/github/forks/knaidoo29/fiesta" alt="github: forks">
+    </a>
+    <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+    </a>
+    <a href="https://github.com/psf/black">
+    <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black">
+    </a>
+    <!-- <a href="https://doi.org/10.5281/zenodo.17093446">
+    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.17093446.svg" alt="zenodo: DOI">
+    </a> -->
+  </p>
 
 ==================================================================================
 FIESTA: Field Interpolation and Estimation using Spatial Techniques and Algorithms

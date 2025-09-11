@@ -126,7 +126,7 @@ def deconvolve_part2grid_2D(field, boxsize, method='TSC'):
     ngrid = len(fieldk)
     kx2d, ky2d = shift.cart.kgrid2D(boxsize, ngrid)
     kn = shift.cart.get_kn(boxsize, ngrid)
-    Wk = get_sinc(kx2d/kn)*get_sinc(ky2d/kn)
+    Wk = get_sinc(np.pi*kx2d/(2*kn))*get_sinc(np.pi*ky2d/(2*kn))
     if method == 'NGP':
         p = 1
     elif method == 'CIC':
@@ -156,7 +156,7 @@ def deconvolve_part2grid_3D(field, boxsize, method='TSC'):
     ngrid = len(fieldk)
     kx3d, ky3d, kz3d = shift.cart.kgrid3D(boxsize, ngrid)
     kn = shift.cart.get_kn(boxsize, ngrid)
-    Wk = get_sinc(kx3d/kn)*get_sinc(ky3d/kn)*get_sinc(kz3d/kn)
+    Wk = get_sinc(np.pi*kx3d/(2*kn))*get_sinc(np.pi*ky3d/(2*kn))*get_sinc(np.pi*kz3d/(2*kn))
     if method == 'NGP':
         p = 1
     elif method == 'CIC':

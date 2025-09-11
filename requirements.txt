@@ -1,4 +1,4 @@
 numba
 numpy
 scipy
-git+https://github.com/knaidoo29/SHIFT.git
+shift-fft

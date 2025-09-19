@@ -24,7 +24,7 @@ class Delaunay2Dv2:
         self.delaunay = None
         self.delaunay_area = None
         self.simplices = None
-        self.simplices_type = None
+        self.simptypes = None
         self.circumcircles = None
         self.angle_total = None
         self.dtfe_mode = None
@@ -211,25 +211,25 @@ class Delaunay2Dv2:
         Determine Delaunay boundary simplices and points.
         """
         # TODO add more comments
-        self.simplices_type = np.ones(len(self.simplices))
+        self.simptypes = np.ones(len(self.simplices))
         cond = np.where(np.sum(self.cross_boundary, axis=1) != 0.)[0]
-        self.simplices_type[cond] = -1. # Circumcircle center is completely outside the boundary
+        self.simptypes[cond] = -1. # Circumcircle center is completely outside the boundary
         self.point_type = np.ones(len(self.points))
         # first column is tied to the simplex type and the second to whether a particle's angles subtend the full circle.
         cond = np.where(np.abs(self.angle_total - 2*np.pi) > 1e-3)[0]
         self.point_type[cond] = -1. 
-        cond = np.where(self.simplices_type == -1.)[0]
+        cond = np.where(self.simptypes == -1.)[0]
         idxs = np.unique(self.simplices[cond].flatten())
         self.point_type[idxs] = -1.
-        cond = np.where(self.simplices_type == 1.)[0]
-        cond = np.where(self.simplices_type == 1.)[0]
+        cond = np.where(self.simptypes == 1.)[0]
+        cond = np.where(self.simptypes == 1.)[0]
         simplices = self.simplices[cond]
         point_type0 = self.point_type[simplices[:,0]]
         point_type1 = self.point_type[simplices[:,1]]
         point_type2 = self.point_type[simplices[:,2]]
         cond2 = np.where((point_type0 == -1.) | (point_type1 == -1.) | (point_type2 == -1.))[0]
-        self.simplices_type[cond[cond2]] = 0.
-        cond = np.where(self.simplices_type == 0.)[0]
+        self.simptypes[cond[cond2]] = 0.
+        cond = np.where(self.simptypes == 0.)[0]
         idxs = np.unique(self.simplices[cond].flatten())
         cond = np.where(self.point_type[idxs] != -1)[0]
         self.point_type[idxs[cond]] = 0.
@@ -317,13 +317,130 @@ class Delaunay2Dv2:
         """
         simplices_idx = self.find_simplex(x, y)
         f_est = np.nan*np.ones(len(x))
-        if self.dtfe_mode == 'field':
-            cond = np.where((simplices_idx != -1) & (self.simplices_type[simplices_idx] != -1.))[0]
-        if self.dtfe_mode == 'density':
-            cond = np.where((simplices_idx != -1) & (self.simplices_type[simplices_idx] == 1.))[0]
+        # if self.dtfe_mode == 'field':
+        #     cond = np.where((simplices_idx != -1) & (self.simptypes[simplices_idx] != -1.))[0]
+        # if self.dtfe_mode == 'density':
+        cond = np.where((simplices_idx != -1) & (self.simptypes[simplices_idx] == 1.))[0]
         f_est[cond] = src.delaunay_estimate_2d(simplices_idx[cond], x[cond], y[cond], self.x0, self.y0, self.f0, self.delf0)
         return f_est
 
 
+    def get_border(self):
+        """
+        Returns border points and simplices.
+        """
+        border = {}
+        keep_idx = -np.ones(len(self.x), dtype='int')
+        cond = np.where(self.point_type != 1)[0]
+        keep_idx[cond] = np.arange(len(cond))
+        border['x'] = self.x[cond]
+        border['y'] = self.y[cond]
+        border['mass'] = self.mass[cond]
+        border['ptype'] = self.point_type[cond]
+        if self.f is None:
+            border['f'] = None
+        else:
+            border['f'] = self.f[cond]
+        border['dtfe_mode'] = self.dtfe_mode
+        cond = np.where(self.simptypes != 1)[0]
+        border['simplices'] = keep_idx[self.simplices[cond]]
+        border['simptypes'] = self.simptypes[cond]
+        return border
+
+
     def clean(self):
         self.__init__()
+
+
+class DelaunayJoiner2D:
+    
+    
+    def __init__(self):
+        """
+        """
+        self.x = []
+        self.y = []
+        self.f = []
+        self.mass = []
+        self.Np = 0
+        self.Nb = 0
+        self.pID = []
+        self.ptypes = []
+        self.simplices = []
+        self.simptypes = []
+        self.dtfe_mode = None
+        self.dtfe = None
+        
+    
+    def add_border(self, border):
+        """
+        """
+        if self.dtfe_mode is None:
+            self.dtfe_mode = border['dtfe_mode']
+        else:
+            assert self.dtfe_mode == border['dtfe_mode'], 'Border DTFE must match preassigned border DTFEs.'
+        self.x.append(border['x'])
+        self.y.append(border['y'])
+        self.f.append(border['f'])
+        self.mass.append(border['mass'])
+        self.pID.append(self.Nb*np.ones(len(border['x'])))
+        self.Nb += 1
+        self.ptypes.append(border['ptype'])
+        idx2globalidx = np.arange(len(border['x'])) + self.Np
+        self.Np += len(border['x'])
+        self.simplices.append(idx2globalidx[border['simplices']])
+        self.simptypes.append(border['simptypes'])
+        
+        
+    
+    def _concatenate(self):
+        """
+        """
+        self.x = np.concatenate(self.x)
+        self.y = np.concatenate(self.y)
+        self.f = np.concatenate(self.f)
+        self.mass = np.concatenate(self.mass)
+        self.pID = np.concatenate(self.pID)
+        self.ptypes = np.concatenate(self.ptypes)
+        self.simplices = np.concatenate(self.simplices)
+        self.simptypes = np.concatenate(self.simptypes)
+        
+        
+    def run(self, boundary):
+        """
+        """
+        self._concatenate()
+        self.dtfe = fiesta.dtfe.Delaunay2Dv2()
+        self.dtfe.setup(self.x, self.y, boundary, mass=self.mass)
+        self.dtfe.run()
+        if self.dtfe_mode == 'density':
+            self.dtfe.get_dens()
+            cond = np.where(self.ptypes == 0.)[0]
+            self.dtfe.point_dens[cond] = self.f[cond]
+            self.dtfe.set_field2dens()
+        else:
+            self.dtfe.set_field(self.f)
+            
+        cond = np.where(
+            (self.pID[self.dtfe.simplices[:,0]] == self.pID[self.dtfe.simplices[:,1]]) & 
+            (self.pID[self.dtfe.simplices[:,1]] == self.pID[self.dtfe.simplices[:,2]]) &
+            (self.ptypes[self.dtfe.simplices[:,0]] == 0.) & 
+            (self.ptypes[self.dtfe.simplices[:,1]] == 0.) & 
+            (self.ptypes[self.dtfe.simplices[:,2]] == 0.)
+        )[0]
+        self.dtfe.simptypes[cond] = -1.
+    
+    
+    def estimate(self, x, y):
+        """"""
+        return self.dtfe.estimate(x, y)
+    
+    
+    def get_border(self):
+        """"""
+        return self.dtfe.get_border()
+    
+    
+    def clean(self):
+        """"""
+        return self.__init__()

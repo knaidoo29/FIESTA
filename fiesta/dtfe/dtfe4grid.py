@@ -430,9 +430,9 @@ def get_density_dtfe4grid2D(x, y, boxsize, ngrid, origin=0., mass=None, partitio
                 dtfe.run()
                 dtfe.get_dens()
                 dtfe.set_field2dens()
-
-                cond = np.where(dtfe.point_type != 1.)[0]
                 
+                cond = np.where(dtfe.point_type != 1.)[0]
+
                 # store boundary particles
                 x_boundary.append(x[xcond[ycond[cond]]])
                 y_boundary.append(y[xcond[ycond[cond]]])
@@ -446,6 +446,7 @@ def get_density_dtfe4grid2D(x, y, boxsize, ngrid, origin=0., mass=None, partitio
 
             cond = np.where(np.isfinite(dens[pixID[pix_xcond]]))[0]
             pixID = np.delete(pixID, pix_xcond[cond])
+        plt.show()
 
         # concatenate boundary particles
         x_boundary = np.concatenate(x_boundary)
@@ -495,7 +496,7 @@ def get_density_dtfe4grid2D(x, y, boxsize, ngrid, origin=0., mass=None, partitio
                 dtfe.set_field2dens()
                 
                 cond2 = np.where(dtfe.point_type != 1.)[0]
-                
+
                 # store boundary particles
                 x_gboundary.append(x_boundary[cond[cond2]])
                 y_gboundary.append(y_boundary[cond[cond2]])
@@ -516,6 +517,8 @@ def get_density_dtfe4grid2D(x, y, boxsize, ngrid, origin=0., mass=None, partitio
             mass_gboundary = np.concatenate(mass_gboundary)
             type_gboundary = np.concatenate(type_gboundary)
             dens_gboundary = np.concatenate(dens_gboundary)
+
+            plt.show()
 
             # partition boundary
             boundary = [xorigin, xorigin+xboxsize, yorigin, yorigin+yboxsize]
@@ -781,6 +784,24 @@ def get_density_dtfe4grid2D_v2(x, y, boxsize, ngrid, origin=0., mass=None, parti
             dtfe.get_dens()
             dtfe.set_field2dens()
 
+            import matplotlib.pylab as plt
+
+            con = np.where(dtfe.simplices_type == 1.)[0]
+            plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+                        [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+                        color='C0', linewidth=0.5
+                        )
+            con = np.where(dtfe.simplices_type == 0.)[0]
+            plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+                        [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+                        color='C1', linewidth=0.5
+                        )
+            con = np.where(dtfe.simplices_type == -1.)[0]
+            plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+                        [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+                        color='C2', linewidth=0.5
+                        )
+            
             cond = np.where(dtfe.point_type != 1.)[0]
             
             # store boundary particles
@@ -856,46 +877,85 @@ def get_density_dtfe4grid2D_v2(x, y, boxsize, ngrid, origin=0., mass=None, parti
 
             dtfe.set_field2dens()
 
-            # simplices_cond = np.where((dtfe.point_type[dtfe.simplices[:,0]] != 1.) & (dtfe.point_type[dtfe.simplices[:,1]] != 1.) & (dtfe.point_type[dtfe.simplices[:,2]] != 1))[0]
-            # dtfe.simplices_type[simplices_cond] = -1.
-            # simplices_cond = np.where(
-            #     (dtfe.simplices_type == 1) &
-            #     ((dtfe.point_type[dtfe.simplices[:,0]] == 0.) | (dtfe.point_type[dtfe.simplices[:,1]] == 0.) | (dtfe.point_type[dtfe.simplices[:,2]] == 0)) &
-            #     (partID[dtfe.simplices[:,0]] == partID[dtfe.simplices[:,1]]) & 
-            #     (partID[dtfe.simplices[:,1]] == partID[dtfe.simplices[:,2]])
-            #     )[0]
-            # dtfe.simplices_type[simplices_cond] = 1.
-            # simplices_cond = np.where(
-            #     (dtfe.simplices_type == 1) &
-            #     ((dtfe.point_type[dtfe.simplices[:,0]] == 0.) & (dtfe.point_type[dtfe.simplices[:,1]] == 0.) & (dtfe.point_type[dtfe.simplices[:,2]] == 0)) &
-            #     (partID[dtfe.simplices[:,0]] == partID[dtfe.simplices[:,1]]) & 
-            #     (partID[dtfe.simplices[:,1]] == partID[dtfe.simplices[:,2]])
-            #     )[0]
-            # dtfe.simplices_type[simplices_cond] = 0.
-
+            simplices_cond = np.where((dtfe.point_type[dtfe.simplices[:,0]] != 1.) & (dtfe.point_type[dtfe.simplices[:,1]] != 1.) & (dtfe.point_type[dtfe.simplices[:,2]] != 1))[0]
+            dtfe.simplices_type[simplices_cond] = -1.
             simplices_cond = np.where(
-                ((partID[dtfe.simplices[:,0]] == partID[dtfe.simplices[:,1]]) & (partID[dtfe.simplices[:,1]] == partID[dtfe.simplices[:,2]])) & 
-                (dtfe.simplices_type == 1.)
-            )[0]
+                (dtfe.simplices_type == 1) &
+                ((dtfe.point_type[dtfe.simplices[:,0]] == 0.) | (dtfe.point_type[dtfe.simplices[:,1]] == 0.) | (dtfe.point_type[dtfe.simplices[:,2]] == 0)) &
+                (partID[cond[dtfe.simplices[:,0]]] == partID[cond[dtfe.simplices[:,1]]]) & 
+                (partID[cond[dtfe.simplices[:,1]]] == partID[cond[dtfe.simplices[:,2]]])
+                )[0]
             dtfe.simplices_type[simplices_cond] = 1.
+            simplices_cond = np.where(
+                (dtfe.simplices_type == 1) &
+                ((dtfe.point_type[dtfe.simplices[:,0]] == 0.) & (dtfe.point_type[dtfe.simplices[:,1]] == 0.) & (dtfe.point_type[dtfe.simplices[:,2]] == 0)) &
+                (partID[cond[dtfe.simplices[:,0]]] == partID[cond[dtfe.simplices[:,1]]]) & 
+                (partID[cond[dtfe.simplices[:,1]]] == partID[cond[dtfe.simplices[:,2]]])
+                )[0]
+            dtfe.simplices_type[simplices_cond] = 0.
+
+            # simplices_cond = np.where(
+            #     ((partID[cond[dtfe.simplices[:,0]]] != partID[cond[dtfe.simplices[:,1]]]) | (partID[cond[dtfe.simplices[:,1]]] != partID[cond[dtfe.simplices[:,2]]])) & 
+            #     (dtfe.simplices_type == 1.)
+            # )[0]
+            # dtfe.simplices_type[simplices_cond] = 2.
+
+            # _cond = np.where(dtfe.simplices_type == 2)[0]
+            # simplices_cond = np.unique(dtfe.delaunay.neighbors[_cond])
+            # # _cond = np.where(dtfe.simplices_type[simplices_cond] == 1.)[0]
+            # dtfe.simplices_type[simplices_cond] = 3.
 
             # _cond = np.where(dtfe.simplices_type == 2.)[0]
             # _cond = np.unique(dtfe.simplices[_cond])
             # dtfe.point_type[_cond] = 2.
-            _cond = np.where(dtfe.simplices_type == 1.)[0]
-            _cond = np.unique(dtfe.simplices[_cond])
-            dtfe.point_type[_cond] = 1.
-            _cond = np.where(dtfe.simplices_type == 0.)[0]
-            _cond = np.unique(dtfe.simplices[_cond])
-            dtfe.point_type[_cond] = 0.
-            _cond = np.where(dtfe.simplices_type == -1.)[0]
-            _cond = np.unique(dtfe.simplices[_cond])
-            dtfe.point_type[_cond] = -1.
+            # _cond = np.where(dtfe.simplices_type == 1.)[0]
+            # _cond = np.unique(dtfe.simplices[_cond])
+            # dtfe.point_type[_cond] = 1.
+            # _cond = np.where(dtfe.simplices_type == 0.)[0]
+            # _cond = np.unique(dtfe.simplices[_cond])
+            # dtfe.point_type[_cond] = 0.
+            # _cond = np.where(dtfe.simplices_type == -1.)[0]
+            # _cond = np.unique(dtfe.simplices[_cond])
+            # dtfe.point_type[_cond] = -1.
+
+            plt.scatter(dtfe.x, dtfe.y, c=dtfe.point_type)
+            plt.show()
+
+            # _cond = np.where(dtfe.simplices_type == 2)[0]
+            # simplices_cond = np.unique(dtfe.delaunay.neighbors[_cond])
+            # dtfe.simplices_type[simplices_cond] = 2.
+
+            # con = np.where(dtfe.simplices_type == 3.)[0]
+            # plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+            #             [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+            #             color='C4', linewidth=0.5
+            #             )
+            # con = np.where(dtfe.simplices_type == 2.)[0]
+            # plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+            #             [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+            #             color='C0', linewidth=0.5
+            #             )
+            # con = np.where(dtfe.simplices_type == 1.)[0]
+            # plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+            #             [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+            #             color='C1', linewidth=0.5
+            #             )
+            # con = np.where(dtfe.simplices_type == 0.)[0]
+            # plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+            #             [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+            #             color='C2', linewidth=0.5
+            #             )
+            # con = np.where(dtfe.simplices_type == -1.)[0]
+            # plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+            #             [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+            #             color='C3', linewidth=0.5
+            #             )
 
             # cond_simplices = np.where(dtfe.simplices_type == -1)[0]
             # dtfe.point_type[np.unique(dtfe.simplices[cond_simplices])] = -1.
             
-            cond2 = np.where(dtfe.point_type < 1.)[0]
+
+            cond2 = np.where(dtfe.point_type != 1.)[0]
             
             # store boundary particles
             x_gboundary.append(x_boundary[cond[cond2]])
@@ -935,6 +995,9 @@ def get_density_dtfe4grid2D_v2(x, y, boxsize, ngrid, origin=0., mass=None, parti
 
         partID = np.searchsorted(xedges, x_gboundary, side="right") - 1
 
+        plt.scatter(x_gboundary, y_gboundary, c=partID, s=1)
+        plt.show()
+
         # partition boundary
         boundary = [xorigin, xorigin+xboxsize, yorigin, yorigin+yboxsize]
         
@@ -953,6 +1016,50 @@ def get_density_dtfe4grid2D_v2(x, y, boxsize, ngrid, origin=0., mass=None, parti
         dtfe.point_type[cond] = type_gboundary[cond]
 
         dtfe.set_field2dens()
+
+        simplices_cond = np.where((dtfe.point_type[dtfe.simplices[:,0]] != 1.) & (dtfe.point_type[dtfe.simplices[:,1]] != 1.) & (dtfe.point_type[dtfe.simplices[:,2]] != 1))[0]
+        dtfe.simplices_type[simplices_cond] = -1.
+        simplices_cond = np.where(
+            (dtfe.simplices_type == 1) &
+            ((dtfe.point_type[dtfe.simplices[:,0]] == 0.) | (dtfe.point_type[dtfe.simplices[:,1]] == 0.) | (dtfe.point_type[dtfe.simplices[:,2]] == 0)) &
+            (partID[dtfe.simplices[:,0]] == partID[dtfe.simplices[:,1]]) & 
+            (partID[dtfe.simplices[:,1]] == partID[dtfe.simplices[:,2]])
+            )[0]
+        dtfe.simplices_type[simplices_cond] = 1.
+        simplices_cond = np.where(
+            (dtfe.simplices_type == 1) &
+            ((dtfe.point_type[dtfe.simplices[:,0]] == 0.) & (dtfe.point_type[dtfe.simplices[:,1]] == 0.) & (dtfe.point_type[dtfe.simplices[:,2]] == 0)) &
+            (partID[dtfe.simplices[:,0]] == partID[dtfe.simplices[:,1]]) & 
+            (partID[dtfe.simplices[:,1]] == partID[dtfe.simplices[:,2]])
+            )[0]
+        dtfe.simplices_type[simplices_cond] = 0.
+        
+        # con = np.where(dtfe.simplices_type == 3.)[0]
+        # plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+        #             [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+        #             color='C4', linewidth=0.5
+        #             )
+        # con = np.where(dtfe.simplices_type == 2.)[0]
+        # plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+        #             [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+        #             color='C0', linewidth=0.5
+        #             )
+        
+        con = np.where(dtfe.simplices_type == 1.)[0]
+        plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+                    [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+                    color='C1', linewidth=0.5
+                    )
+        con = np.where(dtfe.simplices_type == 0.)[0]
+        plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+                    [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+                    color='C2', linewidth=0.5
+                    )
+        con = np.where(dtfe.simplices_type == -1.)[0]
+        plt.plot([dtfe.x[dtfe.simplices[con,0]], dtfe.x[dtfe.simplices[con,1]], dtfe.x[dtfe.simplices[con,2]], dtfe.x[dtfe.simplices[con,0]]],
+                    [dtfe.y[dtfe.simplices[con,0]], dtfe.y[dtfe.simplices[con,1]], dtfe.y[dtfe.simplices[con,2]], dtfe.y[dtfe.simplices[con,0]]],
+                    color='C3', linewidth=0.5
+                    )
 
         # simplices_cond = np.where((dtfe.point_type[dtfe.simplices[:,0]] != 1.) & (dtfe.point_type[dtfe.simplices[:,1]] != 1.) & (dtfe.point_type[dtfe.simplices[:,2]] != 1))[0]
         # dtfe.simplices_type[simplices_cond] = -1.
@@ -976,6 +1083,14 @@ def get_density_dtfe4grid2D_v2(x, y, boxsize, ngrid, origin=0., mass=None, parti
         #     )[0]
         # dtfe.simplices_type[simplices_cond] = 0.
 
+        simplices_has = np.where(((dtfe.point_type[dtfe.simplices[:,0]] == 1.) |
+                                  (dtfe.point_type[dtfe.simplices[:,1]] == 1.) |
+                                  (dtfe.point_type[dtfe.simplices[:,2]] == 1.))
+                                  & 
+                                  (dtfe.point_type[dtfe.simplices[:,0]] != dtfe.point_type[dtfe.simplices[:,1]]) |
+                                  (dtfe.point_type[dtfe.simplices[:,1]] != dtfe.point_type[dtfe.simplices[:,2]])
+                                  )[0]
+        dtfe.simplices_type[simplices_has] = 0.
         simplices_cond = np.where(
             (dtfe.point_type[dtfe.simplices[:,0]] == 0.) &
             (dtfe.point_type[dtfe.simplices[:,1]] == 0.) &
@@ -989,15 +1104,15 @@ def get_density_dtfe4grid2D_v2(x, y, boxsize, ngrid, origin=0., mass=None, parti
         # _cond = np.where(dtfe.simplices_type == 2.)[0]
         # _cond = np.unique(dtfe.simplices[_cond])
         # dtfe.point_type[_cond] = 2.
-        _cond = np.where(dtfe.simplices_type == 1.)[0]
-        _cond = np.unique(dtfe.simplices[_cond])
-        dtfe.point_type[_cond] = 1.
+        # _cond = np.where(dtfe.simplices_type == 1.)[0]
+        # _cond = np.unique(dtfe.simplices[_cond])
+        # dtfe.point_type[_cond] = 1.
         _cond = np.where(dtfe.simplices_type == 0.)[0]
         _cond = np.unique(dtfe.simplices[_cond])
         dtfe.point_type[_cond] = 0.
-        _cond = np.where(dtfe.simplices_type == -1.)[0]
-        _cond = np.unique(dtfe.simplices[_cond])
-        dtfe.point_type[_cond] = -1.
+        # _cond = np.where(dtfe.simplices_type == -1.)[0]
+        # _cond = np.unique(dtfe.simplices[_cond])
+        # dtfe.point_type[_cond] = -1.
 
         # cond_simplices = np.where(dtfe.simplices_type == -1)[0]
         # dtfe.point_type[np.unique(dtfe.simplices[cond_simplices])] = -1.

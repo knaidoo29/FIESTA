@@ -67,7 +67,7 @@ def sum_delaunay_area_4_points_2d(delaunay_area, del_vert0, del_vert1, del_vert2
         i2 = del_vert2[i]
         point_area[i0] += delaunay_area[i]/3.
         point_area[i1] += delaunay_area[i]/3.
-        point_area[i2]+= delaunay_area[i]/3.
+        point_area[i2] += delaunay_area[i]/3.
     return point_area
 
 @njit

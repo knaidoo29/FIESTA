@@ -9,59 +9,66 @@ from typing import Union, Tuple, Optional, List
 from copy import deepcopy
 
 
-def mean_separation_2D(npart, boxsize):
-    """Calculates the mean separation for particles inside a 2D box.
+# TODO: Get rid of this? Is this used for anything?
 
-    Parameters
-    ----------
-    npart : int
-        Number of particles.
-    boxsize : float or list
-        Dimensions of the box.
+# def mean_separation_2D(npart, boxsize):
+#     """
+#     Calculates the mean separation for particles inside a 2D box.
 
-    Returns
-    -------
-    mean_sep : float
-        Mean separation of particles.
-    """
-    if np.isscalar(boxsize):
-        area = boxsize**2.
-    else:
-        area = boxsize[0]*boxsize[1]
-    mean_sep = np.sqrt(area/npart)
-    return mean_sep
+#     Parameters
+#     ----------
+#     npart : int
+#         Number of particles.
+#     boxsize : float or list
+#         Dimensions of the box.
+
+#     Returns
+#     -------
+#     mean_sep : float
+#         Mean separation of particles.
+#     """
+#     if np.isscalar(boxsize):
+#         area = boxsize**2.
+#     else:
+#         area = boxsize[0]*boxsize[1]
+#     mean_sep = np.sqrt(area/npart)
+#     return mean_sep
 
 
-def mean_separation_3D(npart, boxsize):
-    """Calculates the mean separation for particles inside a 3D box.
+# def mean_separation_3D(npart, boxsize):
+#     """
+#     Calculates the mean separation for particles inside a 3D box.
 
-    Parameters
-    ----------
-    npart : int
-        Number of particles.
-    boxsize : float or list
-        Dimensions of the box.
+#     Parameters
+#     ----------
+#     npart : int
+#         Number of particles.
+#     boxsize : float or list
+#         Dimensions of the box.
 
-    Returns
-    -------
-    mean_sep : float
-        Mean separation of particles.
-    """
-    if np.isscalar(boxsize):
-        vol = boxsize**3.
-    else:
-        vol = boxsize[0]*boxsize[1]*boxsize[2]
-    mean_sep = (vol/npart)**(1./3.)
-    return mean_sep
+#     Returns
+#     -------
+#     mean_sep : float
+#         Mean separation of particles.
+#     """
+#     if np.isscalar(boxsize):
+#         vol = boxsize**3.
+#     else:
+#         vol = boxsize[0]*boxsize[1]*boxsize[2]
+#     mean_sep = (vol/npart)**(1./3.)
+#     return mean_sep
 
 
 def delaunay_density4grid2D(
     x: np.ndarray, y: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
     origin: Union[float, List[float]] = 0., mass: Optional[np.ndarray] = None, partition: int = 1, 
     periodic : Union[bool, List[bool]] = True, fbuffer: float = 0.2, subsampling: int = 1, 
-    outputgrid: bool = False
-) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
-    """Returns the Delaunay tesselation density on a grid.
+    outputgrid: bool = False, outputexterior: bool = False, normalise : bool = True, flatten: bool = False
+) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray], 
+           Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray], 
+           Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
+    """
+    Returns the Delaunay tesselation density on a grid.
 
     Parameters
     ----------
@@ -87,6 +94,12 @@ def delaunay_density4grid2D(
         mean pixel value and not the value at the center.
     outputgrid : bool, optional
         Outputs coordinate grid.
+    outputexterior : bool, optional
+        Output exterior information, including exterior border dtfe and current unassigned pixels.
+    normalise : bool, optional
+        Whether to normalise the outputing density field.
+    flatten : bool, optional
+        Flatten output density array.
 
     Returns
     -------
@@ -94,6 +107,12 @@ def delaunay_density4grid2D(
         Density field values on a grid.
     x2d, y2d : ndarray, optional
         Pixel coordinate points.
+    exterior_border : dict, optional
+        If outputexterior = True, the exterior_border dictionary is outputted.
+    pixID : ndarray, optional
+        If outputexterior = True, pixels that are currently undersampled.
+    count: ndarray, optional
+        If outputexterior = True, the counts for each undersampled pixel.
     """
 
     # define boxsize on each axis
@@ -311,22 +330,43 @@ def delaunay_density4grid2D(
         pixID = np.delete(pixID, cond[cond2])
         count = np.delete(count, cond[cond2])
 
-    dens /= len(dx2d)
+        exterior_border = dtfe.get_border()
 
-    dens = dens.reshape(nxgrid,nygrid)
+    if normalise:
+        dens /= len(dx2d)
+        cond = np.where(count == 0.)[0]
+        dens[pixID[cond]] *= len(dx2d)
+        cond = np.where(count != 0.)[0]
+        dens[pixID[cond]] *= len(dx2d)/count[cond]
 
-    if outputgrid:
-        return dens, x2d, y2d
+    if flatten == False:
+        dens = dens.reshape(nxgrid,nygrid)
+
+    if outputexterior:
+        if outputgrid:
+            return dens, x2d, y2d, exterior_border, pixID, count
+        else:
+            return dens, exterior_border, pixID, count
     else:
-        return dens
+        if outputgrid:
+            return dens, x2d, y2d
+        else:
+            return dens
 
 
 def delaunay_field4grid2D(
     x: np.ndarray, y: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
     origin: Union[float, List[float]] = 0., mass: Optional[np.ndarray] = None, partition: int = 1, 
-    periodic : Union[bool, List[bool]] = True, fbuffer: float = 0.5, subsampling: int = 1, outputgrid: bool = False
-) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
-    """Returns the Delaunay tesselation field on a grid.
+    periodic : Union[bool, List[bool]] = True, fbuffer: float = 0.5, subsampling: int = 1, outputgrid: bool = False,
+    outputexterior: bool = False, normalise: bool = True, flatten: bool = False
+) -> Union[
+    np.ndarray,
+    Tuple[np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]
+]:
+    """
+    Returns the Delaunay tesselation field on a grid.
 
     Parameters
     ----------
@@ -343,7 +383,7 @@ def delaunay_field4grid2D(
     mass : array, optional
         Mass or mass weights for each the particles.
     partition : int or list, optional
-        The number of internal Delaunay tesselations used to compute the density grid.
+        The number of internal Delaunay tesselations used to compute the field grid.
     periodic : bool or list, optional
         Determines whether periodic boundaries are applied.
     fbuffer : float, optional
@@ -354,11 +394,17 @@ def delaunay_field4grid2D(
         mean pixel value and not the value at the center.
     outputgrid : bool, optional
         Outputs coordinate grid.
+    outputexterior : bool, optional
+        Ouput exterior information, including exterior border dtfe and current unassigned pixels.
+    normalise : bool, optional
+        Whether to normalise the outputing field.
+    flatten : bool, optional
+        Flatten output field array.
 
     Returns
     -------
-    dens : ndarray
-        Density field values on a grid.
+    field : ndarray
+        Field values on a grid.
     x2d, y2d : ndarray, optional
         Pixel coordinate points.
     """
@@ -577,24 +623,44 @@ def delaunay_field4grid2D(
         pixID = np.delete(pixID, cond[cond2])
         count = np.delete(count, cond[cond2])
 
-    field /= len(dx2d)
+        exterior_border = dtfe.get_border()
 
-    field = field.reshape(nxgrid,nygrid)
+    if normalise:
+        field /= len(dx2d)
 
-    if outputgrid:
-        return field, x2d, y2d
+        cond = np.where(count == 0.)[0]
+        field[pixID[cond]] *= len(dx2d)
+        cond = np.where(count != 0.)[0]
+        field[pixID[cond]] *= len(dx2d)/count[cond]
+
+    if flatten == False:
+        field = field.reshape(nxgrid,nygrid)
+
+    if outputexterior:
+        if outputgrid:
+            return field, x2d, y2d, exterior_border, pixID, count
+        else:
+            return field, exterior_border, pixID, count
     else:
-        return field
-    
+        if outputgrid:
+            return field, x2d, y2d
+        else:
+            return field
 
 
 def delaunay_density4grid3D(
     x: np.ndarray, y: np.ndarray, z: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
     origin: Union[float, List[float]] = 0., mass: Optional[np.ndarray] = None, partition: int = 1, 
     periodic : Union[bool, List[bool]] = True, fbuffer: float = 0.5, subsampling: int = 1, 
-    outputgrid: bool = False
-) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
-    """Returns the Delaunay tesselation density on a grid.
+    outputgrid: bool = False, outputexterior: bool = False, normalise: bool = True, flatten: bool = False
+) -> Union[
+    np.ndarray, 
+    Tuple[np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]    
+]:
+    """
+    Returns the Delaunay tesselation density on a grid.
 
     Parameters
     ----------
@@ -620,7 +686,11 @@ def delaunay_density4grid3D(
         mean pixel value and not the value at the center.
     outputgrid : bool, optional
         Outputs coordinate grid.
-
+    normalise : bool, optional
+        Whether to normalise the outputing density field.
+    flatten : bool, optional
+        Flatten output density array.
+    
     Returns
     -------
     dens : ndarray
@@ -905,14 +975,28 @@ def delaunay_density4grid3D(
         pixID = np.delete(pixID, cond[cond2])
         count = np.delete(count, cond[cond2])
 
-    dens /= len(dx3d)
+        exterior_border = dtfe.get_border()
 
-    dens = dens.reshape(nxgrid,nygrid,nzgrid)
+    if normalise:
+        dens /= len(dx3d)
+        cond = np.where(count == 0.)[0]
+        dens[pixID[cond]] *= len(dx3d)
+        cond = np.where(count != 0.)[0]
+        dens[pixID[cond]] *= len(dx3d)/count[cond]
 
-    if outputgrid:
-        return dens, x3d, y3d, z3d
+    if flatten == False:
+        dens = dens.reshape(nxgrid,nygrid,nzgrid)
+    
+    if outputexterior:
+        if outputgrid:
+            return dens, x3d, y3d, z3d, exterior_border, pixID, count
+        else:
+            return dens, exterior_border, pixID, count
     else:
-        return dens, count
+        if outputgrid:
+            return dens, x3d, y3d, z3d
+        else:
+            return dens
 
 
 
@@ -920,9 +1004,15 @@ def delaunay_field4grid3D(
     x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
     origin: Union[float, List[float]] = 0., mass: Optional[np.ndarray] = None, partition: int = 1, 
     periodic : Union[bool, List[bool]] = True, fbuffer: float = 0.2, subsampling: int = 1, 
-    outputgrid: bool = False
-) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
-    """Returns the Delaunay tesselation density on a grid.
+    outputgrid: bool = False, outputexterior: bool = False, normalise: bool = True, flatten: bool = False
+) -> Union[
+    np.ndarray, 
+    Tuple[np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+]:
+    """
+    Returns the Delaunay tesselation field on a grid.
 
     Parameters
     ----------
@@ -939,7 +1029,7 @@ def delaunay_field4grid3D(
     mass : array, optional
         Mass or mass weights for each the particles.
     partition : int or list, optional
-        The number of internal Delaunay tesselations used to compute the density grid.
+        The number of internal Delaunay tesselations used to compute the field grid.
     periodic : bool or list, optional
         Determines whether periodic boundaries are applied.
     fbuffer : float, optional
@@ -950,11 +1040,15 @@ def delaunay_field4grid3D(
         mean pixel value and not the value at the center.
     outputgrid : bool, optional
         Outputs coordinate grid.
+    normalise : bool, optional
+        Whether to normalise the outputing field.
+    flatten : bool, optional
+        Flatten output field array.
 
     Returns
     -------
-    dens : ndarray
-        Density field values on a grid.
+    field : ndarray
+        Field values on a grid.
     x2d, y2d, z3d : ndarray, optional
         Pixel coordinate points.
     """
@@ -1236,11 +1330,25 @@ def delaunay_field4grid3D(
         pixID = np.delete(pixID, cond[cond2])
         count = np.delete(count, cond[cond2])
 
-    field /= len(dx3d)
+        exterior_border = dtfe.get_border()
 
-    field = field.reshape(nxgrid,nygrid,nzgrid)
+    if normalise:
+        field /= len(dx3d)
+        cond = np.where(count == 0.)[0]
+        field[pixID[cond]] *= len(dx3d)
+        cond = np.where(count != 0.)[0]
+        field[pixID[cond]] *= len(dx3d)/count[cond]
 
-    if outputgrid:
-        return field, x3d, y3d, z3d
+    if flatten == False:
+        field = field.reshape(nxgrid,nygrid,nzgrid)
+
+    if outputexterior:
+        if outputgrid:
+            return field, x3d, y3d, z3d, exterior_border, pixID, count
+        else:
+            return field, exterior_border, pixID, count
     else:
-        return field
+        if outputgrid:
+            return field, x3d, y3d, z3d
+        else:
+            return field

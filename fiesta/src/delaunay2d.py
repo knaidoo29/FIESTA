@@ -4,8 +4,11 @@ from numba import njit
 from . import matrix
 from . import polygon
 
+
 @njit
-def delaunay_area_2d(x, y, del_vert0, del_vert1, del_vert2):
+def delaunay_area_2d(
+    x: np.ndarray, y: np.ndarray, del_vert0: np.ndarray, del_vert1: np.ndarray, del_vert2: np.ndarray
+) -> np.ndarray:
     """
     Determines area for each simplex.
     
@@ -36,8 +39,11 @@ def delaunay_area_2d(x, y, del_vert0, del_vert1, del_vert2):
         areas[i] = polygon.triangle_area(x[i0], y[i0], x[i1], y[i1], x[i2], y[i2])
     return areas
 
+
 @njit
-def sum_delaunay_area_4_points_2d(delaunay_area, del_vert0, del_vert1, del_vert2, npart):
+def sum_delaunay_area_4_points_2d(
+    delaunay_area: np.ndarray, del_vert0: np.ndarray, del_vert1: np.ndarray, del_vert2: np.ndarray, npart: int
+) -> np.ndarray:
     """
     Finds the Delaunay area for each point.
     
@@ -70,8 +76,11 @@ def sum_delaunay_area_4_points_2d(delaunay_area, del_vert0, del_vert1, del_vert2
         point_area[i2] += delaunay_area[i]/3.
     return point_area
 
+
 @njit
-def get_delf0_2d(x, y, f, del_vert0, del_vert1, del_vert2):
+def get_delf0_2d(
+    x: np.ndarray, y: np.ndarray, f: np.ndarray, del_vert0: np.ndarray, del_vert1: np.ndarray, del_vert2: np.ndarray
+) -> np.ndarray:
     """
     Determines delf0 for each simplices.
 
@@ -123,8 +132,11 @@ def get_delf0_2d(x, y, f, del_vert0, del_vert1, del_vert2):
         delf0[2*i+1] = invm[2]*df1 + invm[3]*df2
     return delf0
 
+
 @njit
-def delaunay_estimate_2d(simplices, x, y, x0, y0, f0, delf0):
+def delaunay_estimate_2d(
+    simplices: np.ndarray, x: np.ndarray, y: np.ndarray, x0: np.ndarray, y0: np.ndarray, f0: np.ndarray, delf0: np.ndarray
+) -> np.ndarray:
     """
     Estimates a field from Delaunay tesselation.
 

@@ -6,7 +6,10 @@ from . import polyhedron
 
 
 @njit
-def delaunay_volume_3d(x, y, z, del_vert0, del_vert1, del_vert2, del_vert3):
+def delaunay_volume_3d(
+    x: np.ndarray, y: np.ndarray, z: np.ndarray, del_vert0: np.ndarray, del_vert1: np.ndarray, del_vert2: np.ndarray, 
+    del_vert3: np.ndarray
+) -> np.ndarray:
     """
     Determines the volume for each simplex.
 
@@ -26,10 +29,6 @@ def delaunay_volume_3d(x, y, z, del_vert0, del_vert1, del_vert2, del_vert3):
         Index for vertex 2 of each simplices.
     del_vert3 : array
         Index for vertex 3 of each simplices.
-    npart : int
-        Number of points.
-    nvert : int
-        Number of vertices.
     
     Returns
     -------
@@ -48,7 +47,10 @@ def delaunay_volume_3d(x, y, z, del_vert0, del_vert1, del_vert2, del_vert3):
 
 
 @njit
-def sum_delaunay_vol_4_points_3d(delaunay_vol, del_vert0, del_vert1, del_vert2, del_vert3, npart):
+def sum_delaunay_vol_4_points_3d(
+    delaunay_vol: np.ndarray, del_vert0: np.ndarray, del_vert1: np.ndarray, del_vert2: np.ndarray, del_vert3: np.ndarray, 
+    npart: int
+) -> np.ndarray:
     """
     Finds the Delaunay volume for each point.
     
@@ -85,7 +87,10 @@ def sum_delaunay_vol_4_points_3d(delaunay_vol, del_vert0, del_vert1, del_vert2, 
 
 
 @njit
-def get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3):
+def get_delf0_3d(
+    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, del_vert0: np.ndarray, del_vert1: np.ndarray, 
+    del_vert2: np.ndarray, del_vert3: np.ndarray
+) -> np.ndarray:
     """
     Determines delf0 for each simplices.
 
@@ -160,7 +165,10 @@ def get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3):
 
 
 @njit
-def delaunay_estimate_3d(simplices, x, y, z, x0, y0, z0, f0, delf0):
+def delaunay_estimate_3d(
+    simplices: np.ndarray, x: np.ndarray, y: np.ndarray, z: np.ndarray, x0: np.ndarray, y0: np.ndarray, z0: np.ndarray, 
+    f0: np.ndarray, delf0: np.ndarray
+) -> np.ndarray:
     """
     Estimates a field from Delaunay tesselation.
 

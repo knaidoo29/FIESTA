@@ -5,9 +5,12 @@ import shift
 from . import points
 from .. import src
 
+from typing import List, Optional, Union
 
-def split_limits_by_grid(boxsize, origin, ngrid, MPI):
-    """Returns the ranges along one axis for data being split between nodes.
+
+def split_limits_by_grid(boxsize: float, origin: float, ngrid: int, MPI: object) -> List[float]:
+    """
+    Returns the ranges along one axis for data being split between nodes.
 
     Parameters
     ----------
@@ -31,8 +34,9 @@ def split_limits_by_grid(boxsize, origin, ngrid, MPI):
     return limits
 
 
-def mpi_find_range_2D(fnames, freader, MPI):
-    """Find ranges from each file and returns the ranges to node 0.
+def mpi_find_range_2D(fnames: str, freader: object, MPI: object) -> np.ndarray:
+    """
+    Find ranges from each file and returns the ranges to node 0.
 
     Parameters
     ----------
@@ -66,8 +70,9 @@ def mpi_find_range_2D(fnames, freader, MPI):
     return ranges
 
 
-def mpi_find_range_3D(fnames, freader, MPI):
-    """Find ranges from each file and returns the ranges to node 0.
+def mpi_find_range_3D(fnames: str, freader: object, MPI: object) -> np.ndarray:
+    """
+    Find ranges from each file and returns the ranges to node 0.
 
     Parameters
     ----------
@@ -104,8 +109,9 @@ def mpi_find_range_3D(fnames, freader, MPI):
     return ranges
 
 
-def mpi_open_2D(fnames, freader, ranges, limits, MPI):
-    """Find ranges from each file and returns the ranges to node 0.
+def mpi_open_2D(fnames: str, freader: object, ranges: np.ndarray, limits: List[float]) -> np.ndarray:
+    """
+    Find ranges from each file and returns the ranges to node 0.
 
     Parameters
     ----------
@@ -118,13 +124,11 @@ def mpi_open_2D(fnames, freader, ranges, limits, MPI):
         Ranges with columns: xmin, xmax, ymin and ymax.
     limits : list
         Ranges for each coordinate axis.
-    MPI : class object
-        MPIutils MPI class object.
 
     Returns
     -------
-    ranges : ndarray
-        Ranges with columns: xmin, xmax, ymin and ymax.
+    datas : ndarray
+        Data within range.
     """
     xmins, xmaxs, ymins, ymaxs = ranges[:,0], ranges[:, 1], ranges[:,2], ranges[:, 3]
     xmin, xmax, ymin, ymax = limits[0], limits[1], limits[2], limits[3]
@@ -140,8 +144,9 @@ def mpi_open_2D(fnames, freader, ranges, limits, MPI):
     return datas
 
 
-def mpi_open_3D(fnames, freader, ranges, limits, MPI):
-    """Find ranges from each file and returns the ranges to node 0.
+def mpi_open_3D(fnames: str, freader: object, ranges: np.ndarray, limits: List[float]) -> np.ndarray:
+    """
+    Find ranges from each file and returns the ranges to node 0.
 
     Parameters
     ----------
@@ -159,8 +164,8 @@ def mpi_open_3D(fnames, freader, ranges, limits, MPI):
 
     Returns
     -------
-    ranges : ndarray
-        Ranges with columns: xmin, xmax, ymin, ymax, zmin and zmax.
+    datas : ndarray
+        Data within range.
     """
     xmins, xmaxs, ymins, ymaxs, zmins, zmaxs = ranges[:,0], ranges[:,1], ranges[:,2], ranges[:,3], ranges[:,4], ranges[:,5]
     xmin, xmax, ymin, ymax, zmin, zmax = limits[0], limits[1], limits[2], limits[3], limits[4], limits[5]
@@ -179,8 +184,9 @@ def mpi_open_3D(fnames, freader, ranges, limits, MPI):
     return datas
 
 
-def check_coords_at_MPI_0(x, MPI):
-    """Check if coordinates are only inputed at the zeroth node.
+def check_coords_at_MPI_0(x: np.ndarray, MPI: object) -> bool:
+    """
+    Check if coordinates are only inputed at the zeroth node.
 
     Parameter
     ---------
@@ -215,7 +221,15 @@ def check_coords_at_MPI_0(x, MPI):
 class MPI_SortByX:
 
 
-    def __init__(self, MPI):
+    def __init__(self, MPI: object) -> None:
+        """
+        Initialise MPI point class.
+
+        Parameters
+        ----------
+        MPI : object
+            shift.mpiutils mpi object.
+        """
         self.MPI = MPI
         self.boxsize = None
         self.origin = None
@@ -227,8 +241,21 @@ class MPI_SortByX:
         self.buffer_length = 0.
 
 
-    def settings(self, boxsize, ngrid, origin=0., buffer_type='periodic',
-        buffer_length=0.):
+    def settings(self, boxsize: float, ngrid: int, origin : float = 0., buffer_length : float = 0.) -> None:
+        """
+        Define MPI point setting and dimensions along the x axis.
+
+        Parameters
+        ----------
+        boxsize : float
+            Size of the x-axis range.
+        ngrid : int
+            Number of divisions along this grid being defined.
+        origin : float, optional
+            Origin for x-axis range.
+        buffer_length : float, optional
+            Size of the buffer length.
+        """
         self.boxsize = boxsize
         self.ngrid = ngrid
         self.origin = origin
@@ -236,11 +263,22 @@ class MPI_SortByX:
         self.buffer_length = buffer_length
 
 
-    def input(self, data):
+    def input(self, data: np.ndarray) -> None:
+        """
+        Input coordinates.
+
+        Parameters
+        ----------
+        daata : array
+            A 2 dimensional array where the first column is the x-axis coordinate.
+        """
         self.data = data
 
 
-    def limits4grid(self):
+    def limits4grid(self) -> None:
+        """
+        Determine the limits along x-axis for the x-axis division into a grid.
+        """
         xedges, xgrid = shift.cart.mpi_grid1D(self.boxsize, self.ngrid, self.MPI, origin=self.origin)
         self.limits = [xedges[0], xedges[-1]]
         self.ngrid_rank = len(xgrid)
@@ -253,7 +291,15 @@ class MPI_SortByX:
         self.all_limits = all_limits
 
 
-    def _checkifdist(self):
+    def _checkifdist(self) -> bool:
+        """
+        Checks whether points are distributed according to slab ranges.
+
+        Returns
+        -------
+        ifdist : bool
+            Determines whether the data has ben distributed along the x-axis.
+        """
         if self.data is None:
             check = False
         else:
@@ -276,7 +322,20 @@ class MPI_SortByX:
         return ifdist
 
     
-    def distribute(self, include_internalbuffer=False):
+    def distribute(self, include_internalbuffer: bool = False) -> np.ndarray:
+        """
+        Distributes points along the x-axis based grid-based slab decomposition.
+
+        Parameters
+        ----------
+        include_internalbuffer : bool, optional
+            Whether to include internal buffer region. Note, this does not support, periodic boundary conditions.
+        
+        Yields
+        ------
+        Distributed data.
+        """
+        # TODO: add periodic buffer particles?
         if self._checkifdist() is False:
             for i in range(0, self.MPI.size):
                 if self.data is not None:
@@ -327,7 +386,24 @@ class MPI_SortByX:
             return self.data
 
 
-    def distribute_grid2D(self, x2d, y2d, f2d):
+    def distribute_grid2D(self, x2d: np.ndarray, y2d: np.ndarray, f2d: np.ndarray) -> np.ndarray:
+        """
+        Distributes a 2D grid data set via slab decomposition.
+
+        Parameters
+        ----------
+        x2d : ndarray
+            X-coordinates for the 2D grid.
+        y2d : ndarray
+            y-coordinates for the 2D grid.
+        f2d : ndarray
+            Field values for the 2D grid.
+
+        Returns
+        -------
+        f : ndarray
+            Distributed 2D field grid.
+        """
         if x2d is not None:
             data = np.column_stack([x2d.flatten(), y2d.flatten(), f2d.flatten()])
         else:
@@ -335,22 +411,22 @@ class MPI_SortByX:
         self.input(data)
         data = self.distribute()
         if np.isscalar(self.boxsize):
-            xbox = self.boxsize
+            # xbox = self.boxsize
             ybox = self.boxsize
         else:
-            xbox = self.boxsize[0]
+            # xbox = self.boxsize[0]
             ybox = self.boxsize[1]
         if np.isscalar(self.ngrid):
-            nxgrid = self.ngrid
+            # nxgrid = self.ngrid
             nygrid = self.ngrid
         else:
-            nxgrid = self.ngrid[0]
+            # nxgrid = self.ngrid[0]
             nygrid = self.ngrid[1]
         if np.isscalar(self.origin):
-            xorigin = self.origin
+            # xorigin = self.origin
             yorigin = self.origin
         else:
-            xorigin = self.origin[0]
+            # xorigin = self.origin[0]
             yorigin = self.origin[1]
         dx = (self.limits[1]-self.limits[0])/float(self.ngrid_rank)
         dy = ybox/float(nygrid)
@@ -361,7 +437,26 @@ class MPI_SortByX:
         return f
 
 
-    def distribute_grid3D(self, x3d, y3d, z3d, f3d):
+    def distribute_grid3D(self, x3d: np.ndarray, y3d: np.ndarray, z3d: np.ndarray, f3d: np.ndarray) -> np.ndarray:
+        """
+        Distributes a 3D grid data set via slab decomposition.
+
+        Parameters
+        ----------
+        x3d : ndarray
+            X-coordinates for the 3D grid.
+        y3d : ndarray
+            y-coordinates for the 3D grid.
+        z3d : ndarray
+            y-coordinates for the 3D grid.
+        f23 : ndarray
+            Field values for the 3D grid.
+
+        Returns
+        -------
+        f : ndarray
+            Distributed 3D field grid.
+        """
         if x3d is not None:
             data = np.column_stack([x3d.flatten(), y3d.flatten(), z3d.flatten(), f3d.flatten()])
         else:
@@ -369,27 +464,27 @@ class MPI_SortByX:
         self.input(data)
         data = self.distribute()
         if np.isscalar(self.boxsize):
-            xbox = self.boxsize
+            # xbox = self.boxsize
             ybox = self.boxsize
             zbox = self.boxsize
         else:
-            xbox = self.boxsize[0]
+            # xbox = self.boxsize[0]
             ybox = self.boxsize[1]
             zbox = self.boxsize[2]
         if np.isscalar(self.ngrid):
-            nxgrid = self.ngrid
+            # nxgrid = self.ngrid
             nygrid = self.ngrid
             nzgrid = self.ngrid
         else:
-            nxgrid = self.ngrid[0]
+            # nxgrid = self.ngrid[0]
             nygrid = self.ngrid[1]
             nzgrid = self.ngrid[2]
         if np.isscalar(self.origin):
-            xorigin = self.origin
+            # xorigin = self.origin
             yorigin = self.origin
             zorigin = self.origin
         else:
-            xorigin = self.origin[0]
+            # xorigin = self.origin[0]
             yorigin = self.origin[1]
             zorigin = self.origin[2]
         dx = (self.limits[1]-self.limits[0])/float(self.ngrid_rank)
@@ -403,5 +498,8 @@ class MPI_SortByX:
         return f
 
 
-    def clean(self):
+    def clean(self) -> None:
+        """
+        Reinitialises the class.
+        """
         self.__init__()

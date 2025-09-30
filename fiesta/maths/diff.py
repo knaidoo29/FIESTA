@@ -1,8 +1,9 @@
 import numpy as np
 
 
-def _dfdx(xgrid, f):
-    """Differentiate using a symmetric two-point derivative and the non-symmetric
+def _dfdx(xgrid: np.ndarray, f: np.ndarray) -> np.ndarray:
+    """
+    Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.
 
     Parameters
@@ -41,8 +42,9 @@ def _dfdx(xgrid, f):
     return dfdx
 
 
-def _dfdy(ygrid, f):
-    """Differentiate using a symmetric two-point derivative and the non-symmetric
+def _dfdy(ygrid: np.ndarray, f: np.ndarray) -> np.ndarray:
+    """
+    Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.
 
     Parameters
@@ -67,8 +69,9 @@ def _dfdy(ygrid, f):
     return dfdy
 
 
-def _dfdz(zgrid, f):
-    """Differentiate using a symmetric two-point derivative and the non-symmetric
+def _dfdz(zgrid: np.ndarray, f: np.ndarray) -> np.ndarray:
+    """
+    Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.
 
     Parameters
@@ -93,8 +96,9 @@ def _dfdz(zgrid, f):
     return dfdz
 
 
-def dfdx(xgrid, f, periodic=False):
-    """Differentiate using a symmetric two-point derivative and the non-symmetric
+def dfdx(xgrid: np.ndarray, f: np.ndarray, periodic: bool = False) -> np.ndarray:
+    """
+    Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.
 
     Parameters
@@ -103,6 +107,8 @@ def dfdx(xgrid, f, periodic=False):
         X-axis.
     f : array
         Function values at x.
+    periodic : bool, optional
+        Sets periodic boundary conditions.
 
     Returns
     -------
@@ -129,8 +135,9 @@ def dfdx(xgrid, f, periodic=False):
     return dfdx
 
 
-def dfdy(ygrid, f, periodic=False):
-    """Differentiate using a symmetric two-point derivative and the non-symmetric
+def dfdy(ygrid: np.ndarray, f: np.ndarray, periodic: bool = False) -> np.ndarray:
+    """
+    Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.
 
     Parameters
@@ -139,6 +146,8 @@ def dfdy(ygrid, f, periodic=False):
         Y-axis.
     f : array
         Function values at y.
+    periodic : bool, optional
+        Sets periodic boundary conditions.
 
     Returns
     -------
@@ -166,8 +175,9 @@ def dfdy(ygrid, f, periodic=False):
 
 
 
-def dfdz(zgrid, f, periodic=False):
-    """Differentiate using a symmetric two-point derivative and the non-symmetric
+def dfdz(zgrid: np.ndarray, f: np.ndarray, periodic: bool = False) -> np.ndarray:
+    """
+    Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.
 
     Parameters
@@ -176,6 +186,8 @@ def dfdz(zgrid, f, periodic=False):
         Z-axis.
     f : array
         Function values at z.
+    periodic : bool, optional
+        Sets periodic boundary conditions.
 
     Returns
     -------

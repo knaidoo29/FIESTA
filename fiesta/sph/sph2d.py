@@ -2,46 +2,53 @@ import numpy as np
 
 from . import kernels
 
-from .. import coords
 from .. import kdtree
+
+from typing import Optional, Union
 
 
 class SPH2D(kdtree.KDTree2D):
 
-    """Class for computing Smooth Particle Hydrodynamic (SPH) density and field
-    estimation in 2D.
+    """
+    Class for computing Smooth Particle Hydrodynamic (SPH) density and field estimation in 2D.
     """
 
-    def __init__(self):
-        """Initialises SPH in 2D."""
+    def __init__(self) -> None:
+        """
+        Initialises SPH in 2D.
+        """
         kdtree.KDTree2D.__init__(self)
         self.kernel_type = 'cubic'
 
 
-    def assign_mass(self, mass=None):
-        """Assign particles mass, if none they will be assigned"""
+    def assign_mass(self, mass: Optional[np.ndarray] = None) -> None:
+        """
+        Assign particles mass, if none they will be assigned.
+        """
         if mass is None:
             self.mass = np.ones(len(self.points))
         else:
             self.mass = mass
 
 
-    def kernel(self, r, h):
-        """Returns the SPH kernel value.
+    def kernel(self, r: Union[float, np.ndarray], h: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        """
+        Returns the SPH kernel value.
 
         Parameters
         ----------
-        r : float/array
+        r : float or array
             Radius from a given neighbour.
-        h : float
+        h : float or array
             Smoothing length.
         """
         if self.kernel_type == 'cubic':
             return kernels.cubic_kernel(r, h, dim=2)
 
 
-    def setup(self, k=20, mass=None):
-        """Set basic settings for the SPH data.
+    def setup(self, k: int = 20, mass: Optional[np.ndarray] = None) -> None:
+        """
+        Set basic settings for the SPH data.
 
         Parameters
         ----------
@@ -54,17 +61,24 @@ class SPH2D(kdtree.KDTree2D):
         self.assign_mass(mass=mass)
 
 
-    def sph_estimate(self, x, y, f=None, dens=None):
-        """Estimates a field based on SPH k neighbours.
+    def sph_estimate(
+        self, x: Union[float, np.ndarray], y: Union[float, np.ndarray], f: Optional[np.ndarray] = None, dens: Optional[np.ndarray] = None
+    ) -> Union[float, np.ndarray]:
+        """
+        Estimates a field based on SPH k neighbours.
 
         Parameters
         ----------
-        x, y : array
+        x, y : float or array
             Cartesian coordinates.
+        f : array
+            Field values at KDTree points.
+        dens : array
+            Density estimation.
 
         Returns
         -------
-        f_est : array
+        f_est : float or array
             Field estimation.
         """
         nind, ndist = self.nearest(x, y, k=self.k, return_dist=True)
@@ -82,8 +96,9 @@ class SPH2D(kdtree.KDTree2D):
             return f_est
 
 
-    def get_density(self, x, y):
-        """Calculates density based on SPH k neighbours.
+    def get_density(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """
+        Calculates density based on SPH k neighbours.
 
         Parameters
         ----------
@@ -99,8 +114,9 @@ class SPH2D(kdtree.KDTree2D):
         return dens
 
 
-    def set_field(self, f):
-        """Sets the field values for SPH field estimation.
+    def set_field(self, f: np.ndarray) -> None:
+        """
+        Sets the field values for SPH field estimation.
 
         Parameters
         ----------
@@ -110,12 +126,13 @@ class SPH2D(kdtree.KDTree2D):
         self.f = f
 
 
-    def estimate(self, x, y, dens=None):
-        """Estimates field at points given.
+    def estimate(self, x: Union[float, np.ndarray], y: Union[float, np.ndarray], dens: np.ndarray = None) -> Union[float, np.ndarray]:
+        """
+        Estimates field at points given.
 
         Parameters
         ----------
-        x, y : array
+        x, y : float or array
             Cartesian coordinates.
         dens : array
             Density at cartesian coordinates, if None this will be computed but will
@@ -123,12 +140,14 @@ class SPH2D(kdtree.KDTree2D):
 
         Returns
         -------
-        f_est : array
+        f_est : float or array
             Field estimation.
         """
         return self.sph_estimate(x, y, f=self.f, dens=dens)
 
 
-    def clean(self):
-        """Reinitialises the class."""
+    def clean(self) -> None:
+        """
+        Reinitialises the class.
+        """
         self.__init__()

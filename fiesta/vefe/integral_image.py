@@ -1,18 +1,18 @@
 import numpy as np
 
 
-def get_integral_image2D(fgrid):
+def get_integral_image2D(fgrid: np.ndarray) -> np.ndarray:
     """
     Computes the 2D integral image.
 
     Parameters
     ----------
-    fgrid : array_like
+    fgrid : array
         The 2D field grid.
     
     Returns
     -------
-    igrid : array_like
+    igrid : array
         The 2D integral image.
     """
     shape = np.shape(fgrid)
@@ -23,18 +23,18 @@ def get_integral_image2D(fgrid):
     return igrid
 
 
-def get_integral_image3D(fgrid):
+def get_integral_image3D(fgrid: np.ndarray) -> np.ndarray:
     """
     Computes the 3D integral image.
 
     Parameters
     ----------
-    fgrid : array_like
+    fgrid : array
         The 3D field grid.
     
     Returns
     -------
-    igrid : array_like
+    igrid : array
         The 3D integral image.
     """
     shape = np.shape(fgrid)

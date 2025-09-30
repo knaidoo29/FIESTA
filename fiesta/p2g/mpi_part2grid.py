@@ -1,12 +1,16 @@
 import numpy as np
 import shift
 
+from typing import List, Union
 from .. import src
 
 
-def mpi_part2grid2D(x, y, f, boxsize, ngrid, MPI, method='TSC', periodic=True,
-                    origin=0.):
-    """Returns the density contrast for the nearest grid point grid assignment.
+def mpi_part2grid2D(
+    x: np.ndarray, y: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
+    MPI: object, method: str = 'TSC', periodic: bool = True, origin: Union[float, List[float]] = 0.
+) -> np.ndarray:
+    """
+    Returns the density contrast for the nearest grid point grid assignment.
 
     Parameters
     ----------
@@ -16,14 +20,14 @@ def mpi_part2grid2D(x, y, f, boxsize, ngrid, MPI, method='TSC', periodic=True,
         Y coordinates of the particle.
     f : array
         Value of each particle to be assigned to the grid.
-    boxsize : float
+    boxsize : float or list
         Box size.
-    ngrid : int
+    ngrid : int or list
         Grid divisions across one axis.
     MPI : class
         MPIutils MPI class object.
     method : str, optional
-        Grid assignment scheme, either 'NGP', 'CIC' or 'TSC'.
+        Grid assignment scheme, either 'NGP', 'CIC', 'TSC', 'PCS'.
     periodic : bool, optional
         Assign particles with periodic boundaries.
     origin : float, optional
@@ -56,6 +60,7 @@ def mpi_part2grid2D(x, y, f, boxsize, ngrid, MPI, method='TSC', periodic=True,
     xmin, xmax = xedges[0], xedges[-1]
     dx = xedges[1]-xedges[0]
     nxgrid = len(xgrid)
+    # TODO: get rid of this below?
     # xmins = MPI.collect(xmin)
     # xmaxs = MPI.collect(xmax)
     # if MPI.rank == 0:
@@ -93,9 +98,12 @@ def mpi_part2grid2D(x, y, f, boxsize, ngrid, MPI, method='TSC', periodic=True,
     return fgrid
 
 
-def mpi_part2grid3D(x, y, z, f, boxsize, ngrid, MPI, method='TSC', periodic=True,
-                    origin=0.):
-    """Returns the density contrast for the nearest grid point grid assignment.
+def mpi_part2grid3D(
+    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
+    MPI: object, method: str = 'TSC', periodic: bool = True, origin: Union[float, List[float]] = 0.
+) -> np.ndarray:
+    """
+    Returns the density contrast for the nearest grid point grid assignment.
 
     Parameters
     ----------
@@ -149,6 +157,7 @@ def mpi_part2grid3D(x, y, z, f, boxsize, ngrid, MPI, method='TSC', periodic=True
     xmin, xmax = xedges[0], xedges[-1]
     dx = xedges[1]-xedges[0]
     nxgrid = len(xgrid)
+    # TODO: get rid of this below?
     # xmins = MPI.collect(xmin)
     # xmaxs = MPI.collect(xmax)
     # if MPI.rank == 0:

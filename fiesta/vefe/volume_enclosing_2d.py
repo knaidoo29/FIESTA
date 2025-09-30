@@ -4,15 +4,19 @@ from numba import njit
 from . import integral_image
 from .. import p2g
 
+from typing import Optional, Tuple
+
 
 @njit
-def sum_from_integral_image_2D(igrid, ixmin, ixmax, iymin, iymax, periodic=True):
+def sum_from_integral_image_2D(
+    igrid: np.ndarray, ixmin: int, ixmax: int, iymin: int, iymax: int, periodic: bool = True
+) -> np.ndarray:
     """
     Quick summations from an integral image in 2D.
 
     Parameters
     ----------
-    igrid : array_like
+    igrid : array
         Integral image in 2D.
     ixmin : int
         Minimum grid value along the x grid.
@@ -95,7 +99,9 @@ def sum_from_integral_image_2D(igrid, ixmin, ixmax, iymin, iymax, periodic=True)
 
 
 @njit
-def get_volume_enclosing_box(boxsize, ngrid, dgrid, idgrid, minpart, periodic=True, ifgrid=None):
+def get_volume_enclosing_box(
+    boxsize: float, ngrid: int, dgrid: np.ndarray, idgrid: np.ndarray, minpart: int, periodic: bool = True, ifgrid: Optional[np.ndarray] = None
+) -> np.ndarray:
     """
     Get the volume for an enclosing box containing minpart number of particles.
 
@@ -105,21 +111,21 @@ def get_volume_enclosing_box(boxsize, ngrid, dgrid, idgrid, minpart, periodic=Tr
         Size of the 2D grid.
     ngrid : int
        Grid size.
-    dgrid : array_like
+    dgrid : array
         The 2D density field grid.
-    idgrid : array_like
+    idgrid : array
         The 2D density field integral image.
     minpart : int
         Minimum number of particles.
     periodic : bool, optional
         Periodic boundary condition. 
-    ifgrid : array_like
+    ifgrid : array
         Field integral image. If not None, then the field will be estimate via 
         the volume enclosing box method.
     
     Returns
     -------
-    vgrid : array_like
+    vgrid : array
         The 2D volume enclosing box for density estimation.
     """
     ngrid = len(dgrid)
@@ -187,7 +193,10 @@ def get_volume_enclosing_box(boxsize, ngrid, dgrid, idgrid, minpart, periodic=Tr
         return fgridVEB
 
 
-def vebfe2D(boxsize, ngrid, x, y, minpart=1, w=None, f=None, periodic=True):
+def vebfe2D(
+    boxsize: float, ngrid: int, x: np.ndarray, y: np.ndarray, minpart: int = 1, w: Optional[np.ndarray] = None, 
+    f: Optional[np.ndarray] = None, periodic: bool = True
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     The Volume Enclosing Box Field Estimation (VEBFE) method. This method is similar to a k-Nearest Neighbour 
     method although performed on a grid for speed.
@@ -198,22 +207,22 @@ def vebfe2D(boxsize, ngrid, x, y, minpart=1, w=None, f=None, periodic=True):
         Size of the 2D grid.
     ngrid : int
        Grid size.
-    x, y : array_like
+    x, y : array
         X and Y coordinates of the points.
     minpart : int, optional
         Minimum number of particles.
-    w : array_like, optional
+    w : array, optional
         Weights for the points, if None assumed to be unitary for all.
-    f : array_like
+    f : array, optional
         Field values for the points, if None it is assumed the intention is to compute density.
     periodic : bool, optional
         Periodic boundary condition.
         
     Returns
     -------
-    dgridVEB : array_like
+    dgridVEB : array
         VEB density estimation.
-    fgridVEB : array_like
+    fgridVEB : array
         If f is not None then the field is estimated via VEB.
     """
     if w is None:

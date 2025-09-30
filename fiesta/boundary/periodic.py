@@ -1,8 +1,9 @@
 import numpy as np
 
 
-def buffer_periodic(data, axis, boxsize, buffer_length, origin=0.):
-    """Returns periodic boundary conditions.
+def buffer_periodic(data: np.ndarray, axis: int, boxsize: float, buffer_length: float, origin: float = 0.) -> np.ndarray:
+    """
+    Returns periodic boundary conditions.
 
     Parameters
     ----------
@@ -32,9 +33,12 @@ def buffer_periodic(data, axis, boxsize, buffer_length, origin=0.):
     return datap
 
 
-def subbox_buffer_periodic(data, axis, boxsize, buffer_length, subboxsize,
-    origin=0., subbox_origin=0.):
-    """Returns periodic boundary conditions in a subbox.
+def subbox_buffer_periodic(
+        data: np.ndarray, axis: int, boxsize: float, buffer_length: float, subboxsize: float, origin: float = 0., 
+        subbox_origin: float = 0.
+    ) -> np.ndarray:
+    """
+    Returns periodic boundary conditions in a subbox.
 
     Parameters
     ----------
@@ -65,8 +69,9 @@ def subbox_buffer_periodic(data, axis, boxsize, buffer_length, subboxsize,
     return datap
 
 
-def buffer_periodic_2D(data, boxsize, buffer_length, origin=0.):
-    """Generates random buffer particles around a 2D box.
+def buffer_periodic_2D(data: np.ndarray, boxsize: float, buffer_length: float, origin: float = 0.) -> np.ndarray:
+    """
+    Generates random buffer particles around a 2D box.
 
     Parameters
     ----------
@@ -97,9 +102,11 @@ def buffer_periodic_2D(data, boxsize, buffer_length, origin=0.):
     return datap
 
 
-def subbox_buffer_periodic_2D(data, boxsize, buffer_length, subboxsize,
-    origin=0., subbox_origin=0.):
-    """Generates random buffer particles around a 2D box.
+def subbox_buffer_periodic_2D(
+        data: np.ndarray, boxsize: float, buffer_length: float, subboxsize: float, origin: float = 0., subbox_origin: float = 0.
+    ) -> np.ndarray:
+    """
+    Generates random buffer particles around a 2D box.
 
     Parameters
     ----------
@@ -146,8 +153,9 @@ def subbox_buffer_periodic_2D(data, boxsize, buffer_length, subboxsize,
     return datap
 
 
-def buffer_periodic_3D(data, boxsize, buffer_length, origin=0.):
-    """Generates random buffer particles around a 3D box.
+def buffer_periodic_3D(data: np.ndarray, boxsize: float, buffer_length: float, origin: float = 0.) -> np.ndarray:
+    """
+    Generates random buffer particles around a 3D box.
 
     Parameters
     ----------
@@ -179,9 +187,11 @@ def buffer_periodic_3D(data, boxsize, buffer_length, origin=0.):
     return datap
 
 
-def subbox_buffer_periodic_3D(data, boxsize, buffer_length, subboxsize,
-    origin=0., subbox_origin=0.):
-    """Generates random buffer particles around a 3D box.
+def subbox_buffer_periodic_3D(
+        data: np.ndarray, boxsize: float, buffer_length: float, subboxsize: float, origin: float = 0., subbox_origin: float = 0.
+    ) -> np.ndarray:
+    """
+    Generates random buffer particles around a 3D box.
 
     Parameters
     ----------

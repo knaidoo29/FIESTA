@@ -2,8 +2,11 @@ import numpy as np
 from .. import src
 
 
-def bilinear(fgrid, boxsize, x, y, origin=0., fill_value=np.nan, periodic=True):
-    """ Bilinear interpolation from a 2D grid defined in box of [0., boxsize].
+def bilinear(
+        fgrid: np.ndarray, boxsize: float, x: np.ndarray, y: np.ndarray, origin: float = 0., fill_value: float = np.nan, periodic: bool = True
+    ) -> np.ndarray:
+    """
+    Bilinear interpolation from a 2D grid defined in box of [0., boxsize].
 
     Parameter
     ---------

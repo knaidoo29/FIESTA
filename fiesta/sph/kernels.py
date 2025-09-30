@@ -1,19 +1,22 @@
 import numpy as np
 
+from typing import Union 
 
-def cubic_kernel(r, h, dim=3):
-    """Cubic spline kernel.
+
+def cubic_kernel(r: Union[float, np.ndarray], h: Union[float, np.ndarray], dim: int = 3) -> Union[float, np.ndarray]:
+    """
+    Cubic spline kernel.
 
     Parameters
     ----------
-    r : float
+    r : float or array
         Distance to center point.
-    h : float
+    h : float or array
         Kernel size.
 
     Returns
     -------
-    w : float
+    w : float or array
         Kernel weights.
     """
     if dim == 1:
@@ -40,19 +43,20 @@ def cubic_kernel(r, h, dim=3):
     return w
 
 
-def dcubic_kernel(r, h, dim=3):
-    """Cubic derivative spline kernel.
+def dcubic_kernel(r: Union[float, np.ndarray], h: Union[float, np.ndarray], dim: int = 3) -> Union[float, np.ndarray]:
+    """
+    Cubic derivative spline kernel.
 
     Parameters
     ----------
-    r : float
+    r : float or array
         Distance to center point.
-    h : float
+    h : float or array
         Kernel size.
 
     Returns
     -------
-    w : float
+    w : float or array
         Kernel weights.
     """
     if dim == 1:

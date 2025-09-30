@@ -1,8 +1,11 @@
 import numpy as np
 
+from typing import Tuple 
 
-def x2points(x):
-    """Column stacks input coordinates.
+
+def x2points(x: np.ndarray) -> np.ndarray:
+    """
+    Column stacks input coordinates.
 
     Parameters
     ----------
@@ -21,8 +24,9 @@ def x2points(x):
     return points
 
 
-def points2x(points):
-    """Unstacks input coordinates.
+def points2x(points: np.ndarray) -> np.ndarray:
+    """
+    Unstacks input coordinates.
 
     Parameters
     ----------
@@ -38,8 +42,9 @@ def points2x(points):
     return x
 
 
-def xy2points(x, y):
-    """Column stacks input coordinates.
+def xy2points(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    """
+    Column stacks input coordinates.
 
     Parameters
     ----------
@@ -60,8 +65,9 @@ def xy2points(x, y):
     return points
 
 
-def points2xy(points):
-    """Unstacks input coordinates.
+def points2xy(points: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Unstacks input coordinates.
 
     Parameters
     ----------
@@ -79,8 +85,9 @@ def points2xy(points):
     return x, y
 
 
-def xyz2points(x, y, z):
-    """Column stacks input coordinates.
+def xyz2points(x: np.ndarray, y: np.ndarray, z: np.ndarray) -> np.ndarray:
+    """
+    Column stacks input coordinates.
 
     Parameters
     ----------
@@ -103,8 +110,9 @@ def xyz2points(x, y, z):
     return points
 
 
-def points2xyz(points):
-    """Unstacks input coordinates.
+def points2xyz(points: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Unstacks input coordinates.
 
     Parameters
     ----------
@@ -124,8 +132,9 @@ def points2xyz(points):
     return x, y, z
 
 
-def coord2points(xlist):
-    """Column stacks input coordinates.
+def coord2points(xlist: np.ndarray) -> np.ndarray:
+    """
+    Column stacks input coordinates.
 
     Parameters
     ----------

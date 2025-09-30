@@ -7,7 +7,10 @@ from . import part2grid_wei
 
 
 @njit
-def part2grid_ngp_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid):
+def part2grid_ngp_2d(
+    x: np.ndarray, y: np.ndarray, f: np.ndarray, xlength: float, ylength: float, xmin: float, ymin: float, 
+    nxgrid: int, nygrid: int
+) -> np.ndarray:
     """
     Nearest-grid-point assignment in 2D.
     
@@ -46,11 +49,15 @@ def part2grid_ngp_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid):
         if (xpix >= 0) and (xpix < nxgrid) and (ypix >= 0) and (ypix < nygrid):
             pix = part2grid_pix.pix1dto2d_scalar(xpix, ypix, nygrid)
             fgrid[pix] += fp * wngp
+    
     return fgrid
 
 
 @njit
-def part2grid_cic_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody):
+def part2grid_cic_2d(
+    x: np.ndarray, y: np.ndarray, f: np.ndarray, xlength: float, ylength: float, xmin: float, ymin: float, 
+    nxgrid: int, nygrid: int, periodx: bool, periody: bool
+) -> np.ndarray:
     """
     Cloud-in-cell assignment in 2D.
 
@@ -68,7 +75,7 @@ def part2grid_cic_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, peri
         Number of x and y coordinates.
     nxgrid, nygrid : int
         Number of grids along x and y coordinates.
-    periodx, periody, periodz : bool
+    periodx, periody : bool
         Periodic boundary conditions.
     
     Returns
@@ -110,7 +117,10 @@ def part2grid_cic_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, peri
 
 
 @njit
-def part2grid_tsc_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody):
+def part2grid_tsc_2d(
+    x: np.ndarray, y: np.ndarray, f: np.ndarray, xlength: float, ylength: float, xmin: float, ymin: float, 
+    nxgrid: int, nygrid: int, periodx: bool, periody: bool
+) -> np.ndarray:
     """
     Triangular-shaped-cloud assignment in 2D.
     
@@ -170,7 +180,10 @@ def part2grid_tsc_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, peri
 
 
 @njit
-def part2grid_pcs_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody):
+def part2grid_pcs_2d(
+    x: np.ndarray, y: np.ndarray, f: np.ndarray, xlength: float, ylength: float, xmin: float, ymin: float, 
+    nxgrid: int, nygrid: int, periodx: bool, periody: bool
+) -> np.ndarray:
     """
     Piecewise-Cubic-Spline assignment in 2D.
 

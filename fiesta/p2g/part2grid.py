@@ -1,9 +1,15 @@
 import numpy as np
 from .. import src
 
+from typing import Union, List
 
-def part2grid2D(x, y, f, boxsize, ngrid, method='TSC', periodic=True, origin=0.):
-    """Returns the density contrast for the nearest grid point grid assignment.
+
+def part2grid2D(
+    x: np.ndarray, y: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
+    method: str = 'TSC', periodic: bool = True, origin: Union[float, List[float]] = 0.
+) -> np.ndarray:
+    """
+    Returns the density contrast for the nearest grid point grid assignment.
 
     Parameters
     ----------
@@ -58,8 +64,12 @@ def part2grid2D(x, y, f, boxsize, ngrid, method='TSC', periodic=True, origin=0.)
     return fgrid.reshape(nxgrid, nygrid)
 
 
-def part2grid3D(x, y, z, f, boxsize, ngrid, method='TSC', periodic=True, origin=0.):
-    """Returns the density contrast for the nearest grid point grid assignment.
+def part2grid3D(
+    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[float, List[float]], 
+    method: str = 'TSC', periodic: bool = True, origin: Union[float, List[float]] = 0.
+) -> np.ndarray:
+    """
+    Returns the density contrast for the nearest grid point grid assignment.
 
     Parameters
     ----------

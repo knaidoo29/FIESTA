@@ -1,10 +1,13 @@
 import numpy as np
-from numba import jit, njit
+from numba import njit
 
 from . import grid
 
+
 @njit
-def bilinear_periodic(fgrid, x, y, xbox, ybox, ngridx, ngridy):
+def bilinear_periodic(
+    fgrid: np.ndarray, x: np.ndarray, y: np.ndarray, xbox: float, ybox: float, ngridx: int, ngridy: int
+) -> np.ndarray:
     """
     Bilinear interpolation of field defined on a grid.
 
@@ -75,8 +78,11 @@ def bilinear_periodic(fgrid, x, y, xbox, ybox, ngridx, ngridy):
     
     return f
 
+
 @njit
-def bilinear_nonperiodic(fgrid, x, y, xbox, ybox, ngridx, ngridy):
+def bilinear_nonperiodic(
+    fgrid: np.ndarray, x: np.ndarray, y: np.ndarray, xbox: float, ybox: float, ngridx: int, ngridy: int
+) -> np.ndarray:
     """
     Bilinear interpolation of field defined on a grid.
     
@@ -164,7 +170,10 @@ def bilinear_nonperiodic(fgrid, x, y, xbox, ybox, ngridx, ngridy):
 
 
 @njit
-def bilinear_axisperiodic(fgrid, x, y, xbox, ybox, perix, periy, ngridx, ngridy):
+def bilinear_axisperiodic(
+    fgrid: np.ndarray, x: np.ndarray, y: np.ndarray, xbox: float, ybox: float, perix: int, periy: int, 
+    ngridx: int, ngridy: int
+) -> np.ndarray:
     """
     Bilinear interpolation of a field defined on a grid with axis-periodic conditions.
     

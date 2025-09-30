@@ -3,7 +3,10 @@ from numba import njit
 
 
 @njit
-def tetrahedron_volume(xa, ya, za, xb, yb, zb, xc, yc, zc, xd, yd, zd):
+def tetrahedron_volume(
+    xa: float, ya: float, za: float, xb: float, yb: float, zb: float,
+    xc: float, yc: float, zc: float, xd: float, yd: float, zd: float
+) -> float:
     """
     Computes the volume of a tetrahedron from its vertices using the determinant method.
 

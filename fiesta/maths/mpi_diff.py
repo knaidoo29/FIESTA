@@ -3,8 +3,9 @@ import numpy as np
 from . import diff
 
 
-def mpi_dfdx(xgrid, f, MPI, periodic=False):
-    """Differentiate using a symmetric two-point derivative and the non-symmetric
+def mpi_dfdx(xgrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = False) -> np.ndarray:
+    """
+    Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.
 
     Parameters
@@ -13,6 +14,10 @@ def mpi_dfdx(xgrid, f, MPI, periodic=False):
         X-axis.
     f : array
         Function values at x.
+    MPI : object
+        shift.mpiutils MPI object.
+    periodic : bool, optional
+        Sets periodic boundary conditions.
 
     Returns
     -------
@@ -52,8 +57,12 @@ def mpi_dfdx(xgrid, f, MPI, periodic=False):
     return dfdx
 
 
-def mpi_dfdy(ygrid, f, MPI, periodic=False):
-    """Differentiate using a symmetric two-point derivative and the non-symmetric
+# TODO: MPI is kept in mpi_dfdy and mpi_dfdz to mirror mpi_dfdz, but is not used in those functions, should we removed it?
+
+
+def mpi_dfdy(ygrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = False) -> np.ndarray:
+    """
+    Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.
 
     Parameters
@@ -62,6 +71,10 @@ def mpi_dfdy(ygrid, f, MPI, periodic=False):
         Y-axis.
     f : array
         Function values at y.
+    MPI : object
+        shift.mpiutils MPI object.
+    periodic : bool, optional
+        Sets periodic boundary conditions.
 
     Returns
     -------
@@ -73,8 +86,9 @@ def mpi_dfdy(ygrid, f, MPI, periodic=False):
 
 
 
-def mpi_dfdz(zgrid, f, MPI, periodic=False):
-    """Differentiate using a symmetric two-point derivative and the non-symmetric
+def mpi_dfdz(zgrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = False) -> np.ndarray:
+    """
+    Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.
 
     Parameters
@@ -83,6 +97,10 @@ def mpi_dfdz(zgrid, f, MPI, periodic=False):
         Z-axis.
     f : array
         Function values at z.
+    MPI : object
+        shift.mpiutils MPI object.
+    periodic : bool, optional
+        Sets periodic boundary conditions.
 
     Returns
     -------

@@ -5,7 +5,10 @@ from . import polygon
 
 
 @njit
-def voronoi_2d_area(xpoints, ypoints, xverts, yverts, ridge_point1, ridge_point2, ridge_vertices, ridge_start, ridge_end):
+def voronoi_2d_area(
+    xpoints: np.ndarray, ypoints: np.ndarray, xverts: np.ndarray, yverts: np.ndarray, ridge_point1: np.ndarray, 
+    ridge_point2: np.ndarray, ridge_vertices: np.ndarray, ridge_start: np.ndarray, ridge_end: np.ndarray
+) -> np.ndarray:
     """
     Determines the area of the voronoi cells.
 

@@ -5,7 +5,10 @@ from . import grid
 
 
 @njit
-def trilinear_periodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngridz):
+def trilinear_periodic(
+    fgrid: np.ndarray, x: np.ndarray, y: np.ndarray, z: np.ndarray, xbox: float, ybox: float, zbox: float, 
+    ngridx: int, ngridy: int, ngridz: int
+) -> np.ndarray:
     """
     Trilinear interpolation of field defined on a grid.
 
@@ -112,7 +115,10 @@ def trilinear_periodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngridz)
 
 
 @njit
-def trilinear_nonperiodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngridz):
+def trilinear_nonperiodic(
+    fgrid: np.ndarray, x: np.ndarray, y: np.ndarray, z: np.ndarray, xbox: float, ybox: float, zbox: float, 
+    ngridx: int, ngridy: int, ngridz: int
+) -> np.ndarray:
     """
     Trilinear interpolation of field defined on a grid.
   
@@ -237,7 +243,10 @@ def trilinear_nonperiodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngri
 
 
 @njit
-def trilinear_axisperiodic(fgrid, x, y, z, xbox, ybox, zbox, perix, periy, periz, ngridx, ngridy, ngridz):
+def trilinear_axisperiodic(
+    fgrid: np.ndarray, x: np.ndarray, y: np.ndarray, z: np.ndarray, xbox: float, ybox: float, zbox: float, 
+    perix: int, periy: int, periz: int, ngridx: int, ngridy: int, ngridz: int
+) -> np.ndarray:
     """
     Trilinear interpolation of field defined on a grid.
 
@@ -257,8 +266,6 @@ def trilinear_axisperiodic(fgrid, x, y, z, xbox, ybox, zbox, perix, periy, periz
         0 = non-periodic, 1 = periodic
     ngridx, ngridy, ngridz : int
         Size of the grid along each axis.
-    npart : int
-        Number of particles.
 
     Returns
     -------

@@ -3,8 +3,9 @@ import numpy as np
 from . import periodic
 
 
-def mpi_buffer_periodic_2D(data, boxsize, buffer_length, MPI, origin=0.):
-    """Generates random buffer particles around a 2D box.
+def mpi_buffer_periodic_2D(data: np.ndarray, boxsize: float, buffer_length: float, MPI: object, origin: float = 0.) -> np.ndarray:
+    """
+    Generates random buffer particles around a 2D box.
 
     Parameters
     ----------
@@ -45,8 +46,9 @@ def mpi_buffer_periodic_2D(data, boxsize, buffer_length, MPI, origin=0.):
     return datap
 
 
-def mpi_buffer_periodic_3D(data, boxsize, buffer_length, MPI, origin=0.):
-    """Generates random buffer particles around a 3D box.
+def mpi_buffer_periodic_3D(data: np.ndarray, boxsize: float, buffer_length: float, MPI: object, origin : float = 0.) -> np.ndarray:
+    """
+    Generates random buffer particles around a 3D box.
 
     Parameters
     ----------
@@ -88,8 +90,9 @@ def mpi_buffer_periodic_3D(data, boxsize, buffer_length, MPI, origin=0.):
     return datap
 
 
-def mpi_buffer_internal_3D(data, boxsize, buffer_length, MPI, origin=0.):
-    """Internal buffer particles between partitions are moved up and down.
+def mpi_buffer_internal_3D(data: np.ndarray, boxsize: float, buffer_length: float, MPI: object, origin: float = 0.) -> np.ndarray:
+    """
+    Internal buffer particles between partitions are moved up and down.
 
     Parameters
     ----------

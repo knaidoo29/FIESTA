@@ -3,11 +3,12 @@ from numba import njit
 
 
 @njit
-def weight_cic(xp, xg, dl):
+def weight_cic(xp: float, xg: float, dl: float) -> float:
     """
     Cloud-in-Cell (CIC) weights in 1D.
     
-    Parameters:
+    Parameters
+    ----------
     xp : float
         Coordinate of the particle.
     xg : float
@@ -15,7 +16,8 @@ def weight_cic(xp, xg, dl):
     dl : float
         Size of the grid cell.
 
-    Returns:
+    Returns
+    -------
     w : float
         Weight computed based on the distance between the particle and the grid point.
     """
@@ -32,11 +34,12 @@ def weight_cic(xp, xg, dl):
 
 
 @njit
-def weight_tsc(xp, xg, dl):
+def weight_tsc(xp: float, xg: float, dl: float) -> float:
     """
     Triangular-shaped-cloud (TSC) weights in 1D.
     
-    Parameters:
+    Parameters
+    ----------
     xp : float
         Coordinate of the particle.
     xg : float
@@ -44,7 +47,8 @@ def weight_tsc(xp, xg, dl):
     dl : float
         Size of the grid cell.
     
-    Returns:
+    Returns
+    -------
     w : float
         Weight computed based on the triangular-shaped cloud function.
     """
@@ -66,11 +70,12 @@ def weight_tsc(xp, xg, dl):
 
 
 @njit
-def weight_pcs(xp, xg, dl):
+def weight_pcs(xp: float, xg: float, dl: float) -> float:
     """
     Piecewise-Cubic-Spline (PCS) weights in 1D.
     
-    Parameters:
+    Parameters
+    ----------
     xp : float
         Coordinate of the particle.
     xg : float
@@ -78,7 +83,8 @@ def weight_pcs(xp, xg, dl):
     dl : float
         Size of the grid cell.
     
-    Returns:
+    Returns
+    -------
     w : float
         Weight computed based on the Piecewise-Cubic-Spline function.
     """

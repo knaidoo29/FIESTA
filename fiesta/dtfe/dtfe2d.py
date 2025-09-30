@@ -1,9 +1,6 @@
 import numpy as np
 from scipy.spatial import Delaunay as scDelaunay
 
-import shift
-
-from .. import boundary
 from .. import coords
 from .. import src
 from .. import maths

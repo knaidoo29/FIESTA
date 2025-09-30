@@ -2,7 +2,10 @@ import numpy as np
 from .. import src
 
 
-def trilinear(fgrid, boxsize, x, y, z, origin=0., fill_value=np.nan, periodic=True):
+def trilinear(
+        fgrid: np.ndarray, boxsize: float, x: np.ndarray, y: np.ndarray, z: np.ndarray, origin: float = 0., fill_value: float = np.nan, 
+        periodic: bool = True
+    ) -> np.ndarray:
     """ Trilinear interpolation from a 3D grid defined in box of [0., boxsize].
 
     Parameter

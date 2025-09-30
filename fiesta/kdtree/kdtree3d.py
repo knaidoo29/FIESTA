@@ -4,19 +4,25 @@ from scipy.spatial import KDTree as scKDTree
 from .. import coords
 
 
+from typing import Optional, Tuple
+
+
 class KDTree3D:
 
 
-    def __init__(self):
-        """Initialises the 3D KDTree class"""
+    def __init__(self) -> None:
+        """
+        Initialises the 3D KDTree class.
+        """
         self.points = None
         self.KD = None
         self.usepara = None
         self.ncpu = None
 
 
-    def build_tree(self, x, y, z, boxsize=None, usepara=False, ncpu=4):
-        """Function for building the KDTree.
+    def build_tree(self, x: np.ndarray, y: np.ndarray, z: np.ndarray, boxsize: Optional[float]=None, usepara: bool = False, ncpu: int = 4) -> None:
+        """
+        Function for building the KDTree.
 
         Parameters
         ----------
@@ -35,8 +41,9 @@ class KDTree3D:
         self.KD = scKDTree(self.points, boxsize=boxsize)
 
 
-    def nearest(self, x, y, z, k=1, return_dist=False):
-        """Returns the nearest index (and distance) of a point from the KDTree
+    def nearest(self, x: np.ndarray, y: np.ndarray, z: np.ndarray, k: int = 1, return_dist: bool = False) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Returns the nearest index (and distance) of a point from the KDTree
 
         Parameters
         ----------
@@ -69,8 +76,9 @@ class KDTree3D:
             return nind, ndist
 
 
-    def find_points_in_r(self, x, y, z, r):
-        """Returns the nearest index (and distance) of a point from the KDTree.
+    def find_points_in_r(self, x: np.ndarray, y: np.ndarray, z: np.ndarray, r: float) -> np.ndarray:
+        """
+        Returns the nearest index (and distance) of a point from the KDTree.
 
         Parameters
         ----------
@@ -94,6 +102,8 @@ class KDTree3D:
         return ind
 
 
-    def clean(self):
-        """Reinitilises the class."""
+    def clean(self) -> None:
+        """
+        Reinitilises the class.
+        """
         self.__init__()

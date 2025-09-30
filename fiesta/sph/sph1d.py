@@ -2,46 +2,59 @@ import numpy as np
 
 from . import kernels
 
-from .. import coords
 from .. import kdtree
+
+from typing import Optional, Union
 
 
 class SPH1D(kdtree.KDTree1D):
 
-    """Class for computing Smooth Particle Hydrodynamic (SPH) density and field
+    """
+    Class for computing Smooth Particle Hydrodynamic (SPH) density and field
     estimation in 1D.
     """
 
-    def __init__(self):
-        """Initialises SPH in 1D."""
+    def __init__(self) -> None:
+        """
+        Initialises SPH in 1D.
+        """
         kdtree.KDTree1D.__init__(self)
         self.kernel_type = 'cubic'
 
 
-    def assign_mass(self, mass=None):
-        """Assign particles mass, if none they will be assigned"""
+    def assign_mass(self, mass: Optional[np.ndarray] = None) -> None:
+        """
+        Assign particles mass, if none they will be assigned
+        
+        Parameters
+        ----------
+        mass : array, optional
+            Particle mass.
+        """
         if mass is None:
             self.mass = np.ones(len(self.points))
         else:
             self.mass = mass
 
 
-    def kernel(self, r, h):
-        """Returns the SPH kernel value.
+    def kernel(self, r: Union[float, np.ndarray], h: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        """
+        Returns the SPH kernel value.
 
         Parameters
         ----------
-        r : float/array
+        r : float or array
             Radius from a given neighbour.
-        h : float
+        h : float or array
             Smoothing length.
         """
         if self.kernel_type == 'cubic':
             return kernels.cubic_kernel(r, h, dim=1)
 
 
-    def setup(self, k=20, mass=None):
-        """Set basic settings for the SPH data.
+    def setup(self, k: int = 20, mass: Optional[np.ndarray] = None) -> None:
+        """
+        Set basic settings for the SPH data.
 
         Parameters
         ----------
@@ -54,13 +67,18 @@ class SPH1D(kdtree.KDTree1D):
         self.assign_mass(mass=mass)
 
 
-    def sph_estimate(self, x, f=None, dens=None):
-        """Estimates a field based on SPH k neighbours.
+    def sph_estimate(self, x: np.ndarray, f: Optional[np.ndarray] = None, dens: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Estimates a field based on SPH k neighbours.
 
         Parameters
         ----------
         x : array
             Cartesian coordinates.
+        f : array
+            Field values at KDTree points.
+        dens : array
+            Density at cartesian coordinates, if None this will be computed but will require double the time.
 
         Returns
         -------
@@ -82,8 +100,9 @@ class SPH1D(kdtree.KDTree1D):
             return f_est
 
 
-    def get_density(self, x):
-        """Calculates density based on SPH k neighbours.
+    def get_density(self, x: np.ndarray) -> np.ndarray:
+        """
+        Calculates density based on SPH k neighbours.
 
         Parameters
         ----------
@@ -99,8 +118,9 @@ class SPH1D(kdtree.KDTree1D):
         return dens
 
 
-    def set_field(self, f):
-        """Sets the field values for SPH field estimation.
+    def set_field(self, f: np.ndarray) -> None:
+        """
+        Sets the field values for SPH field estimation.
 
         Parameters
         ----------
@@ -110,8 +130,9 @@ class SPH1D(kdtree.KDTree1D):
         self.f = f
 
 
-    def estimate(self, x, dens=None):
-        """Estimates field at points given.
+    def estimate(self, x: np.ndarray, dens: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Estimates field at points given.
 
         Parameters
         ----------
@@ -129,6 +150,8 @@ class SPH1D(kdtree.KDTree1D):
         return self.sph_estimate(x, f=self.f, dens=dens)
 
 
-    def clean(self):
-        """Reinitialises the class."""
+    def clean(self) -> None:
+        """
+        Reinitialises the class.
+        """
         self.__init__()

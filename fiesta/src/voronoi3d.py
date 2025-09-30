@@ -5,7 +5,10 @@ from . import polyhedron
 
 
 @njit 
-def voronoi_3d_volume(xpoints, ypoints, zpoints, xverts, yverts, zverts, ridge_point1, ridge_point2, ridge_vertices, ridge_start, ridge_end):
+def voronoi_3d_volume(
+    xpoints: np.ndarray, ypoints: np.ndarray, zpoints: np.ndarray, xverts: np.ndarray, yverts: np.ndarray, zverts: np.ndarray, 
+    ridge_point1: np.ndarray, ridge_point2: np.ndarray, ridge_vertices: np.ndarray, ridge_start: np.ndarray, ridge_end: np.ndarray
+) -> np.ndarray:
     """
     Determines the volume of the voronoi cells.
     

@@ -3,8 +3,12 @@ import numpy as np
 from .. import randoms
 
 
-def buffer_random_2D(npart, boxsize, buffer_length, origin=0.):
-    """Generates random buffer particles around a 2D box.
+from typing import Tuple 
+
+
+def buffer_random_2D(npart: int, boxsize: float, buffer_length: float, origin: float = 0.) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Generates random buffer particles around a 2D box.
 
     Parameters
     ----------
@@ -68,8 +72,9 @@ def buffer_random_2D(npart, boxsize, buffer_length, origin=0.):
     return x, y
 
 
-def buffer_random_3D(npart, boxsize, buffer_length, origin=0.):
-    """Generates random buffer particles around a 3D box.
+def buffer_random_3D(npart: int, boxsize: float, buffer_length: float, origin: float = 0.) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Generates random buffer particles around a 3D box.
 
     Parameters
     ----------

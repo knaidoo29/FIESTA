@@ -7,7 +7,10 @@ from . import part2grid_wei
 
 
 @njit
-def part2grid_ngp_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid):
+def part2grid_ngp_3d(
+    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, xlength: float, ylength: float, zlength: float, 
+    xmin: float, ymin: float, zmin: float, nxgrid: int, nygrid: int, nzgrid: int
+) -> np.ndarray:
     """
     Nearest-grid-point assignment in 3D.
 
@@ -57,8 +60,11 @@ def part2grid_ngp_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nx
 
 
 @njit
-def part2grid_cic_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid, 
-    periodx, periody, periodz):
+def part2grid_cic_3d(
+    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, xlength: float, ylength: float, zlength: float, 
+    xmin: float, ymin: float, zmin: float, nxgrid: int, nygrid: int, nzgrid: int, periodx: bool, periody: bool, 
+    periodz: bool
+) -> np.ndarray:
     """
     Cloud-in-cell assignment in 3D.
     
@@ -124,8 +130,11 @@ def part2grid_cic_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nx
 
 
 @njit
-def part2grid_tsc_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid, 
-    periodx, periody, periodz):
+def part2grid_tsc_3d(
+    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, xlength: float, ylength: float, zlength: float,
+    xmin: float, ymin: float, zmin: float, nxgrid: int, nygrid: int, nzgrid: int, periodx: bool, periody: bool,
+    periodz: bool
+) -> np.ndarray:
     """
     Triangular-shaped-cloud assignment in 3D.
 
@@ -191,8 +200,11 @@ def part2grid_tsc_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nx
 
 
 @njit
-def part2grid_pcs_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid,
-    periodx, periody, periodz):
+def part2grid_pcs_3d(
+    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, xlength: float, ylength: float, zlength: float, 
+    xmin: float, ymin: float, zmin: float, nxgrid: int, nygrid: int, nzgrid: int, periodx: bool, periody: bool, 
+    periodz: bool
+) -> np.ndarray:
     """
     Piecewise-Cubic-Spline assignment in 3D.
     

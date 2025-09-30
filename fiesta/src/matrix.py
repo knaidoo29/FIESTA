@@ -3,7 +3,7 @@ from numba import njit
 
 
 @njit
-def inv2by2(m):
+def inv2by2(m: np.ndarray) -> np.ndarray:
     """
     Invert a 2x2 matrix.
 
@@ -34,7 +34,7 @@ def inv2by2(m):
 
 
 @njit
-def inv3by3(m):
+def inv3by3(m: np.ndarray) -> np.ndarray:
     """
     Invert a 3x3 matrix.
 
@@ -83,7 +83,7 @@ def inv3by3(m):
 
 
 @njit
-def eig2by2(m):
+def eig2by2(m: np.ndarray) -> np.ndarray:
     """
     Compute the eigenvalues of a 2x2 matrix.
 
@@ -107,7 +107,7 @@ def eig2by2(m):
 
 
 @njit
-def symeig3by3(m):
+def symeig3by3(m : np.ndarray) -> np.ndarray:
     """
     Compute the eigenvalues of a 3x3 symmetric matrix.
 

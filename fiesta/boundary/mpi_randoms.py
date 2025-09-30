@@ -3,8 +3,12 @@ import numpy as np
 from .. import randoms
 
 
-def mpi_buffer_random_2D(npart, boxsize, limits, buffer_length, MPI):
-    """Generates random buffer particles around a 2D box.
+from typing import List, Tuple
+
+
+def mpi_buffer_random_2D(npart: int, boxsize: float, limits: List[float], buffer_length: float, MPI: object) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Generates random buffer particles around a 2D box.
 
     Parameters
     ----------
@@ -70,8 +74,9 @@ def mpi_buffer_random_2D(npart, boxsize, limits, buffer_length, MPI):
     return x, y
 
 
-def mpi_buffer_random_3D(npart, boxsize, limits, buffer_length, MPI):
-    """Generates random buffer particles around a 3D box.
+def mpi_buffer_random_3D(npart: int, boxsize: float, limits: List[float], buffer_length: float, MPI: object) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Generates random buffer particles around a 3D box.
 
     Parameters
     ----------
@@ -163,8 +168,9 @@ def mpi_buffer_random_3D(npart, boxsize, limits, buffer_length, MPI):
     return x, y, z
 
 
-def mpi_buffer_random_utils(data, limits, buffer_length, MPI):
-    """Generates random buffer particles around a 2D box.
+def mpi_buffer_random_utils(data: np.ndarray, limits: List[float], buffer_length: float, MPI: object) -> np.ndarray:
+    """
+    Generates random buffer particles around a 2D box.
 
     Parameters
     ----------

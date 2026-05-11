@@ -506,7 +506,7 @@ class DelaunayMerger3D:
         self.simptypes = np.concatenate(self.simptypes)
 
     
-    def _filter(self, boundary) -> None:
+    def _filter(self, boundary: List[float]) -> None:
         """
         Filters out points and simplices that go beyond the boundary
 

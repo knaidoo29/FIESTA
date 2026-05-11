@@ -99,8 +99,9 @@ def sum_from_integral_image_2D(
 
 
 @njit
-def get_volume_enclosing_box(
-    boxsize: float, ngrid: int, dgrid: np.ndarray, idgrid: np.ndarray, minpart: int, periodic: bool = True, ifgrid: Optional[np.ndarray] = None
+def get_volume_enclosing_box_2D(
+    boxsize: float, ngrid: int, dgrid: np.ndarray, idgrid: np.ndarray, minpart: int, periodic: bool = True, 
+    ifgrid: Optional[np.ndarray] = None
 ) -> np.ndarray:
     """
     Get the volume for an enclosing box containing minpart number of particles.
@@ -236,9 +237,9 @@ def vebfe2D(
         ifgrid = integral_image.get_integral_image2D(fgrid)
         ifgrid = ifgrid.astype(np.float64)
     if f is None:
-        vgrid = get_volume_enclosing_box(boxsize, ngrid, dgrid, idgrid, minpart, periodic=periodic)
+        vgrid = get_volume_enclosing_box_2D(boxsize, ngrid, dgrid, idgrid, minpart, periodic=periodic)
         dgridVEB = minpart/vgrid
         return dgridVEB
     else:
-        fgridVEB = get_volume_enclosing_box(boxsize, ngrid, dgrid, idgrid, minpart, periodic=periodic, ifgrid=ifgrid)
+        fgridVEB = get_volume_enclosing_box_2D(boxsize, ngrid, dgrid, idgrid, minpart, periodic=periodic, ifgrid=ifgrid)
         return fgridVEB

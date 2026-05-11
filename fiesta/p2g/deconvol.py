@@ -133,11 +133,19 @@ def get_part2grid2D_kernel(
         xboxsize, yboxsize = boxsize, boxsize
     else:
         xboxsize, yboxsize = boxsize[0], boxsize[1]
-    knx = shift.cart.get_kn(xboxsize, nxgrid)
-    kny = shift.cart.get_kn(yboxsize, nygrid)
-    Wk =  np.sinc(np.pi*kx2d/(2*knx))
-    Wk *= np.sinc(np.pi*ky2d/(2*kny))
-    Wk = Wk**get_deconvol_p(method)
+    # knx = shift.cart.get_kn(xboxsize, nxgrid)
+    # kny = shift.cart.get_kn(yboxsize, nygrid)
+    # Wk =  np.sinc(kx2d/(np.pi*2*knx))
+    # Wk *= np.sinc(ky2d/(np.pi*2*kny))
+    # Wk =  np.sinc(kx2d/(2*knx))
+    # Wk *= np.sinc(ky2d/(2*kny))
+    dx = xboxsize/nxgrid
+    dy = yboxsize/nygrid
+    # dz = zboxsize/nzgrid
+    Wk = np.sinc(kx2d*dx/(2*np.pi))**get_deconvol_p(method)
+    Wk *= np.sinc(ky2d*dy/(2*np.pi))**get_deconvol_p(method)
+    # Wk *= np.sinc(kz3d*dz/(2*np.pi))
+    # Wk = Wk**get_deconvol_p(method)
     return Wk
 
 
@@ -169,16 +177,25 @@ def get_part2grid3D_kernel(
     else:
         nxgrid, nygrid, nzgrid = ngrid[0], ngrid[1], ngrid[2]
     if np.isscalar(boxsize):
-        xboxsize, yboxsize, zboxsize = boxsize, boxsize
+        xboxsize, yboxsize, zboxsize = boxsize, boxsize, boxsize
     else:
-        xboxsize, yboxsize, zboxsize = boxsize[0], boxsize[1]
-    knx = shift.cart.get_kn(xboxsize, nxgrid)
-    kny = shift.cart.get_kn(yboxsize, nygrid)
-    knz = shift.cart.get_kn(zboxsize, nygrid)
-    Wk =  np.sinc(np.pi*kx3d/(2*knx))
-    Wk *= np.sinc(np.pi*ky3d/(2*kny))
-    Wk *= np.sinc(np.pi*kz3d/(2*kny))
-    Wk = Wk**get_deconvol_p(method)
+        xboxsize, yboxsize, zboxsize = boxsize[0], boxsize[1], boxsize[2]
+    # knx = shift.cart.get_kn(xboxsize, nxgrid)
+    # kny = shift.cart.get_kn(yboxsize, nygrid)
+    # knz = shift.cart.get_kn(zboxsize, nzgrid)
+    # Wk =  np.sinc(kx3d/(np.pi*2*knx))
+    # Wk *= np.sinc(ky3d/(np.pi*2*kny))
+    # Wk *= np.sinc(kz3d/(np.pi*2*knz))
+    # Wk =  np.sinc(kx3d/(2*knx))
+    # Wk *= np.sinc(ky3d/(2*kny))
+    # Wk *= np.sinc(kz3d/(2*knz))
+    dx = xboxsize/nxgrid
+    dy = yboxsize/nygrid
+    dz = zboxsize/nzgrid
+    Wk = np.sinc(kx3d*dx/(2*np.pi))**get_deconvol_p(method)
+    Wk *= np.sinc(ky3d*dy/(2*np.pi))**get_deconvol_p(method)
+    Wk *= np.sinc(kz3d*dz/(2*np.pi))**get_deconvol_p(method)
+    # Wk = Wk**get_deconvol_p(method)
     return Wk
 
 

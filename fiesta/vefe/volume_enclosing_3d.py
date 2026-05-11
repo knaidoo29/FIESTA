@@ -222,7 +222,7 @@ def get_volume_enclosing_box_3D(
                     if ifgrid is not None:
                         iadd = 1
                         isub = 0
-                        fgridVEB[i,j,k] = sum_from_integral_image_3D(ifgrid, i+isub, i+iadd, j+isub, j+iadd, k+isub, k+iadd, periodic=periodic)/dgrid[i,j]
+                        fgridVEB[i,j,k] = sum_from_integral_image_3D(ifgrid, i+isub, i+iadd, j+isub, j+iadd, k+isub, k+iadd, periodic=periodic)/dgrid[i,j,k]
                 else:
                     iadd = 1
                     isub = 0

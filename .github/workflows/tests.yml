@@ -70,9 +70,10 @@ jobs:
           # Run standard tests
           coverage run --parallel-mode -m pytest tests/normal_tests
 
-          # Run MPI tests — --oversubscribe allows >1 rank per core on CI runners
-          # -x makes mpirun propagate non-zero exit codes from any rank
-          mpirun -n 2 --oversubscribe \
+          # Run MPI tests — MPICH (not OpenMPI) is installed, so --oversubscribe
+          # is not needed or supported; MPICH allows oversubscription by default.
+          # -x forwards env vars into MPI ranks.
+          mpirun -n 2 \
             -x COVERAGE_PROCESS_START \
             coverage run --parallel-mode -m pytest -s -v tests/mpi_tests
 

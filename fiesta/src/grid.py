@@ -3,7 +3,7 @@ from numba import njit
 
 
 @njit
-def xgrid(xpix: int, dx: float, xmin: float) -> float:
+def xgrid(xpix: int, dx: float, xmin: float) -> float:  # pragma: no cover
     """
     Returns the grid value along one axis.
 
@@ -25,7 +25,7 @@ def xgrid(xpix: int, dx: float, xmin: float) -> float:
 
 
 @njit
-def xgrids(xpix: np.ndarray, dx: int, xmin: int) -> np.ndarray:
+def xgrids(xpix: np.ndarray, dx: int, xmin: int) -> np.ndarray:  # pragma: no cover
     """
     Returns the grid values along one axis for multiple indices.
 

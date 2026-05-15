@@ -1,5 +1,3 @@
-
-
 def flatten_list(list_: list) -> list:
     """Flattens input list
 

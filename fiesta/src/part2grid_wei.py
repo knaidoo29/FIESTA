@@ -3,10 +3,10 @@ from numba import njit
 
 
 @njit
-def weight_cic(xp: float, xg: float, dl: float) -> float:
+def weight_cic(xp: float, xg: float, dl: float) -> float:  # pragma: no cover
     """
     Cloud-in-Cell (CIC) weights in 1D.
-    
+
     Parameters
     ----------
     xp : float
@@ -23,21 +23,21 @@ def weight_cic(xp: float, xg: float, dl: float) -> float:
     """
     # Compute the absolute distance between the particle and the grid point
     dx = abs(xp - xg)
-    
+
     # Calculate the weight using the Cloud-in-Cell method
     if dx <= dl:
-        w = (1. - (dx / dl)) / dl
+        w = (1.0 - (dx / dl)) / dl
     else:
         w = 0.0
-    
+
     return w
 
 
 @njit
-def weight_tsc(xp: float, xg: float, dl: float) -> float:
+def weight_tsc(xp: float, xg: float, dl: float) -> float:  # pragma: no cover
     """
     Triangular-shaped-cloud (TSC) weights in 1D.
-    
+
     Parameters
     ----------
     xp : float
@@ -46,7 +46,7 @@ def weight_tsc(xp: float, xg: float, dl: float) -> float:
         Coordinate of the grid point.
     dl : float
         Size of the grid cell.
-    
+
     Returns
     -------
     w : float
@@ -54,26 +54,26 @@ def weight_tsc(xp: float, xg: float, dl: float) -> float:
     """
     # Compute the absolute distance between the particle and the grid point
     dx = abs(xp - xg)
-    
+
     # Calculate the weight using the Triangular-Shaped-Cloud method
-    if dx <= dl / 2.:
-        w = 3. / 4. - (dx / dl) ** 2.
-    elif dx <= 3. * dl / 2.:
-        w = (1./2.) * ((3. / 2. - (dx / dl)) ** 2.)
+    if dx <= dl / 2.0:
+        w = 3.0 / 4.0 - (dx / dl) ** 2.0
+    elif dx <= 3.0 * dl / 2.0:
+        w = (1.0 / 2.0) * ((3.0 / 2.0 - (dx / dl)) ** 2.0)
     else:
         w = 0.0
-    
+
     # Normalize the weight by the cell size
     w = w / dl
-    
+
     return w
 
 
 @njit
-def weight_pcs(xp: float, xg: float, dl: float) -> float:
+def weight_pcs(xp: float, xg: float, dl: float) -> float:  # pragma: no cover
     """
     Piecewise-Cubic-Spline (PCS) weights in 1D.
-    
+
     Parameters
     ----------
     xp : float
@@ -82,7 +82,7 @@ def weight_pcs(xp: float, xg: float, dl: float) -> float:
         Coordinate of the grid point.
     dl : float
         Size of the grid cell.
-    
+
     Returns
     -------
     w : float
@@ -90,16 +90,16 @@ def weight_pcs(xp: float, xg: float, dl: float) -> float:
     """
     # Compute the absolute distance between the particle and the grid point
     dx = abs(xp - xg)
-    
+
     # Calculate the weight using the Piecewise-Cubic-Spline method
     if dx <= dl:
-        w = (1. / 6.) * (4. - 6. * (dx / dl) ** 2. + 3. * (dx / dl) ** 3.)
-    elif dx <= 2. * dl:
-        w = (1. / 6.) * ((2. - (dx / dl)) ** 3.)
+        w = (1.0 / 6.0) * (4.0 - 6.0 * (dx / dl) ** 2.0 + 3.0 * (dx / dl) ** 3.0)
+    elif dx <= 2.0 * dl:
+        w = (1.0 / 6.0) * ((2.0 - (dx / dl)) ** 3.0)
     else:
         w = 0.0
-    
+
     # Normalize the weight by the cell size
     w = w / dl
-    
+
     return w

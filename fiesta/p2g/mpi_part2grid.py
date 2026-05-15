@@ -6,8 +6,15 @@ from .. import src
 
 
 def mpi_part2grid2D(
-    x: np.ndarray, y: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
-    MPI: object, method: str = 'TSC', periodic: bool = True, origin: Union[float, List[float]] = 0.
+    x: np.ndarray,
+    y: np.ndarray,
+    f: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: Union[int, List[int]],
+    MPI: object,
+    method: str = "TSC",
+    periodic: bool = True,
+    origin: Union[float, List[float]] = 0.0,
 ) -> np.ndarray:
     """
     Returns the density contrast for the nearest grid point grid assignment.
@@ -58,7 +65,7 @@ def mpi_part2grid2D(
         periodx, periody = periodic[0], periodic[1]
     xedges, xgrid = shift.cart.mpi_grid1D(xlength, nxgrid, MPI, origin=xmin)
     xmin, xmax = xedges[0], xedges[-1]
-    dx = xedges[1]-xedges[0]
+    dx = xedges[1] - xedges[0]
     nxgrid = len(xgrid)
     # TODO: get rid of this below?
     # xmins = MPI.collect(xmin)
@@ -73,21 +80,29 @@ def mpi_part2grid2D(
     #     data = MPI.recv(0, tag=10+MPI.rank)
     #     x, y, f = data[:,0], data[:,1], data[:,2]
     # MPI.wait()
-    if method != 'NGP':
+    if method != "NGP":
         xmin -= dx
         xmax += dx
         nxgrid += 2
     xlength = xmax - xmin
-    if method == 'NGP':
-        fgrid = src.part2grid_ngp_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid)
-    elif method == 'CIC':
-        fgrid = src.part2grid_cic_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, False, periody)
-    elif method == 'TSC':
-        fgrid = src.part2grid_tsc_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, False, periody)
-    elif method == 'PCS':
-        fgrid = src.part2grid_pcs_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, False, periody)
+    if method == "NGP":
+        fgrid = src.part2grid_ngp_2d(
+            x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid
+        )
+    elif method == "CIC":
+        fgrid = src.part2grid_cic_2d(
+            x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, False, periody
+        )
+    elif method == "TSC":
+        fgrid = src.part2grid_tsc_2d(
+            x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, False, periody
+        )
+    elif method == "PCS":
+        fgrid = src.part2grid_pcs_2d(
+            x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, False, periody
+        )
     fgrid = fgrid.reshape(nxgrid, nygrid)
-    if method != 'NGP':
+    if method != "NGP":
         fgrid_send_up = MPI.send_up(fgrid[-1])
         fgrid_send_down = MPI.send_down(fgrid[0])
         fgrid = fgrid[1:-1]
@@ -99,8 +114,16 @@ def mpi_part2grid2D(
 
 
 def mpi_part2grid3D(
-    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
-    MPI: object, method: str = 'TSC', periodic: bool = True, origin: Union[float, List[float]] = 0.
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    f: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: Union[int, List[int]],
+    MPI: object,
+    method: str = "TSC",
+    periodic: bool = True,
+    origin: Union[float, List[float]] = 0.0,
 ) -> np.ndarray:
     """
     Returns the density contrast for the nearest grid point grid assignment.
@@ -155,7 +178,7 @@ def mpi_part2grid3D(
         periodx, periody, periodz = periodic[0], periodic[1], periodic[2]
     xedges, xgrid = shift.cart.mpi_grid1D(xlength, nxgrid, MPI, origin=xmin)
     xmin, xmax = xedges[0], xedges[-1]
-    dx = xedges[1]-xedges[0]
+    dx = xedges[1] - xedges[0]
     nxgrid = len(xgrid)
     # TODO: get rid of this below?
     # xmins = MPI.collect(xmin)
@@ -170,21 +193,86 @@ def mpi_part2grid3D(
     #     data = MPI.recv(0, tag=10+MPI.rank)
     #     x, y, z, f = data[:,0], data[:,1], data[:,2], data[:,3]
     # MPI.wait()
-    if method != 'NGP':
+    if method != "NGP":
         xmin -= dx
         xmax += dx
         nxgrid += 2
     xlength = xmax - xmin
-    if method == 'NGP':
-        fgrid = src.part2grid_ngp_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid)
-    elif method == 'CIC':
-        fgrid = src.part2grid_cic_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid, False, periody, periodz)
-    elif method == 'TSC':
-        fgrid = src.part2grid_tsc_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid, False, periody, periodz)
-    elif method == 'PCS':
-        fgrid = src.part2grid_pcs_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid, False, periody, periodz)
+    if method == "NGP":
+        fgrid = src.part2grid_ngp_3d(
+            x,
+            y,
+            z,
+            f,
+            xlength,
+            ylength,
+            zlength,
+            xmin,
+            ymin,
+            zmin,
+            nxgrid,
+            nygrid,
+            nzgrid,
+        )
+    elif method == "CIC":
+        fgrid = src.part2grid_cic_3d(
+            x,
+            y,
+            z,
+            f,
+            xlength,
+            ylength,
+            zlength,
+            xmin,
+            ymin,
+            zmin,
+            nxgrid,
+            nygrid,
+            nzgrid,
+            False,
+            periody,
+            periodz,
+        )
+    elif method == "TSC":
+        fgrid = src.part2grid_tsc_3d(
+            x,
+            y,
+            z,
+            f,
+            xlength,
+            ylength,
+            zlength,
+            xmin,
+            ymin,
+            zmin,
+            nxgrid,
+            nygrid,
+            nzgrid,
+            False,
+            periody,
+            periodz,
+        )
+    elif method == "PCS":
+        fgrid = src.part2grid_pcs_3d(
+            x,
+            y,
+            z,
+            f,
+            xlength,
+            ylength,
+            zlength,
+            xmin,
+            ymin,
+            zmin,
+            nxgrid,
+            nygrid,
+            nzgrid,
+            False,
+            periody,
+            periodz,
+        )
     fgrid = fgrid.reshape(nxgrid, nygrid, nzgrid)
-    if method != 'NGP':
+    if method != "NGP":
         fgrid_send_up = MPI.send_up(fgrid[-1])
         fgrid_send_down = MPI.send_down(fgrid[0])
         fgrid = fgrid[1:-1]

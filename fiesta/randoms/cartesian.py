@@ -2,6 +2,7 @@ import numpy as np
 
 from typing import Tuple
 
+
 def random_uniform(size: int, xmin: float, xmax: float) -> np.ndarray:
     """
     Generates uniform randoms along one axis.
@@ -26,7 +27,9 @@ def random_uniform(size: int, xmin: float, xmax: float) -> np.ndarray:
     return x
 
 
-def random_box(size: int, xmin: float, xmax: float, ymin: float, ymax: float) -> Tuple[np.ndarray, np.ndarray]:
+def random_box(
+    size: int, xmin: float, xmax: float, ymin: float, ymax: float
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generates random particles inside a box.
 
@@ -56,7 +59,13 @@ def random_box(size: int, xmin: float, xmax: float, ymin: float, ymax: float) ->
 
 
 def random_cube(
-    size: int, xmin: float, xmax: float, ymin: float, ymax: float, zmin: float, zmax: float
+    size: int,
+    xmin: float,
+    xmax: float,
+    ymin: float,
+    ymax: float,
+    zmin: float,
+    zmax: float,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Generates random particles inside a box.

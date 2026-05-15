@@ -8,7 +8,6 @@ from .. import src
 
 class DelaunayThickSlice:
 
-
     def __init__(self):
         """Initialises DelaunayThickSlice class"""
         self.points = None
@@ -30,19 +29,17 @@ class DelaunayThickSlice:
         self.useperiodic = False
         self.nperiodic = None
 
-
     def _extent(self):
-        """"Calculates and stores minimum and maximum of
+        """ "Calculates and stores minimum and maximum of
         input points in the variable extent."""
         if self.extent is None:
-            xmin = np.min(self.points[:self.npart, 0])
-            xmax = np.max(self.points[:self.npart, 0])
-            ymin = np.min(self.points[:self.npart, 1])
-            ymax = np.max(self.points[:self.npart, 1])
-            zmin = np.min(self.points[:self.npart, 2])
-            zmax = np.max(self.points[:self.npart, 2])
+            xmin = np.min(self.points[: self.npart, 0])
+            xmax = np.max(self.points[: self.npart, 0])
+            ymin = np.min(self.points[: self.npart, 1])
+            ymax = np.max(self.points[: self.npart, 1])
+            zmin = np.min(self.points[: self.npart, 2])
+            zmax = np.max(self.points[: self.npart, 2])
             self.extent = [xmin, xmax, ymin, ymax, zmin, zmax]
-
 
     def set_points(self, x, y, z):
         """Sets the points for voronoi cells.
@@ -59,7 +56,6 @@ class DelaunayThickSlice:
         self.points = coords.xyz2points(x, y, z)
         self.npart = len(self.points)
 
-
     def set_buffer(self, boxsize, thickness, buffer_length):
         """Defines buffer particles to be placed around a given box.
 
@@ -74,24 +70,29 @@ class DelaunayThickSlice:
         """
         # check boxsize is consistent with particles.
         self._extent()
-        assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
-        assert self.extent[2] >= 0. and self.extent[3] <= boxsize, "Y coordinates exceed the range of the box, check or redefine boxsize."
+        assert (
+            self.extent[0] >= 0.0 and self.extent[1] <= boxsize
+        ), "X coordinates exceed the range of the box, check or redefine boxsize."
+        assert (
+            self.extent[2] >= 0.0 and self.extent[3] <= boxsize
+        ), "Y coordinates exceed the range of the box, check or redefine boxsize."
         self.boxsize = boxsize
         self.buffer_length = buffer_length
         self.thickness = thickness
         self.usebuffer = True
         self.useperiodic = False
-        x_buffer, y_buffer, z_buffer = boundary.buffer_random_particles_3d_slice(self.npart, self.boxsize, self.thickness, self.buffer_length)
+        x_buffer, y_buffer, z_buffer = boundary.buffer_random_particles_3d_slice(
+            self.npart, self.boxsize, self.thickness, self.buffer_length
+        )
         self.nbuffer = len(x_buffer)
         # redefine points to include buffer points and also define mask
         self.ispart = np.ones(self.npart + self.nbuffer)
-        self.ispart[self.npart:] = 0.
+        self.ispart[self.npart :] = 0.0
         # concatenate points and buffer
         x_pnb = np.concatenate([self.points[:, 0], x_buffer])
         y_pnb = np.concatenate([self.points[:, 1], y_buffer])
         z_pnb = np.concatenate([self.points[:, 2], z_buffer])
         self.points = coords.xyz2points(x_pnb, y_pnb, z_pnb)
-
 
     def set_periodic(self, boxsize, buffer_length):
         """Defines periodic particles to be placed around a given box.
@@ -105,30 +106,42 @@ class DelaunayThickSlice:
         """
         # check boxsize is consistent with particles.
         self._extent()
-        assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
-        assert self.extent[2] >= 0. and self.extent[3] <= boxsize, "Y coordinates exceed the range of the box, check or redefine boxsize."
-        assert self.extent[4] >= 0. and self.extent[5] <= boxsize, "Z coordinates exceed the range of the box, check or redefine boxsize."
+        assert (
+            self.extent[0] >= 0.0 and self.extent[1] <= boxsize
+        ), "X coordinates exceed the range of the box, check or redefine boxsize."
+        assert (
+            self.extent[2] >= 0.0 and self.extent[3] <= boxsize
+        ), "Y coordinates exceed the range of the box, check or redefine boxsize."
+        assert (
+            self.extent[4] >= 0.0 and self.extent[5] <= boxsize
+        ), "Z coordinates exceed the range of the box, check or redefine boxsize."
         self.boxsize = boxsize
         self.buffer_length = buffer_length
-        x_periodic, y_periodic, z_periodic = boundary.buffer_periodic_particles_3d_slice(self.points[:, 0], self.points[:, 1], self.points[:, 2], self.boxsize, self.buffer_length)
+        x_periodic, y_periodic, z_periodic = (
+            boundary.buffer_periodic_particles_3d_slice(
+                self.points[:, 0],
+                self.points[:, 1],
+                self.points[:, 2],
+                self.boxsize,
+                self.buffer_length,
+            )
+        )
         self.nperiodic = len(x_periodic)
         self.usebuffer = False
         self.useperiodic = True
         # redefine points to include periodic points and also define mask
         self.ispart = np.ones(self.npart + self.nperiodic)
-        self.ispart[self.npart:] = 0.
+        self.ispart[self.npart :] = 0.0
         # concatenate points and buffer
         x_pnb = np.concatenate([self.points[:, 0], x_periodic])
         y_pnb = np.concatenate([self.points[:, 1], y_periodic])
         z_pnb = np.concatenate([self.points[:, 2], z_periodic])
         self.points = coords.xyz2points(x_pnb, y_pnb, z_pnb)
 
-
     def construct(self):
         """Constructs Delaunay tesselation"""
         self.delaunay = scDelaunay(self.points)
         self.delaunay_simplices = self.delaunay.simplices
-
 
     def find_simplex(self, x, y, z):
         """Find the simplex the coordinates lie within."""
@@ -136,8 +149,7 @@ class DelaunayThickSlice:
         simplices = self.delaunay.find_simplex(points)
         return simplices
 
-
-    def set_field(self, f, bufferval=0.):
+    def set_field(self, f, bufferval=0.0):
         """Sets the field values of the input points.
 
         Parameters
@@ -151,9 +163,9 @@ class DelaunayThickSlice:
         assert lenf == self.npart, "f must be equal to input points."
         x, y, z = self.points[:, 0], self.points[:, 1], self.points[:, 2]
         if self.usebuffer == True:
-            f = np.concatenate([f, bufferval*np.ones(self.nbuffer)])
+            f = np.concatenate([f, bufferval * np.ones(self.nbuffer)])
         elif self.useperiodic == True:
-            f = np.concatenate([f, bufferval*np.ones(self.nperiodic)])
+            f = np.concatenate([f, bufferval * np.ones(self.nperiodic)])
         del_vert0 = self.delaunay_simplices[:, 0]
         del_vert1 = self.delaunay_simplices[:, 1]
         del_vert2 = self.delaunay_simplices[:, 2]
@@ -162,10 +174,18 @@ class DelaunayThickSlice:
         self.y0 = y[del_vert0]
         self.z0 = z[del_vert0]
         self.f0 = f[del_vert0]
-        self.delf0 = src.get_delf0_3d(x=x, y=y, z=z, f=f, del_vert0=del_vert0, del_vert1=del_vert1,
-                                      del_vert2=del_vert2, del_vert3=del_vert3,
-                                      npart=len(x), nvert=len(del_vert0))
-
+        self.delf0 = src.get_delf0_3d(
+            x=x,
+            y=y,
+            z=z,
+            f=f,
+            del_vert0=del_vert0,
+            del_vert1=del_vert1,
+            del_vert2=del_vert2,
+            del_vert3=del_vert3,
+            npart=len(x),
+            nvert=len(del_vert0),
+        )
 
     def estimate(self, x, y, z):
         """Estimates a field from the Delaunay tesselation.
@@ -185,11 +205,20 @@ class DelaunayThickSlice:
             Estimates of the field
         """
         simplices = self.find_simplex(x, y, z)
-        f_est = src.delaunay_estimate_3d(simplices=simplices, x=x, y=y, z=z, x0=self.x0,
-                                         y0=self.y0, z0=self.z0, f0=self.f0, delf0=self.delf0,
-                                         npart=len(x), nsimp0=len(self.x0))
+        f_est = src.delaunay_estimate_3d(
+            simplices=simplices,
+            x=x,
+            y=y,
+            z=z,
+            x0=self.x0,
+            y0=self.y0,
+            z0=self.z0,
+            f0=self.f0,
+            delf0=self.delf0,
+            npart=len(x),
+            nsimp0=len(self.x0),
+        )
         return f_est
-
 
     def clean(self):
         self.__init__()

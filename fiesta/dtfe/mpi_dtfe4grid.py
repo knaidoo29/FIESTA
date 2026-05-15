@@ -11,10 +11,18 @@ from copy import deepcopy
 
 
 def mpi_delaunay_density4grid2D(
-    x: np.ndarray, y: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
-    MPI: object, origin: Union[float, List[float]] = 0., mass: Optional[np.ndarray] = None, 
-    partition: int = 1, periodic : Union[bool, List[bool]] = True, fbuffer: float = 0.5, subsampling: int = 1, 
-    outputgrid: bool = False
+    x: np.ndarray,
+    y: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: Union[int, List[int]],
+    MPI: object,
+    origin: Union[float, List[float]] = 0.0,
+    mass: Optional[np.ndarray] = None,
+    partition: int = 1,
+    periodic: Union[bool, List[bool]] = True,
+    fbuffer: float = 0.5,
+    subsampling: int = 1,
+    outputgrid: bool = False,
 ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
     """
     Returns the Delaunay tesselation density on a grid.
@@ -60,36 +68,38 @@ def mpi_delaunay_density4grid2D(
         xboxsize, yboxsize = boxsize, boxsize
     else:
         xboxsize, yboxsize = boxsize[0], boxsize[1]
-    
+
     # define boxsize on each axis
     if np.isscalar(origin):
         xorigin, yorigin = origin, origin
     else:
         xorigin, yorigin = origin[0], origin[1]
-    
+
     # define grid on each axis
     if np.isscalar(ngrid):
         nxgrid, nygrid = ngrid, ngrid
     else:
         nxgrid, nygrid = ngrid[0], ngrid[1]
-    
+
     # define grid on each axis
     if np.isscalar(periodic):
         xperiodic, yperiodic = periodic, periodic
     else:
         xperiodic, yperiodic = periodic[0], periodic[1]
-    
+
     # define pixel length across each axis
-    dx = xboxsize/nxgrid
-    dy = yboxsize/nygrid
+    dx = xboxsize / nxgrid
+    dy = yboxsize / nygrid
 
     if np.isscalar(subsampling):
         dnxgrid, dnygrid = subsampling, subsampling
     else:
         dnxgrid, dnygrid = subsampling[0], subsampling[1]
-    
+
     # define subsampling points for each pixel
-    dx2d, dy2d = shift.cart.grid2D([dx, dy], [dnxgrid, dnygrid], origin=[-dx/2., -dy/2.])
+    dx2d, dy2d = shift.cart.grid2D(
+        [dx, dy], [dnxgrid, dnygrid], origin=[-dx / 2.0, -dy / 2.0]
+    )
     dx2d, dy2d = dx2d.flatten(), dy2d.flatten()
 
     # collapse data
@@ -98,13 +108,13 @@ def mpi_delaunay_density4grid2D(
             data = coords.coord2points([x, y, np.ones(len(x))])
         else:
             data = coords.coord2points([x, y, mass])
-    else:
+    else:  # pragma: no cover
         data = None
-    
+
     # check size of data
     if data is not None:
         lendata = len(data)
-    else:
+    else:  # pragma: no cover
         lendata = 0
     size = MPI.collect(lendata, outlist=True)
     if MPI.rank == 0:
@@ -120,10 +130,10 @@ def mpi_delaunay_density4grid2D(
     MPI_SBX.input(data)
     MPI_SBX.limits4grid()
     data = MPI_SBX.distribute()
-    limits = [MPI_SBX.limits[0], MPI_SBX.limits[1], yorigin, yorigin+yboxsize]
-    
+    limits = [MPI_SBX.limits[0], MPI_SBX.limits[1], yorigin, yorigin + yboxsize]
+
     # coordinates only inside subbox
-    x, y, mass = data[:,0], data[:,1], data[:,2]
+    x, y, mass = data[:, 0], data[:, 1], data[:, 2]
 
     # create grids
     xedges, xgrid = shift.cart.mpi_grid1D(xboxsize, nxgrid, MPI, origin=xorigin)
@@ -142,9 +152,20 @@ def mpi_delaunay_density4grid2D(
     _nygrid = len(ygrid)
 
     dens, exterior_border, pixID, count = dtfe4grid.delaunay_density4grid2D(
-        x, y, [_xboxsize, _yboxsize], [_nxgrid, _nygrid], origin=[_xorigin, _yorigin], mass=mass, 
-        partition=partition, periodic=[False, False], fbuffer=fbuffer, subsampling=subsampling, 
-        outputgrid=False, outputexterior=True, normalise=False, flatten=True
+        x,
+        y,
+        [_xboxsize, _yboxsize],
+        [_nxgrid, _nygrid],
+        origin=[_xorigin, _yorigin],
+        mass=mass,
+        partition=partition,
+        periodic=[False, False],
+        fbuffer=fbuffer,
+        subsampling=subsampling,
+        outputgrid=False,
+        outputexterior=True,
+        normalise=False,
+        flatten=True,
     )
 
     MPI.wait()
@@ -152,29 +173,29 @@ def mpi_delaunay_density4grid2D(
     # get border particles from adjacent slabs with the slab below
 
     exterior_border_below = {}
-    
-    exterior_border_below['x'] = MPI.send_up(exterior_border['x'])
-    exterior_border_below['y'] = MPI.send_up(exterior_border['y'])
-    exterior_border_below['mass'] = MPI.send_up(exterior_border['mass'])
-    exterior_border_below['ptype'] = MPI.send_up(exterior_border['ptype'])
-    exterior_border_below['f'] = MPI.send_up(exterior_border['f'])
-    exterior_border_below['dtfe_mode'] = exterior_border['dtfe_mode']
-    exterior_border_below['simplices'] = MPI.send_up(exterior_border['simplices'])
-    exterior_border_below['simptypes'] = MPI.send_up(exterior_border['simptypes'])
+
+    exterior_border_below["x"] = MPI.send_up(exterior_border["x"])
+    exterior_border_below["y"] = MPI.send_up(exterior_border["y"])
+    exterior_border_below["mass"] = MPI.send_up(exterior_border["mass"])
+    exterior_border_below["ptype"] = MPI.send_up(exterior_border["ptype"])
+    exterior_border_below["f"] = MPI.send_up(exterior_border["f"])
+    exterior_border_below["dtfe_mode"] = exterior_border["dtfe_mode"]
+    exterior_border_below["simplices"] = MPI.send_up(exterior_border["simplices"])
+    exterior_border_below["simptypes"] = MPI.send_up(exterior_border["simptypes"])
 
     # get border particles from adjacent slabs with the slab above
-    
+
     exterior_border_above = {}
 
-    exterior_border_above['x'] = MPI.send_down(exterior_border['x'])
-    exterior_border_above['y'] = MPI.send_down(exterior_border['y'])
-    exterior_border_above['mass'] = MPI.send_down(exterior_border['mass'])
-    exterior_border_above['ptype'] = MPI.send_down(exterior_border['ptype'])
-    exterior_border_above['f'] = MPI.send_down(exterior_border['f'])
-    exterior_border_above['dtfe_mode'] = exterior_border['dtfe_mode']
-    exterior_border_above['simplices'] = MPI.send_down(exterior_border['simplices'])
-    exterior_border_above['simptypes'] = MPI.send_down(exterior_border['simptypes'])
-    
+    exterior_border_above["x"] = MPI.send_down(exterior_border["x"])
+    exterior_border_above["y"] = MPI.send_down(exterior_border["y"])
+    exterior_border_above["mass"] = MPI.send_down(exterior_border["mass"])
+    exterior_border_above["ptype"] = MPI.send_down(exterior_border["ptype"])
+    exterior_border_above["f"] = MPI.send_down(exterior_border["f"])
+    exterior_border_above["dtfe_mode"] = exterior_border["dtfe_mode"]
+    exterior_border_above["simplices"] = MPI.send_down(exterior_border["simplices"])
+    exterior_border_above["simptypes"] = MPI.send_down(exterior_border["simptypes"])
+
     # Construct merged Delaunay tesselation
 
     dtfe = dtfe2d.DelaunayMerger2D()
@@ -186,41 +207,55 @@ def mpi_delaunay_density4grid2D(
 
     for j in range(jmin, jmax):
         _exterior_border_below = deepcopy(exterior_border_below)
-        _exterior_border_below['y'] += j*yboxsize
+        _exterior_border_below["y"] += j * yboxsize
         if MPI.rank != 0:
             dtfe.add_border(_exterior_border_below)
         else:
             if xperiodic:
-                _exterior_border_below['x'] -= xboxsize
+                _exterior_border_below["x"] -= xboxsize
                 dtfe.add_border(_exterior_border_below)
-        
+
         _exterior_border = deepcopy(exterior_border)
-        _exterior_border['y'] += j*yboxsize
+        _exterior_border["y"] += j * yboxsize
         dtfe.add_border(_exterior_border)
 
         _exterior_border_above = deepcopy(exterior_border_above)
-        _exterior_border_above['y'] += j*yboxsize
-        if MPI.rank != MPI.size-1:
+        _exterior_border_above["y"] += j * yboxsize
+        if MPI.rank != MPI.size - 1:
             dtfe.add_border(_exterior_border_above)
         else:
             if xperiodic:
-                _exterior_border_above['x'] += xboxsize
+                _exterior_border_above["x"] += xboxsize
                 dtfe.add_border(_exterior_border_above)
 
-    _xbuffer = fbuffer*_xboxsize
-    _ybuffer = fbuffer*_yboxsize
-    
-    boundary = [_xorigin-_xbuffer, _xorigin+_xboxsize+_xbuffer, _yorigin-_ybuffer, _yorigin+_yboxsize+_ybuffer]
+    _xbuffer = fbuffer * _xboxsize
+    _ybuffer = fbuffer * _yboxsize
+
+    boundary = [
+        _xorigin - _xbuffer,
+        _xorigin + _xboxsize + _xbuffer,
+        _yorigin - _ybuffer,
+        _yorigin + _yboxsize + _ybuffer,
+    ]
 
     dtfe.run(boundary, apply_filter=True)
 
-    cond = np.where((x2d[pixID] >= boundary[0]) & (x2d[pixID] < boundary[1]) & (y2d[pixID] >= boundary[2]) & (y2d[pixID] < boundary[3]))[0]
+    cond = np.where(
+        (x2d[pixID] >= boundary[0])
+        & (x2d[pixID] < boundary[1])
+        & (y2d[pixID] >= boundary[2])
+        & (y2d[pixID] < boundary[3])
+    )[0]
 
     for _dx2d, _dy2d in zip(dx2d, dy2d):
-        dtfe_estimate = dtfe.estimate(x2d[pixID[cond]]+_dx2d, y2d[pixID[cond]]+_dy2d)
-        cond_isfinite = np.where(np.isfinite(dtfe_estimate) & (count[cond] != len(dx2d)))[0]
+        dtfe_estimate = dtfe.estimate(
+            x2d[pixID[cond]] + _dx2d, y2d[pixID[cond]] + _dy2d
+        )
+        cond_isfinite = np.where(
+            np.isfinite(dtfe_estimate) & (count[cond] != len(dx2d))
+        )[0]
         dens[pixID[cond[cond_isfinite]]] += dtfe_estimate[cond_isfinite]
-        count[cond[cond_isfinite]] += 1.
+        count[cond[cond_isfinite]] += 1.0
 
     cond2 = np.where(count[cond] == len(dx2d))[0]
     pixID = np.delete(pixID, cond[cond2])
@@ -230,10 +265,10 @@ def mpi_delaunay_density4grid2D(
 
     dens /= len(dx2d)
 
-    cond = np.where(count == 0.)[0]
+    cond = np.where(count == 0.0)[0]
     dens[pixID[cond]] *= len(dx2d)
-    cond = np.where(count != 0.)[0]
-    dens[pixID[cond]] *= len(dx2d)/count[cond]
+    cond = np.where(count != 0.0)[0]
+    dens[pixID[cond]] *= len(dx2d) / count[cond]
 
     dens = dens.reshape(_nxgrid, _nygrid)
 
@@ -244,10 +279,19 @@ def mpi_delaunay_density4grid2D(
 
 
 def mpi_delaunay_field4grid2D(
-    x: np.ndarray, y: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
-    MPI: object, origin: Union[float, List[float]] = 0., mass: Optional[np.ndarray] = None, 
-    partition: int = 1, periodic : Union[bool, List[bool]] = True, fbuffer: float = 0.5, subsampling: int = 1, 
-    outputgrid: bool = False
+    x: np.ndarray,
+    y: np.ndarray,
+    f: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: Union[int, List[int]],
+    MPI: object,
+    origin: Union[float, List[float]] = 0.0,
+    mass: Optional[np.ndarray] = None,
+    partition: int = 1,
+    periodic: Union[bool, List[bool]] = True,
+    fbuffer: float = 0.5,
+    subsampling: int = 1,
+    outputgrid: bool = False,
 ):
     """
     Returns the Delaunay tesselation field on a grid.
@@ -295,36 +339,38 @@ def mpi_delaunay_field4grid2D(
         xboxsize, yboxsize = boxsize, boxsize
     else:
         xboxsize, yboxsize = boxsize[0], boxsize[1]
-    
+
     # define boxsize on each axis
     if np.isscalar(origin):
         xorigin, yorigin = origin, origin
     else:
         xorigin, yorigin = origin[0], origin[1]
-    
+
     # define grid on each axis
     if np.isscalar(ngrid):
         nxgrid, nygrid = ngrid, ngrid
     else:
         nxgrid, nygrid = ngrid[0], ngrid[1]
-    
+
     # define grid on each axis
     if np.isscalar(periodic):
         xperiodic, yperiodic = periodic, periodic
     else:
         xperiodic, yperiodic = periodic[0], periodic[1]
-    
+
     # define pixel length across each axis
-    dx = xboxsize/nxgrid
-    dy = yboxsize/nygrid
+    dx = xboxsize / nxgrid
+    dy = yboxsize / nygrid
 
     if np.isscalar(subsampling):
         dnxgrid, dnygrid = subsampling, subsampling
     else:
         dnxgrid, dnygrid = subsampling[0], subsampling[1]
-    
+
     # define subsampling points for each pixel
-    dx2d, dy2d = shift.cart.grid2D([dx, dy], [dnxgrid, dnygrid], origin=[-dx/2., -dy/2.])
+    dx2d, dy2d = shift.cart.grid2D(
+        [dx, dy], [dnxgrid, dnygrid], origin=[-dx / 2.0, -dy / 2.0]
+    )
     dx2d, dy2d = dx2d.flatten(), dy2d.flatten()
 
     # collapse data
@@ -333,13 +379,13 @@ def mpi_delaunay_field4grid2D(
             data = coords.coord2points([x, y, f, np.ones(len(x))])
         else:
             data = coords.coord2points([x, y, f, mass])
-    else:
+    else:  # pragma: no cover
         data = None
-    
+
     # check size of data
     if data is not None:
         lendata = len(data)
-    else:
+    else:  # pragma: no cover
         lendata = 0
     size = MPI.collect(lendata, outlist=True)
     if MPI.rank == 0:
@@ -355,10 +401,10 @@ def mpi_delaunay_field4grid2D(
     MPI_SBX.input(data)
     MPI_SBX.limits4grid()
     data = MPI_SBX.distribute()
-    limits = [MPI_SBX.limits[0], MPI_SBX.limits[1], yorigin, yorigin+yboxsize]
-    
+    limits = [MPI_SBX.limits[0], MPI_SBX.limits[1], yorigin, yorigin + yboxsize]
+
     # coordinates only inside subbox
-    x, y, f, mass = data[:,0], data[:,1], data[:,2], data[:,3]
+    x, y, f, mass = data[:, 0], data[:, 1], data[:, 2], data[:, 3]
 
     # create grids
     xedges, xgrid = shift.cart.mpi_grid1D(xboxsize, nxgrid, MPI, origin=xorigin)
@@ -377,9 +423,21 @@ def mpi_delaunay_field4grid2D(
     _nygrid = len(ygrid)
 
     field, exterior_border, pixID, count = dtfe4grid.delaunay_field4grid2D(
-        x, y, f, [_xboxsize, _yboxsize], [_nxgrid, _nygrid], origin=[_xorigin, _yorigin], mass=mass, 
-        partition=partition, periodic=[False, False], fbuffer=fbuffer, subsampling=subsampling, 
-        outputgrid=False, outputexterior=True, normalise=False, flatten=True
+        x,
+        y,
+        f,
+        [_xboxsize, _yboxsize],
+        [_nxgrid, _nygrid],
+        origin=[_xorigin, _yorigin],
+        mass=mass,
+        partition=partition,
+        periodic=[False, False],
+        fbuffer=fbuffer,
+        subsampling=subsampling,
+        outputgrid=False,
+        outputexterior=True,
+        normalise=False,
+        flatten=True,
     )
 
     MPI.wait()
@@ -387,29 +445,29 @@ def mpi_delaunay_field4grid2D(
     # get border particles from adjacent slabs with the slab below
 
     exterior_border_below = {}
-    
-    exterior_border_below['x'] = MPI.send_up(exterior_border['x'])
-    exterior_border_below['y'] = MPI.send_up(exterior_border['y'])
-    exterior_border_below['mass'] = MPI.send_up(exterior_border['mass'])
-    exterior_border_below['ptype'] = MPI.send_up(exterior_border['ptype'])
-    exterior_border_below['f'] = MPI.send_up(exterior_border['f'])
-    exterior_border_below['dtfe_mode'] = exterior_border['dtfe_mode']
-    exterior_border_below['simplices'] = MPI.send_up(exterior_border['simplices'])
-    exterior_border_below['simptypes'] = MPI.send_up(exterior_border['simptypes'])
+
+    exterior_border_below["x"] = MPI.send_up(exterior_border["x"])
+    exterior_border_below["y"] = MPI.send_up(exterior_border["y"])
+    exterior_border_below["mass"] = MPI.send_up(exterior_border["mass"])
+    exterior_border_below["ptype"] = MPI.send_up(exterior_border["ptype"])
+    exterior_border_below["f"] = MPI.send_up(exterior_border["f"])
+    exterior_border_below["dtfe_mode"] = exterior_border["dtfe_mode"]
+    exterior_border_below["simplices"] = MPI.send_up(exterior_border["simplices"])
+    exterior_border_below["simptypes"] = MPI.send_up(exterior_border["simptypes"])
 
     # get border particles from adjacent slabs with the slab above
-    
+
     exterior_border_above = {}
 
-    exterior_border_above['x'] = MPI.send_down(exterior_border['x'])
-    exterior_border_above['y'] = MPI.send_down(exterior_border['y'])
-    exterior_border_above['mass'] = MPI.send_down(exterior_border['mass'])
-    exterior_border_above['ptype'] = MPI.send_down(exterior_border['ptype'])
-    exterior_border_above['f'] = MPI.send_down(exterior_border['f'])
-    exterior_border_above['dtfe_mode'] = exterior_border['dtfe_mode']
-    exterior_border_above['simplices'] = MPI.send_down(exterior_border['simplices'])
-    exterior_border_above['simptypes'] = MPI.send_down(exterior_border['simptypes'])
-    
+    exterior_border_above["x"] = MPI.send_down(exterior_border["x"])
+    exterior_border_above["y"] = MPI.send_down(exterior_border["y"])
+    exterior_border_above["mass"] = MPI.send_down(exterior_border["mass"])
+    exterior_border_above["ptype"] = MPI.send_down(exterior_border["ptype"])
+    exterior_border_above["f"] = MPI.send_down(exterior_border["f"])
+    exterior_border_above["dtfe_mode"] = exterior_border["dtfe_mode"]
+    exterior_border_above["simplices"] = MPI.send_down(exterior_border["simplices"])
+    exterior_border_above["simptypes"] = MPI.send_down(exterior_border["simptypes"])
+
     # Construct merged Delaunay tesselation
 
     dtfe = dtfe2d.DelaunayMerger2D()
@@ -421,42 +479,56 @@ def mpi_delaunay_field4grid2D(
 
     for j in range(jmin, jmax):
         _exterior_border_below = deepcopy(exterior_border_below)
-        _exterior_border_below['y'] += j*yboxsize
+        _exterior_border_below["y"] += j * yboxsize
         if MPI.rank != 0:
             dtfe.add_border(_exterior_border_below)
         else:
             if xperiodic:
-                _exterior_border_below['x'] -= xboxsize
+                _exterior_border_below["x"] -= xboxsize
                 dtfe.add_border(_exterior_border_below)
-        
+
         _exterior_border = deepcopy(exterior_border)
-        _exterior_border['y'] += j*yboxsize
+        _exterior_border["y"] += j * yboxsize
         dtfe.add_border(_exterior_border)
 
         _exterior_border_above = deepcopy(exterior_border_above)
-        _exterior_border_above['y'] += j*yboxsize
-        if MPI.rank != MPI.size-1:
+        _exterior_border_above["y"] += j * yboxsize
+        if MPI.rank != MPI.size - 1:
             dtfe.add_border(_exterior_border_above)
         else:
             if xperiodic:
-                _exterior_border_above['x'] += xboxsize
+                _exterior_border_above["x"] += xboxsize
                 dtfe.add_border(_exterior_border_above)
 
-    _xbuffer = fbuffer*_xboxsize
-    _ybuffer = fbuffer*_yboxsize
-    
-    boundary = [_xorigin-_xbuffer, _xorigin+_xboxsize+_xbuffer, _yorigin-_ybuffer, _yorigin+_yboxsize+_ybuffer]
+    _xbuffer = fbuffer * _xboxsize
+    _ybuffer = fbuffer * _yboxsize
+
+    boundary = [
+        _xorigin - _xbuffer,
+        _xorigin + _xboxsize + _xbuffer,
+        _yorigin - _ybuffer,
+        _yorigin + _yboxsize + _ybuffer,
+    ]
 
     dtfe.run(boundary, apply_filter=True)
 
-    cond = np.where((x2d[pixID] >= boundary[0]) & (x2d[pixID] < boundary[1]) & (y2d[pixID] >= boundary[2]) & (y2d[pixID] < boundary[3]))[0]
+    cond = np.where(
+        (x2d[pixID] >= boundary[0])
+        & (x2d[pixID] < boundary[1])
+        & (y2d[pixID] >= boundary[2])
+        & (y2d[pixID] < boundary[3])
+    )[0]
 
     for _dx2d, _dy2d in zip(dx2d, dy2d):
-        dtfe_estimate = dtfe.estimate(x2d[pixID[cond]]+_dx2d, y2d[pixID[cond]]+_dy2d)
-        cond_isfinite = np.where(np.isfinite(dtfe_estimate) & (count[cond] != len(dx2d)))[0]
+        dtfe_estimate = dtfe.estimate(
+            x2d[pixID[cond]] + _dx2d, y2d[pixID[cond]] + _dy2d
+        )
+        cond_isfinite = np.where(
+            np.isfinite(dtfe_estimate) & (count[cond] != len(dx2d))
+        )[0]
         field[pixID[cond[cond_isfinite]]] += dtfe_estimate[cond_isfinite]
-        count[cond[cond_isfinite]] += 1.
-    
+        count[cond[cond_isfinite]] += 1.0
+
     cond2 = np.where(count[cond] == len(dx2d))[0]
     pixID = np.delete(pixID, cond[cond2])
     count = np.delete(count, cond[cond2])
@@ -465,10 +537,10 @@ def mpi_delaunay_field4grid2D(
 
     field /= len(dx2d)
 
-    cond = np.where(count == 0.)[0]
+    cond = np.where(count == 0.0)[0]
     field[pixID[cond]] *= len(dx2d)
-    cond = np.where(count != 0.)[0]
-    field[pixID[cond]] *= len(dx2d)/count[cond]
+    cond = np.where(count != 0.0)[0]
+    field[pixID[cond]] *= len(dx2d) / count[cond]
 
     field = field.reshape(_nxgrid, _nygrid)
 
@@ -479,10 +551,19 @@ def mpi_delaunay_field4grid2D(
 
 
 def mpi_delaunay_density4grid3D(
-    x: np.ndarray, y: np.ndarray, z: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
-    MPI: object, origin: Union[float, List[float]] = 0., mass: Optional[np.ndarray] = None, 
-    partition: int = 1, periodic : Union[bool, List[bool]] = True, fbuffer: float = 0.5, subsampling: int = 1, 
-    outputgrid: bool = False
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: Union[int, List[int]],
+    MPI: object,
+    origin: Union[float, List[float]] = 0.0,
+    mass: Optional[np.ndarray] = None,
+    partition: int = 1,
+    periodic: Union[bool, List[bool]] = True,
+    fbuffer: float = 0.5,
+    subsampling: int = 1,
+    outputgrid: bool = False,
 ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
     """
     Returns the Delaunay tesselation density on a grid.
@@ -528,37 +609,41 @@ def mpi_delaunay_density4grid3D(
         xboxsize, yboxsize, zboxsize = boxsize, boxsize, boxsize
     else:
         xboxsize, yboxsize, zboxsize = boxsize[0], boxsize[1], boxsize[2]
-    
+
     # define boxsize on each axis
     if np.isscalar(origin):
         xorigin, yorigin, zorigin = origin, origin, origin
     else:
         xorigin, yorigin, zorigin = origin[0], origin[1], origin[2]
-    
+
     # define grid on each axis
     if np.isscalar(ngrid):
         nxgrid, nygrid, nzgrid = ngrid, ngrid, ngrid
     else:
         nxgrid, nygrid, nzgrid = ngrid[0], ngrid[1], ngrid[2]
-    
+
     # define grid on each axis
     if np.isscalar(periodic):
         xperiodic, yperiodic, zperiodic = periodic, periodic, periodic
     else:
         xperiodic, yperiodic, zperiodic = periodic[0], periodic[1], periodic[2]
-    
+
     # define pixel length across each axis
-    dx = xboxsize/nxgrid
-    dy = yboxsize/nygrid
-    dz = yboxsize/nzgrid
+    dx = xboxsize / nxgrid
+    dy = yboxsize / nygrid
+    dz = yboxsize / nzgrid
 
     if np.isscalar(subsampling):
         dnxgrid, dnygrid, dnzgrid = subsampling, subsampling, subsampling
     else:
         dnxgrid, dnygrid, dnzgrid = subsampling[0], subsampling[1], subsampling[2]
-    
+
     # define subsampling points for each pixel
-    dx3d, dy3d, dz3d = shift.cart.grid3D([dx, dy, dz], [dnxgrid, dnygrid, dnzgrid], origin=[-dx/2., -dy/2., -dz/2.])
+    dx3d, dy3d, dz3d = shift.cart.grid3D(
+        [dx, dy, dz],
+        [dnxgrid, dnygrid, dnzgrid],
+        origin=[-dx / 2.0, -dy / 2.0, -dz / 2.0],
+    )
     dx3d, dy3d, dz3d = dx3d.flatten(), dy3d.flatten(), dz3d.flatten()
 
     # collapse data
@@ -567,13 +652,13 @@ def mpi_delaunay_density4grid3D(
             data = coords.coord2points([x, y, z, np.ones(len(x))])
         else:
             data = coords.coord2points([x, y, z, mass])
-    else:
+    else:  # pragma: no cover
         data = None
-    
+
     # check size of data
     if data is not None:
         lendata = len(data)
-    else:
+    else:  # pragma: no cover
         lendata = 0
     size = MPI.collect(lendata, outlist=True)
     if MPI.rank == 0:
@@ -591,10 +676,10 @@ def mpi_delaunay_density4grid3D(
     data = MPI_SBX.distribute()
 
     # TODO: This isn't used for anything but hesitant to remove since it's good for diagnostics...
-    # limits = [MPI_SBX.limits[0], MPI_SBX.limits[1], yorigin, yorigin+yboxsize, zorigin, zorigin+zboxsize] 
-    
+    # limits = [MPI_SBX.limits[0], MPI_SBX.limits[1], yorigin, yorigin+yboxsize, zorigin, zorigin+zboxsize]
+
     # coordinates only inside subbox
-    x, y, z, mass = data[:,0], data[:,1], data[:,2], data[:,3]
+    x, y, z, mass = data[:, 0], data[:, 1], data[:, 2], data[:, 3]
 
     # create grids
     xedges, xgrid = shift.cart.mpi_grid1D(xboxsize, nxgrid, MPI, origin=xorigin)
@@ -618,10 +703,21 @@ def mpi_delaunay_density4grid3D(
     _nzgrid = len(zgrid)
 
     dens, exterior_border, pixID, count = dtfe4grid.delaunay_density4grid3D(
-        x, y, z, [_xboxsize, _yboxsize, _zboxsize], [_nxgrid, _nygrid, _nzgrid], 
-        origin=[_xorigin, _yorigin, _zorigin], mass=mass, partition=partition, 
-        periodic=[False, False, False], fbuffer=fbuffer, subsampling=subsampling, 
-        outputgrid=False, outputexterior=True, normalise=False, flatten=True
+        x,
+        y,
+        z,
+        [_xboxsize, _yboxsize, _zboxsize],
+        [_nxgrid, _nygrid, _nzgrid],
+        origin=[_xorigin, _yorigin, _zorigin],
+        mass=mass,
+        partition=partition,
+        periodic=[False, False, False],
+        fbuffer=fbuffer,
+        subsampling=subsampling,
+        outputgrid=False,
+        outputexterior=True,
+        normalise=False,
+        flatten=True,
     )
 
     MPI.wait()
@@ -629,31 +725,31 @@ def mpi_delaunay_density4grid3D(
     # get border particles from adjacent slabs with the slab below
 
     exterior_border_below = {}
-    
-    exterior_border_below['x'] = MPI.send_up(exterior_border['x'])
-    exterior_border_below['y'] = MPI.send_up(exterior_border['y'])
-    exterior_border_below['z'] = MPI.send_up(exterior_border['z'])
-    exterior_border_below['mass'] = MPI.send_up(exterior_border['mass'])
-    exterior_border_below['ptype'] = MPI.send_up(exterior_border['ptype'])
-    exterior_border_below['f'] = MPI.send_up(exterior_border['f'])
-    exterior_border_below['dtfe_mode'] = exterior_border['dtfe_mode']
-    exterior_border_below['simplices'] = MPI.send_up(exterior_border['simplices'])
-    exterior_border_below['simptypes'] = MPI.send_up(exterior_border['simptypes'])
+
+    exterior_border_below["x"] = MPI.send_up(exterior_border["x"])
+    exterior_border_below["y"] = MPI.send_up(exterior_border["y"])
+    exterior_border_below["z"] = MPI.send_up(exterior_border["z"])
+    exterior_border_below["mass"] = MPI.send_up(exterior_border["mass"])
+    exterior_border_below["ptype"] = MPI.send_up(exterior_border["ptype"])
+    exterior_border_below["f"] = MPI.send_up(exterior_border["f"])
+    exterior_border_below["dtfe_mode"] = exterior_border["dtfe_mode"]
+    exterior_border_below["simplices"] = MPI.send_up(exterior_border["simplices"])
+    exterior_border_below["simptypes"] = MPI.send_up(exterior_border["simptypes"])
 
     # get border particles from adjacent slabs with the slab above
-    
+
     exterior_border_above = {}
 
-    exterior_border_above['x'] = MPI.send_down(exterior_border['x'])
-    exterior_border_above['y'] = MPI.send_down(exterior_border['y'])
-    exterior_border_above['z'] = MPI.send_down(exterior_border['z'])
-    exterior_border_above['mass'] = MPI.send_down(exterior_border['mass'])
-    exterior_border_above['ptype'] = MPI.send_down(exterior_border['ptype'])
-    exterior_border_above['f'] = MPI.send_down(exterior_border['f'])
-    exterior_border_above['dtfe_mode'] = exterior_border['dtfe_mode']
-    exterior_border_above['simplices'] = MPI.send_down(exterior_border['simplices'])
-    exterior_border_above['simptypes'] = MPI.send_down(exterior_border['simptypes'])
-    
+    exterior_border_above["x"] = MPI.send_down(exterior_border["x"])
+    exterior_border_above["y"] = MPI.send_down(exterior_border["y"])
+    exterior_border_above["z"] = MPI.send_down(exterior_border["z"])
+    exterior_border_above["mass"] = MPI.send_down(exterior_border["mass"])
+    exterior_border_above["ptype"] = MPI.send_down(exterior_border["ptype"])
+    exterior_border_above["f"] = MPI.send_down(exterior_border["f"])
+    exterior_border_above["dtfe_mode"] = exterior_border["dtfe_mode"]
+    exterior_border_above["simplices"] = MPI.send_down(exterior_border["simplices"])
+    exterior_border_above["simptypes"] = MPI.send_down(exterior_border["simptypes"])
+
     # Construct merged Delaunay tesselation
 
     dtfe = dtfe3d.DelaunayMerger3D()
@@ -671,48 +767,63 @@ def mpi_delaunay_density4grid3D(
     for j in range(jmin, jmax):
         for k in range(kmin, kmax):
             _exterior_border_below = deepcopy(exterior_border_below)
-            _exterior_border_below['y'] += j*yboxsize
-            _exterior_border_below['z'] += k*zboxsize
+            _exterior_border_below["y"] += j * yboxsize
+            _exterior_border_below["z"] += k * zboxsize
             if MPI.rank != 0:
                 dtfe.add_border(_exterior_border_below)
             else:
                 if xperiodic:
-                    _exterior_border_below['x'] -= xboxsize
+                    _exterior_border_below["x"] -= xboxsize
                     dtfe.add_border(_exterior_border_below)
-            
+
             _exterior_border = deepcopy(exterior_border)
-            _exterior_border['y'] += j*yboxsize
-            _exterior_border['z'] += k*zboxsize
+            _exterior_border["y"] += j * yboxsize
+            _exterior_border["z"] += k * zboxsize
             dtfe.add_border(_exterior_border)
 
             _exterior_border_above = deepcopy(exterior_border_above)
-            _exterior_border_above['y'] += j*yboxsize
-            _exterior_border_above['z'] += k*zboxsize
-            if MPI.rank != MPI.size-1:
+            _exterior_border_above["y"] += j * yboxsize
+            _exterior_border_above["z"] += k * zboxsize
+            if MPI.rank != MPI.size - 1:
                 dtfe.add_border(_exterior_border_above)
             else:
                 if xperiodic:
-                    _exterior_border_above['x'] += xboxsize
+                    _exterior_border_above["x"] += xboxsize
                     dtfe.add_border(_exterior_border_above)
 
-    _xbuffer = fbuffer*_xboxsize
-    _ybuffer = fbuffer*_yboxsize
-    _zbuffer = fbuffer*_zboxsize
-    
-    boundary = [_xorigin-_xbuffer, _xorigin+_xboxsize+_xbuffer, _yorigin-_ybuffer, _yorigin+_yboxsize+_ybuffer, _zorigin-_zbuffer, _zorigin+_zboxsize+_zbuffer]
+    _xbuffer = fbuffer * _xboxsize
+    _ybuffer = fbuffer * _yboxsize
+    _zbuffer = fbuffer * _zboxsize
+
+    boundary = [
+        _xorigin - _xbuffer,
+        _xorigin + _xboxsize + _xbuffer,
+        _yorigin - _ybuffer,
+        _yorigin + _yboxsize + _ybuffer,
+        _zorigin - _zbuffer,
+        _zorigin + _zboxsize + _zbuffer,
+    ]
 
     dtfe.run(boundary, apply_filter=True)
 
     cond = np.where(
-        (x3d[pixID] >= boundary[0]) & (x3d[pixID] < boundary[1]) & 
-        (y3d[pixID] >= boundary[2]) & (y3d[pixID] < boundary[3]) & 
-        (z3d[pixID] >= boundary[4]) & (z3d[pixID] < boundary[5]))[0]
+        (x3d[pixID] >= boundary[0])
+        & (x3d[pixID] < boundary[1])
+        & (y3d[pixID] >= boundary[2])
+        & (y3d[pixID] < boundary[3])
+        & (z3d[pixID] >= boundary[4])
+        & (z3d[pixID] < boundary[5])
+    )[0]
 
     for _dx3d, _dy3d, _dz3d in zip(dx3d, dy3d, dz3d):
-        dtfe_estimate = dtfe.estimate(x3d[pixID[cond]]+_dx3d, y3d[pixID[cond]]+_dy3d, z3d[pixID[cond]]+_dz3d)
-        cond_isfinite = np.where(np.isfinite(dtfe_estimate) & (count[cond] != len(dx3d)))[0]
+        dtfe_estimate = dtfe.estimate(
+            x3d[pixID[cond]] + _dx3d, y3d[pixID[cond]] + _dy3d, z3d[pixID[cond]] + _dz3d
+        )
+        cond_isfinite = np.where(
+            np.isfinite(dtfe_estimate) & (count[cond] != len(dx3d))
+        )[0]
         dens[pixID[cond[cond_isfinite]]] += dtfe_estimate[cond_isfinite]
-        count[cond[cond_isfinite]] += 1.
+        count[cond[cond_isfinite]] += 1.0
 
     cond2 = np.where(count[cond] == len(dx3d))[0]
     pixID = np.delete(pixID, cond[cond2])
@@ -722,10 +833,10 @@ def mpi_delaunay_density4grid3D(
 
     dens /= len(dx3d)
 
-    cond = np.where(count == 0.)[0]
+    cond = np.where(count == 0.0)[0]
     dens[pixID[cond]] *= len(dx3d)
-    cond = np.where(count != 0.)[0]
-    dens[pixID[cond]] *= len(dx3d)/count[cond]
+    cond = np.where(count != 0.0)[0]
+    dens[pixID[cond]] *= len(dx3d) / count[cond]
 
     dens = dens.reshape(_nxgrid, _nygrid, _nzgrid)
 
@@ -736,10 +847,20 @@ def mpi_delaunay_density4grid3D(
 
 
 def mpi_delaunay_field4grid3D(
-    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], 
-    ngrid: Union[int, List[int]], MPI: object, origin: Union[float, List[float]] = 0., mass: Optional[np.ndarray] = None, 
-    partition: int = 1, periodic : Union[bool, List[bool]] = True, fbuffer: float = 0.5, subsampling: int = 1, 
-    outputgrid: bool = False
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    f: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: Union[int, List[int]],
+    MPI: object,
+    origin: Union[float, List[float]] = 0.0,
+    mass: Optional[np.ndarray] = None,
+    partition: int = 1,
+    periodic: Union[bool, List[bool]] = True,
+    fbuffer: float = 0.5,
+    subsampling: int = 1,
+    outputgrid: bool = False,
 ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
     """
     Returns the Delaunay tesselation field a grid.
@@ -787,37 +908,41 @@ def mpi_delaunay_field4grid3D(
         xboxsize, yboxsize, zboxsize = boxsize, boxsize, boxsize
     else:
         xboxsize, yboxsize, zboxsize = boxsize[0], boxsize[1], boxsize[2]
-    
+
     # define boxsize on each axis
     if np.isscalar(origin):
         xorigin, yorigin, zorigin = origin, origin, origin
     else:
         xorigin, yorigin, zorigin = origin[0], origin[1], origin[2]
-    
+
     # define grid on each axis
     if np.isscalar(ngrid):
         nxgrid, nygrid, nzgrid = ngrid, ngrid, ngrid
     else:
         nxgrid, nygrid, nzgrid = ngrid[0], ngrid[1], ngrid[2]
-    
+
     # define grid on each axis
     if np.isscalar(periodic):
         xperiodic, yperiodic, zperiodic = periodic, periodic, periodic
     else:
         xperiodic, yperiodic, zperiodic = periodic[0], periodic[1], periodic[2]
-    
+
     # define pixel length across each axis
-    dx = xboxsize/nxgrid
-    dy = yboxsize/nygrid
-    dz = yboxsize/nzgrid
+    dx = xboxsize / nxgrid
+    dy = yboxsize / nygrid
+    dz = yboxsize / nzgrid
 
     if np.isscalar(subsampling):
         dnxgrid, dnygrid, dnzgrid = subsampling, subsampling, subsampling
     else:
         dnxgrid, dnygrid, dnzgrid = subsampling[0], subsampling[1], subsampling[2]
-    
+
     # define subsampling points for each pixel
-    dx3d, dy3d, dz3d = shift.cart.grid3D([dx, dy, dz], [dnxgrid, dnygrid, dnzgrid], origin=[-dx/2., -dy/2., -dz/2.])
+    dx3d, dy3d, dz3d = shift.cart.grid3D(
+        [dx, dy, dz],
+        [dnxgrid, dnygrid, dnzgrid],
+        origin=[-dx / 2.0, -dy / 2.0, -dz / 2.0],
+    )
     dx3d, dy3d, dz3d = dx3d.flatten(), dy3d.flatten(), dz3d.flatten()
 
     # collapse data
@@ -826,13 +951,13 @@ def mpi_delaunay_field4grid3D(
             data = coords.coord2points([x, y, z, f, np.ones(len(x))])
         else:
             data = coords.coord2points([x, y, z, f, mass])
-    else:
+    else:  # pragma: no cover
         data = None
-    
+
     # check size of data
     if data is not None:
         lendata = len(data)
-    else:
+    else:  # pragma: no cover
         lendata = 0
     size = MPI.collect(lendata, outlist=True)
     if MPI.rank == 0:
@@ -850,10 +975,10 @@ def mpi_delaunay_field4grid3D(
     data = MPI_SBX.distribute()
 
     # TODO: This isn't used for anything but hesitant to remove since it's good for diagnostics...
-    # limits = [MPI_SBX.limits[0], MPI_SBX.limits[1], yorigin, yorigin+yboxsize, zorigin, zorigin+zboxsize] 
-    
+    # limits = [MPI_SBX.limits[0], MPI_SBX.limits[1], yorigin, yorigin+yboxsize, zorigin, zorigin+zboxsize]
+
     # coordinates only inside subbox
-    x, y, z, f, mass = data[:,0], data[:,1], data[:,2], data[:,3], data[:,4]
+    x, y, z, f, mass = data[:, 0], data[:, 1], data[:, 2], data[:, 3], data[:, 4]
 
     # create grids
     xedges, xgrid = shift.cart.mpi_grid1D(xboxsize, nxgrid, MPI, origin=xorigin)
@@ -877,10 +1002,22 @@ def mpi_delaunay_field4grid3D(
     _nzgrid = len(zgrid)
 
     field, exterior_border, pixID, count = dtfe4grid.delaunay_field4grid3D(
-        x, y, z, f, [_xboxsize, _yboxsize, _zboxsize], [_nxgrid, _nygrid, _nzgrid], 
-        origin=[_xorigin, _yorigin, _zorigin], mass=mass, partition=partition, 
-        periodic=[False, False, False], fbuffer=fbuffer, subsampling=subsampling, 
-        outputgrid=False, outputexterior=True, normalise=False, flatten=True
+        x,
+        y,
+        z,
+        f,
+        [_xboxsize, _yboxsize, _zboxsize],
+        [_nxgrid, _nygrid, _nzgrid],
+        origin=[_xorigin, _yorigin, _zorigin],
+        mass=mass,
+        partition=partition,
+        periodic=[False, False, False],
+        fbuffer=fbuffer,
+        subsampling=subsampling,
+        outputgrid=False,
+        outputexterior=True,
+        normalise=False,
+        flatten=True,
     )
 
     MPI.wait()
@@ -888,31 +1025,31 @@ def mpi_delaunay_field4grid3D(
     # get border particles from adjacent slabs with the slab below
 
     exterior_border_below = {}
-    
-    exterior_border_below['x'] = MPI.send_up(exterior_border['x'])
-    exterior_border_below['y'] = MPI.send_up(exterior_border['y'])
-    exterior_border_below['z'] = MPI.send_up(exterior_border['z'])
-    exterior_border_below['mass'] = MPI.send_up(exterior_border['mass'])
-    exterior_border_below['ptype'] = MPI.send_up(exterior_border['ptype'])
-    exterior_border_below['f'] = MPI.send_up(exterior_border['f'])
-    exterior_border_below['dtfe_mode'] = exterior_border['dtfe_mode']
-    exterior_border_below['simplices'] = MPI.send_up(exterior_border['simplices'])
-    exterior_border_below['simptypes'] = MPI.send_up(exterior_border['simptypes'])
+
+    exterior_border_below["x"] = MPI.send_up(exterior_border["x"])
+    exterior_border_below["y"] = MPI.send_up(exterior_border["y"])
+    exterior_border_below["z"] = MPI.send_up(exterior_border["z"])
+    exterior_border_below["mass"] = MPI.send_up(exterior_border["mass"])
+    exterior_border_below["ptype"] = MPI.send_up(exterior_border["ptype"])
+    exterior_border_below["f"] = MPI.send_up(exterior_border["f"])
+    exterior_border_below["dtfe_mode"] = exterior_border["dtfe_mode"]
+    exterior_border_below["simplices"] = MPI.send_up(exterior_border["simplices"])
+    exterior_border_below["simptypes"] = MPI.send_up(exterior_border["simptypes"])
 
     # get border particles from adjacent slabs with the slab above
-    
+
     exterior_border_above = {}
 
-    exterior_border_above['x'] = MPI.send_down(exterior_border['x'])
-    exterior_border_above['y'] = MPI.send_down(exterior_border['y'])
-    exterior_border_above['z'] = MPI.send_down(exterior_border['z'])
-    exterior_border_above['mass'] = MPI.send_down(exterior_border['mass'])
-    exterior_border_above['ptype'] = MPI.send_down(exterior_border['ptype'])
-    exterior_border_above['f'] = MPI.send_down(exterior_border['f'])
-    exterior_border_above['dtfe_mode'] = exterior_border['dtfe_mode']
-    exterior_border_above['simplices'] = MPI.send_down(exterior_border['simplices'])
-    exterior_border_above['simptypes'] = MPI.send_down(exterior_border['simptypes'])
-    
+    exterior_border_above["x"] = MPI.send_down(exterior_border["x"])
+    exterior_border_above["y"] = MPI.send_down(exterior_border["y"])
+    exterior_border_above["z"] = MPI.send_down(exterior_border["z"])
+    exterior_border_above["mass"] = MPI.send_down(exterior_border["mass"])
+    exterior_border_above["ptype"] = MPI.send_down(exterior_border["ptype"])
+    exterior_border_above["f"] = MPI.send_down(exterior_border["f"])
+    exterior_border_above["dtfe_mode"] = exterior_border["dtfe_mode"]
+    exterior_border_above["simplices"] = MPI.send_down(exterior_border["simplices"])
+    exterior_border_above["simptypes"] = MPI.send_down(exterior_border["simptypes"])
+
     # Construct merged Delaunay tesselation
 
     dtfe = dtfe3d.DelaunayMerger3D()
@@ -930,48 +1067,63 @@ def mpi_delaunay_field4grid3D(
     for j in range(jmin, jmax):
         for k in range(kmin, kmax):
             _exterior_border_below = deepcopy(exterior_border_below)
-            _exterior_border_below['y'] += j*yboxsize
-            _exterior_border_below['z'] += k*zboxsize
+            _exterior_border_below["y"] += j * yboxsize
+            _exterior_border_below["z"] += k * zboxsize
             if MPI.rank != 0:
                 dtfe.add_border(_exterior_border_below)
             else:
                 if xperiodic:
-                    _exterior_border_below['x'] -= xboxsize
+                    _exterior_border_below["x"] -= xboxsize
                     dtfe.add_border(_exterior_border_below)
-            
+
             _exterior_border = deepcopy(exterior_border)
-            _exterior_border['y'] += j*yboxsize
-            _exterior_border['z'] += k*zboxsize
+            _exterior_border["y"] += j * yboxsize
+            _exterior_border["z"] += k * zboxsize
             dtfe.add_border(_exterior_border)
 
             _exterior_border_above = deepcopy(exterior_border_above)
-            _exterior_border_above['y'] += j*yboxsize
-            _exterior_border_above['z'] += k*zboxsize
-            if MPI.rank != MPI.size-1:
+            _exterior_border_above["y"] += j * yboxsize
+            _exterior_border_above["z"] += k * zboxsize
+            if MPI.rank != MPI.size - 1:
                 dtfe.add_border(_exterior_border_above)
             else:
                 if xperiodic:
-                    _exterior_border_above['x'] += xboxsize
+                    _exterior_border_above["x"] += xboxsize
                     dtfe.add_border(_exterior_border_above)
 
-    _xbuffer = fbuffer*_xboxsize
-    _ybuffer = fbuffer*_yboxsize
-    _zbuffer = fbuffer*_zboxsize
-    
-    boundary = [_xorigin-_xbuffer, _xorigin+_xboxsize+_xbuffer, _yorigin-_ybuffer, _yorigin+_yboxsize+_ybuffer, _zorigin-_zbuffer, _zorigin+_zboxsize+_zbuffer]
+    _xbuffer = fbuffer * _xboxsize
+    _ybuffer = fbuffer * _yboxsize
+    _zbuffer = fbuffer * _zboxsize
+
+    boundary = [
+        _xorigin - _xbuffer,
+        _xorigin + _xboxsize + _xbuffer,
+        _yorigin - _ybuffer,
+        _yorigin + _yboxsize + _ybuffer,
+        _zorigin - _zbuffer,
+        _zorigin + _zboxsize + _zbuffer,
+    ]
 
     dtfe.run(boundary, apply_filter=True)
 
     cond = np.where(
-        (x3d[pixID] >= boundary[0]) & (x3d[pixID] < boundary[1]) & 
-        (y3d[pixID] >= boundary[2]) & (y3d[pixID] < boundary[3]) & 
-        (z3d[pixID] >= boundary[4]) & (z3d[pixID] < boundary[5]))[0]
+        (x3d[pixID] >= boundary[0])
+        & (x3d[pixID] < boundary[1])
+        & (y3d[pixID] >= boundary[2])
+        & (y3d[pixID] < boundary[3])
+        & (z3d[pixID] >= boundary[4])
+        & (z3d[pixID] < boundary[5])
+    )[0]
 
     for _dx3d, _dy3d, _dz3d in zip(dx3d, dy3d, dz3d):
-        dtfe_estimate = dtfe.estimate(x3d[pixID[cond]]+_dx3d, y3d[pixID[cond]]+_dy3d, z3d[pixID[cond]]+_dz3d)
-        cond_isfinite = np.where(np.isfinite(dtfe_estimate) & (count[cond] != len(dx3d)))[0]
+        dtfe_estimate = dtfe.estimate(
+            x3d[pixID[cond]] + _dx3d, y3d[pixID[cond]] + _dy3d, z3d[pixID[cond]] + _dz3d
+        )
+        cond_isfinite = np.where(
+            np.isfinite(dtfe_estimate) & (count[cond] != len(dx3d))
+        )[0]
         field[pixID[cond[cond_isfinite]]] += dtfe_estimate[cond_isfinite]
-        count[cond[cond_isfinite]] += 1.
+        count[cond[cond_isfinite]] += 1.0
 
     cond2 = np.where(count[cond] == len(dx3d))[0]
     pixID = np.delete(pixID, cond[cond2])
@@ -981,10 +1133,10 @@ def mpi_delaunay_field4grid3D(
 
     field /= len(dx3d)
 
-    cond = np.where(count == 0.)[0]
+    cond = np.where(count == 0.0)[0]
     field[pixID[cond]] *= len(dx3d)
-    cond = np.where(count != 0.)[0]
-    field[pixID[cond]] *= len(dx3d)/count[cond]
+    cond = np.where(count != 0.0)[0]
+    field[pixID[cond]] *= len(dx3d) / count[cond]
 
     field = field.reshape(_nxgrid, _nygrid, _nzgrid)
 
@@ -992,4 +1144,3 @@ def mpi_delaunay_field4grid3D(
         return field, x3d, y3d, z3d
     else:
         return field
-

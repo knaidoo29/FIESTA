@@ -1,4 +1,3 @@
-
 from . import boundary
 from . import coords
 from . import dtfe
@@ -10,4 +9,4 @@ from . import randoms
 from . import sph
 from . import src
 from . import utils
-from . import vefe
+from . import gridsph

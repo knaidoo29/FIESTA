@@ -19,15 +19,16 @@ def get_deconvol_p(method: str) -> int:
     p : float
         Deconvolution power.
     """
-    if method == 'NGP':
-        p = 1.
-    elif method == 'CIC':
-        p = 2.
-    elif method == 'TSC':
-        p = 3.
-    elif method == 'PCS':
-        p = 4.
+    if method == "NGP":
+        p = 1.0
+    elif method == "CIC":
+        p = 2.0
+    elif method == "TSC":
+        p = 3.0
+    elif method == "PCS":
+        p = 4.0
     return p
+
 
 # TODO: removed this or incorporate it for what it is...
 
@@ -103,9 +104,12 @@ def get_deconvol_p(method: str) -> int:
 
 
 def get_part2grid2D_kernel(
-        kx2d: Union[float, np.ndarray], ky2d: Union[float, np.ndarray], ngrid: Union[int, List[int]], boxsize: Union[float, List[float]], 
-        method: str = 'TSC'
-    ) -> np.ndarray:
+    kx2d: Union[float, np.ndarray],
+    ky2d: Union[float, np.ndarray],
+    ngrid: Union[int, List[int]],
+    boxsize: Union[float, List[float]],
+    method: str = "TSC",
+) -> np.ndarray:
     """
     Returns the convolution kernel for particle-to-grid assignment scheme on a Fourier space grid.
 
@@ -116,10 +120,10 @@ def get_part2grid2D_kernel(
     ngrid: int or list
         Grid dimensions.
     boxsize : float or list
-        Box size. 
+        Box size.
     method : str
         grid assignment scheme, either NGP, CIC, TSC or PCS.
-    
+
     Returns
     -------
     Wk : array
@@ -139,20 +143,24 @@ def get_part2grid2D_kernel(
     # Wk *= np.sinc(ky2d/(np.pi*2*kny))
     # Wk =  np.sinc(kx2d/(2*knx))
     # Wk *= np.sinc(ky2d/(2*kny))
-    dx = xboxsize/nxgrid
-    dy = yboxsize/nygrid
+    dx = xboxsize / nxgrid
+    dy = yboxsize / nygrid
     # dz = zboxsize/nzgrid
-    Wk = np.sinc(kx2d*dx/(2*np.pi))**get_deconvol_p(method)
-    Wk *= np.sinc(ky2d*dy/(2*np.pi))**get_deconvol_p(method)
+    Wk = np.sinc(kx2d * dx / (2 * np.pi)) ** get_deconvol_p(method)
+    Wk *= np.sinc(ky2d * dy / (2 * np.pi)) ** get_deconvol_p(method)
     # Wk *= np.sinc(kz3d*dz/(2*np.pi))
     # Wk = Wk**get_deconvol_p(method)
     return Wk
 
 
 def get_part2grid3D_kernel(
-        kx3d: Union[float, np.ndarray], ky3d: Union[float, np.ndarray], kz3d: Union[float, np.ndarray], ngrid: Union[int, List[int]], 
-        boxsize: Union[float, List[float]], method: str = 'TSC'
-    ) -> np.ndarray:
+    kx3d: Union[float, np.ndarray],
+    ky3d: Union[float, np.ndarray],
+    kz3d: Union[float, np.ndarray],
+    ngrid: Union[int, List[int]],
+    boxsize: Union[float, List[float]],
+    method: str = "TSC",
+) -> np.ndarray:
     """
     Returns the convolution kernel for particle-to-grid assignment scheme on a Fourier space grid.
 
@@ -163,10 +171,10 @@ def get_part2grid3D_kernel(
     ngrid: int or list
         Grid dimensions.
     boxsize : float or list
-        Box size. 
+        Box size.
     method : str
         grid assignment scheme, either NGP, CIC, TSC or PCS.
-    
+
     Returns
     -------
     Wk : array
@@ -189,18 +197,19 @@ def get_part2grid3D_kernel(
     # Wk =  np.sinc(kx3d/(2*knx))
     # Wk *= np.sinc(ky3d/(2*kny))
     # Wk *= np.sinc(kz3d/(2*knz))
-    dx = xboxsize/nxgrid
-    dy = yboxsize/nygrid
-    dz = zboxsize/nzgrid
-    Wk = np.sinc(kx3d*dx/(2*np.pi))**get_deconvol_p(method)
-    Wk *= np.sinc(ky3d*dy/(2*np.pi))**get_deconvol_p(method)
-    Wk *= np.sinc(kz3d*dz/(2*np.pi))**get_deconvol_p(method)
+    dx = xboxsize / nxgrid
+    dy = yboxsize / nygrid
+    dz = zboxsize / nzgrid
+    Wk = np.sinc(kx3d * dx / (2 * np.pi)) ** get_deconvol_p(method)
+    Wk *= np.sinc(ky3d * dy / (2 * np.pi)) ** get_deconvol_p(method)
+    Wk *= np.sinc(kz3d * dz / (2 * np.pi)) ** get_deconvol_p(method)
     # Wk = Wk**get_deconvol_p(method)
     return Wk
 
 
-
-def deconvolve_part2grid_2D(field: np.ndarray, boxsize: Union[float, List[float]], method: str = 'TSC') -> np.ndarray:
+def deconvolve_part2grid_2D(
+    field: np.ndarray, boxsize: Union[float, List[float]], method: str = "TSC"
+) -> np.ndarray:
     """
     Deconvolve the grid assignment scheme in Fourier space.
 
@@ -222,7 +231,9 @@ def deconvolve_part2grid_2D(field: np.ndarray, boxsize: Union[float, List[float]
     return field
 
 
-def deconvolve_part2grid_3D(field: np.ndarray, boxsize: Union[float, List[float]], method: str = 'TSC') -> np.ndarray:
+def deconvolve_part2grid_3D(
+    field: np.ndarray, boxsize: Union[float, List[float]], method: str = "TSC"
+) -> np.ndarray:
     """
     Deconvolve the grid assignment scheme in Fourier space.
 

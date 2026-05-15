@@ -3,7 +3,9 @@ import numpy as np
 from typing import Union, Optional
 
 
-def complex_mult(complex_array: np.ndarray, factors: Union[float, np.ndarray]) -> np.ndarray:
+def complex_mult(
+    complex_array: np.ndarray, factors: Union[float, np.ndarray]
+) -> np.ndarray:
     """Complex array multiplication.
 
     Parameters
@@ -18,7 +20,9 @@ def complex_mult(complex_array: np.ndarray, factors: Union[float, np.ndarray]) -
     return complex_array
 
 
-def complex_div(complex_array: np.ndarray, factors: Union[float, np.ndarray]) -> np.ndarray:
+def complex_div(
+    complex_array: np.ndarray, factors: Union[float, np.ndarray]
+) -> np.ndarray:
     """Complex array division.
 
     Parameters

@@ -5,10 +5,10 @@ from . import grid
 
 
 @njit
-def which_pix(x: float, dx: float, xmin: float) -> int:
+def which_pix(x: float, dx: float, xmin: float) -> int:  # pragma: no cover
     """
     Find pixel along a defined grid.
-    
+
     Parameters
     ----------
     x : float
@@ -28,7 +28,7 @@ def which_pix(x: float, dx: float, xmin: float) -> int:
 
 
 @njit
-def which_pixs(x: np.ndarray, dx: float, xmin: float) -> np.ndarray:
+def which_pixs(x: np.ndarray, dx: float, xmin: float) -> np.ndarray:  # pragma: no cover
     """
     Find pixels along a defined grid for an array of points.
 
@@ -51,7 +51,9 @@ def which_pixs(x: np.ndarray, dx: float, xmin: float) -> np.ndarray:
 
 
 @njit
-def pix1dto2d(xpix: np.ndarray, ypix: np.ndarray, ygrid: int) -> np.ndarray:
+def pix1dto2d(
+    xpix: np.ndarray, ypix: np.ndarray, ygrid: int
+) -> np.ndarray:  # pragma: no cover
     """
     Maps pixels given along a single axis in x and y onto a flattened 2D grid.
 
@@ -81,7 +83,9 @@ def pix1dto2d(xpix: np.ndarray, ypix: np.ndarray, ygrid: int) -> np.ndarray:
 
 
 @njit
-def pix1dto3d(xpix: np.ndarray, ypix: np.ndarray, zpix: np.ndarray, ygrid: int, zgrid: int) -> np.ndarray:
+def pix1dto3d(
+    xpix: np.ndarray, ypix: np.ndarray, zpix: np.ndarray, ygrid: int, zgrid: int
+) -> np.ndarray:  # pragma: no cover
     """
     Maps pixels given along a single axis in x, y, and z onto a flattened 3D grid.
 
@@ -116,7 +120,7 @@ def pix1dto3d(xpix: np.ndarray, ypix: np.ndarray, zpix: np.ndarray, ygrid: int, 
 
 
 @njit
-def pix1dto2d_scalar(xpix: int, ypix: int, ygrid: int) -> int:
+def pix1dto2d_scalar(xpix: int, ypix: int, ygrid: int) -> int:  # pragma: no cover
     """
     Maps pixels given along a single axis in x and y onto a flattened 2D grid.
 
@@ -142,7 +146,9 @@ def pix1dto2d_scalar(xpix: int, ypix: int, ygrid: int) -> int:
 
 
 @njit
-def pix1dto3d_scalar(xpix: np.ndarray, ypix: np.ndarray, zpix: np.ndarray, ygrid: int, zgrid: int) -> np.ndarray:
+def pix1dto3d_scalar(
+    xpix: np.ndarray, ypix: np.ndarray, zpix: np.ndarray, ygrid: int, zgrid: int
+) -> np.ndarray:  # pragma: no cover
     """
     Maps pixels given along a single axis in x, y, and z onto a flattened 3D grid.
 
@@ -172,7 +178,7 @@ def pix1dto3d_scalar(xpix: np.ndarray, ypix: np.ndarray, zpix: np.ndarray, ygrid
 
 
 @njit
-def periodic_pix(pix: np.ndarray, ngrid: int) -> np.ndarray:
+def periodic_pix(pix: np.ndarray, ngrid: int) -> np.ndarray:  # pragma: no cover
     """
     Applies periodic boundary conditions to pixel indices.
 
@@ -197,7 +203,7 @@ def periodic_pix(pix: np.ndarray, ngrid: int) -> np.ndarray:
 
 
 @njit
-def ngp_pix(x: float, dx: float, xmin: float) -> int:
+def ngp_pix(x: float, dx: float, xmin: float) -> int:  # pragma: no cover
     """
     Nearest-grid-point pixel index.
 
@@ -220,7 +226,7 @@ def ngp_pix(x: float, dx: float, xmin: float) -> int:
 
 
 @njit
-def cic_pix(x: float, dx: float, xmin: float) -> np.ndarray:
+def cic_pix(x: float, dx: float, xmin: float) -> np.ndarray:  # pragma: no cover
     """
     Cloud-in-cell pixel indices.
 
@@ -249,7 +255,7 @@ def cic_pix(x: float, dx: float, xmin: float) -> np.ndarray:
 
 
 @njit
-def tsc_pix(x: float, dx: float, xmin: float) -> np.ndarray:
+def tsc_pix(x: float, dx: float, xmin: float) -> np.ndarray:  # pragma: no cover
     """
     Triangular-shaped-cloud pixel indices.
 
@@ -273,7 +279,7 @@ def tsc_pix(x: float, dx: float, xmin: float) -> np.ndarray:
 
 
 @njit
-def pcs_pix(x: float, dx: float, xmin: float) -> np.ndarray:
+def pcs_pix(x: float, dx: float, xmin: float) -> np.ndarray:  # pragma: no cover
     """
     Piecewise-Cubic-Spline pixel indices.
 

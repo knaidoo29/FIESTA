@@ -1,6 +1,6 @@
 import numpy as np
 
-from typing import Tuple 
+from typing import Tuple
 
 
 def x2points(x: np.ndarray) -> np.ndarray:

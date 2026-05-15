@@ -8,9 +8,20 @@ from . import part2grid_wei
 
 @njit
 def part2grid_ngp_3d(
-    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, xlength: float, ylength: float, zlength: float, 
-    xmin: float, ymin: float, zmin: float, nxgrid: int, nygrid: int, nzgrid: int
-) -> np.ndarray:
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    f: np.ndarray,
+    xlength: float,
+    ylength: float,
+    zlength: float,
+    xmin: float,
+    ymin: float,
+    zmin: float,
+    nxgrid: int,
+    nygrid: int,
+    nzgrid: int,
+) -> np.ndarray:  # pragma: no cover
     """
     Nearest-grid-point assignment in 3D.
 
@@ -28,7 +39,7 @@ def part2grid_ngp_3d(
         Number of x, y and z coordinates.
     nxgrid, nygrid, nzgrid : int
         Number of grids along x, y and z coordinates.
-    
+
     Returns
     -------
     fgrid : array
@@ -39,7 +50,7 @@ def part2grid_ngp_3d(
     dx = xlength / float(nxgrid)
     dy = ylength / float(nygrid)
     dz = zlength / float(nzgrid)
-    wngp = 1. / (dx * dy * dz)
+    wngp = 1.0 / (dx * dy * dz)
 
     fgrid = np.zeros(nxgrid * nygrid * nzgrid)
 
@@ -61,13 +72,26 @@ def part2grid_ngp_3d(
 
 @njit
 def part2grid_cic_3d(
-    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, xlength: float, ylength: float, zlength: float, 
-    xmin: float, ymin: float, zmin: float, nxgrid: int, nygrid: int, nzgrid: int, periodx: bool, periody: bool, 
-    periodz: bool
-) -> np.ndarray:
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    f: np.ndarray,
+    xlength: float,
+    ylength: float,
+    zlength: float,
+    xmin: float,
+    ymin: float,
+    zmin: float,
+    nxgrid: int,
+    nygrid: int,
+    nzgrid: int,
+    periodx: bool,
+    periody: bool,
+    periodz: bool,
+) -> np.ndarray:  # pragma: no cover
     """
     Cloud-in-cell assignment in 3D.
-    
+
     Parameters
     ----------
     x, y, z : array
@@ -82,7 +106,7 @@ def part2grid_cic_3d(
         Number of grids along x, y & z coordinates.
     periodx, periody, periodz : bool
         Periodic boundary conditions.
-    
+
     Returns
     -------
     fgrid : array
@@ -120,8 +144,17 @@ def part2grid_cic_3d(
         for j1 in range(2):
             for j2 in range(2):
                 for j3 in range(2):
-                    if (xpix[j1] >= 0) and (xpix[j1] < nxgrid) and (ypix[j2] >= 0) and (ypix[j2] < nygrid) and (zpix[j3] >= 0) and (zpix[j3] < nygrid):
-                        pix = part2grid_pix.pix1dto3d_scalar(xpix[j1], ypix[j2], zpix[j3], nygrid, nzgrid)
+                    if (
+                        (xpix[j1] >= 0)
+                        and (xpix[j1] < nxgrid)
+                        and (ypix[j2] >= 0)
+                        and (ypix[j2] < nygrid)
+                        and (zpix[j3] >= 0)
+                        and (zpix[j3] < nygrid)
+                    ):
+                        pix = part2grid_pix.pix1dto3d_scalar(
+                            xpix[j1], ypix[j2], zpix[j3], nygrid, nzgrid
+                        )
                         wx = part2grid_wei.weight_cic(xp, xg[j1], dx)
                         wy = part2grid_wei.weight_cic(yp, yg[j2], dy)
                         wz = part2grid_wei.weight_cic(zp, zg[j3], dz)
@@ -131,10 +164,23 @@ def part2grid_cic_3d(
 
 @njit
 def part2grid_tsc_3d(
-    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, xlength: float, ylength: float, zlength: float,
-    xmin: float, ymin: float, zmin: float, nxgrid: int, nygrid: int, nzgrid: int, periodx: bool, periody: bool,
-    periodz: bool
-) -> np.ndarray:
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    f: np.ndarray,
+    xlength: float,
+    ylength: float,
+    zlength: float,
+    xmin: float,
+    ymin: float,
+    zmin: float,
+    nxgrid: int,
+    nygrid: int,
+    nzgrid: int,
+    periodx: bool,
+    periody: bool,
+    periodz: bool,
+) -> np.ndarray:  # pragma: no cover
     """
     Triangular-shaped-cloud assignment in 3D.
 
@@ -152,7 +198,7 @@ def part2grid_tsc_3d(
         Number of grids along x, y & z coordinates.
     periodx, periody, periodz : bool
         Periodic boundary conditions.
-    
+
     Returns
     -------
     fgrid : array
@@ -190,8 +236,17 @@ def part2grid_tsc_3d(
         for j1 in range(3):
             for j2 in range(3):
                 for j3 in range(3):
-                    if (xpix[j1] >= 0) and (xpix[j1] < nxgrid) and (ypix[j2] >= 0) and (ypix[j2] < nygrid) and (zpix[j3] >= 0) and (zpix[j3] < nygrid):
-                        pix = part2grid_pix.pix1dto3d_scalar(xpix[j1], ypix[j2], zpix[j3], nygrid, nzgrid)
+                    if (
+                        (xpix[j1] >= 0)
+                        and (xpix[j1] < nxgrid)
+                        and (ypix[j2] >= 0)
+                        and (ypix[j2] < nygrid)
+                        and (zpix[j3] >= 0)
+                        and (zpix[j3] < nygrid)
+                    ):
+                        pix = part2grid_pix.pix1dto3d_scalar(
+                            xpix[j1], ypix[j2], zpix[j3], nygrid, nzgrid
+                        )
                         wx = part2grid_wei.weight_tsc(xp, xg[j1], dx)
                         wy = part2grid_wei.weight_tsc(yp, yg[j2], dy)
                         wz = part2grid_wei.weight_tsc(zp, zg[j3], dz)
@@ -201,13 +256,26 @@ def part2grid_tsc_3d(
 
 @njit
 def part2grid_pcs_3d(
-    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, xlength: float, ylength: float, zlength: float, 
-    xmin: float, ymin: float, zmin: float, nxgrid: int, nygrid: int, nzgrid: int, periodx: bool, periody: bool, 
-    periodz: bool
-) -> np.ndarray:
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    f: np.ndarray,
+    xlength: float,
+    ylength: float,
+    zlength: float,
+    xmin: float,
+    ymin: float,
+    zmin: float,
+    nxgrid: int,
+    nygrid: int,
+    nzgrid: int,
+    periodx: bool,
+    periody: bool,
+    periodz: bool,
+) -> np.ndarray:  # pragma: no cover
     """
     Piecewise-Cubic-Spline assignment in 3D.
-    
+
     Parameters
     ----------
     x, y, z : array
@@ -222,7 +290,7 @@ def part2grid_pcs_3d(
         Number of grids along x, y & z coordinates.
     periodx, periody, periodz : bool
         Periodic boundary conditions.
-    
+
     Returns
     -------
     fgrid : array
@@ -260,8 +328,17 @@ def part2grid_pcs_3d(
         for j1 in range(4):
             for j2 in range(4):
                 for j3 in range(4):
-                    if (xpix[j1] >= 0) and (xpix[j1] < nxgrid) and (ypix[j2] >= 0) and (ypix[j2] < nygrid) and (zpix[j3] >= 0) and (zpix[j3] < nygrid):
-                        pix = part2grid_pix.pix1dto3d_scalar(xpix[j1], ypix[j2], zpix[j3], nygrid, nzgrid)
+                    if (
+                        (xpix[j1] >= 0)
+                        and (xpix[j1] < nxgrid)
+                        and (ypix[j2] >= 0)
+                        and (ypix[j2] < nygrid)
+                        and (zpix[j3] >= 0)
+                        and (zpix[j3] < nygrid)
+                    ):
+                        pix = part2grid_pix.pix1dto3d_scalar(
+                            xpix[j1], ypix[j2], zpix[j3], nygrid, nzgrid
+                        )
                         wx = part2grid_wei.weight_pcs(xp, xg[j1], dx)
                         wy = part2grid_wei.weight_pcs(yp, yg[j2], dy)
                         wz = part2grid_wei.weight_pcs(zp, zg[j3], dz)

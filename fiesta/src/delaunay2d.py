@@ -7,11 +7,15 @@ from . import polygon
 
 @njit
 def delaunay_area_2d(
-    x: np.ndarray, y: np.ndarray, del_vert0: np.ndarray, del_vert1: np.ndarray, del_vert2: np.ndarray
-) -> np.ndarray:
+    x: np.ndarray,
+    y: np.ndarray,
+    del_vert0: np.ndarray,
+    del_vert1: np.ndarray,
+    del_vert2: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
     """
     Determines area for each simplex.
-    
+
     Parameters
     ----------
     x : array
@@ -42,11 +46,15 @@ def delaunay_area_2d(
 
 @njit
 def sum_delaunay_area_4_points_2d(
-    delaunay_area: np.ndarray, del_vert0: np.ndarray, del_vert1: np.ndarray, del_vert2: np.ndarray, npart: int
-) -> np.ndarray:
+    delaunay_area: np.ndarray,
+    del_vert0: np.ndarray,
+    del_vert1: np.ndarray,
+    del_vert2: np.ndarray,
+    npart: int,
+) -> np.ndarray:  # pragma: no cover
     """
     Finds the Delaunay area for each point.
-    
+
     Parameters
     ----------
     delaunay_area : array
@@ -59,7 +67,7 @@ def sum_delaunay_area_4_points_2d(
         Index for vertex 2 of each simplices.
     npart : int
         Number of points.
-    
+
     Returns
     -------
     point_area : array
@@ -71,16 +79,21 @@ def sum_delaunay_area_4_points_2d(
         i0 = del_vert0[i]
         i1 = del_vert1[i]
         i2 = del_vert2[i]
-        point_area[i0] += delaunay_area[i]/3.
-        point_area[i1] += delaunay_area[i]/3.
-        point_area[i2] += delaunay_area[i]/3.
+        point_area[i0] += delaunay_area[i] / 3.0
+        point_area[i1] += delaunay_area[i] / 3.0
+        point_area[i2] += delaunay_area[i] / 3.0
     return point_area
 
 
 @njit
 def get_delf0_2d(
-    x: np.ndarray, y: np.ndarray, f: np.ndarray, del_vert0: np.ndarray, del_vert1: np.ndarray, del_vert2: np.ndarray
-) -> np.ndarray:
+    x: np.ndarray,
+    y: np.ndarray,
+    f: np.ndarray,
+    del_vert0: np.ndarray,
+    del_vert1: np.ndarray,
+    del_vert2: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
     """
     Determines delf0 for each simplices.
 
@@ -98,14 +111,14 @@ def get_delf0_2d(
         Index for vertex 1 of each simplices.
     del_vert2 : array
         Index for vertex 2 of each simplices.
-    
+
     Returns
     -------
     delf0 : array
         The 2D difference in each simplices.
     """
     nvert = len(del_vert0)
-    delf0 = np.zeros(2*nvert)
+    delf0 = np.zeros(2 * nvert)
     m = np.zeros(4)
     for i in range(0, nvert):
         i0 = del_vert0[i]
@@ -128,15 +141,21 @@ def get_delf0_2d(
 
         invm = matrix.inv2by2(m)
 
-        delf0[2*i] = invm[0]*df1 + invm[1]*df2
-        delf0[2*i+1] = invm[2]*df1 + invm[3]*df2
+        delf0[2 * i] = invm[0] * df1 + invm[1] * df2
+        delf0[2 * i + 1] = invm[2] * df1 + invm[3] * df2
     return delf0
 
 
 @njit
 def delaunay_estimate_2d(
-    simplices: np.ndarray, x: np.ndarray, y: np.ndarray, x0: np.ndarray, y0: np.ndarray, f0: np.ndarray, delf0: np.ndarray
-) -> np.ndarray:
+    simplices: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    x0: np.ndarray,
+    y0: np.ndarray,
+    f0: np.ndarray,
+    delf0: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
     """
     Estimates a field from Delaunay tesselation.
 
@@ -155,7 +174,7 @@ def delaunay_estimate_2d(
         Field values at vertex 0 of each simplices.
     delf0 : array
         The 2D difference in each simplices.
-    
+
     Returns
     -------
     f_est : array
@@ -165,5 +184,7 @@ def delaunay_estimate_2d(
     f_est = np.zeros(npart)
     for i in range(0, npart):
         j = simplices[i]
-        f_est[i] = f0[j] + delf0[2*j]*(x[i] - x0[j]) + delf0[2*j+1]*(y[i] - y0[j])
+        f_est[i] = (
+            f0[j] + delf0[2 * j] * (x[i] - x0[j]) + delf0[2 * j + 1] * (y[i] - y0[j])
+        )
     return f_est

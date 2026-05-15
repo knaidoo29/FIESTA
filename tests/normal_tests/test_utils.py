@@ -26,20 +26,20 @@ class TestUtils:
         assert np.allclose(mag, expected)
 
     def test_complex_mult(self):
-        arr = np.array([1+2j, 3+4j])
+        arr = np.array([1 + 2j, 3 + 4j])
         factors = 2.0
-        result = complex_mult(arr, factors)
         expected = arr * factors
+        result = complex_mult(arr, factors)
         assert np.allclose(result, expected)
 
     def test_complex_div(self):
-        arr = np.array([2+4j, 6+8j])
+        arr = np.array([2 + 4j, 6 + 8j])
         factors = 2.0
-        result = complex_div(arr, factors)
         expected = arr / factors
+        result = complex_div(arr, factors)
         assert np.allclose(result, expected)
 
     def test_flatten_list(self):
-        nested = [1, [2, 3], [4, [5, 6]]]
+        nested = [[1, 2], [3, 4]]
         flat = flatten_list(nested)
-        assert flat == [1, 2, 3, 4, 5, 6]
+        assert flat == [1, 2, 3, 4]

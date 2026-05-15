@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="&lt;no title&gt;" href="api.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>FIESTA documentation</title>
@@ -243,35 +243,57 @@
         <article role="main" id="furo-main-content">
           <img alt="_images/FiEsta_logo_large_white.jpg" class="only-light align-center" src="_images/FiEsta_logo_large_white.jpg" />
 <img alt="_images/FiEsta_logo_large_black.jpg" class="only-dark align-center" src="_images/FiEsta_logo_large_black.jpg" />
-<section id="field-interpolation-and-estimation-using-spatial-techniques-and-algorithms">
-<h1>Field Interpolation and Estimation using Spatial Techniques and Algorithms<a class="headerlink" href="#field-interpolation-and-estimation-using-spatial-techniques-and-algorithms" title="Link to this heading">¶</a></h1>
-<div class="table-wrapper docutils container">
-<table class="docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p>Author</p></td>
-<td><p>Krishna Naidoo</p></td>
-</tr>
-<tr class="row-even"><td><p>Version</p></td>
-<td><p>0.2.0</p></td>
-</tr>
-<tr class="row-odd"><td><p>Repository</p></td>
-<td><p><a class="reference external" href="https://github.com/knaidoo29/FIESTA">https://github.com/knaidoo29/FIESTA</a></p></td>
-</tr>
-<tr class="row-even"><td><p>Documentation</p></td>
-<td><p><a class="reference external" href="https://fiesta-docs.readthedocs.io/">https://fiesta-docs.readthedocs.io/</a></p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<p align="center">
+  <a href="https://github.com/knaidoo29/FIESTA/actions/workflows/tests.yml">
+  <img src="https://github.com/knaidoo29/FIESTA/actions/workflows/tests.yml/badge.svg" alt="Python Tests">
+  </a>
+  <a href="https://codecov.io/gh/knaidoo29/FIESTA" >
+  <img src="https://codecov.io/gh/knaidoo29/FIESTA/graph/badge.svg?token=HX4OB31MS3"/>
+  </a>
+  <a href="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue">
+  <img src="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue" alt="Python Version Support">
+  </a>
+  <a href="https://img.shields.io/github/v/release/knaidoo29/FIESTA">
+  <img src="https://img.shields.io/github/v/release/knaidoo29/FIESTA" alt="Version">
+  </a>
+  <a href="https://pypi.org/project/fiesta-pkg/">
+  <img src="https://img.shields.io/pypi/v/fiesta-pkg.svg" alt="PyPI version">
+  </a>
+  <a href="https://fiesta-docs.readthedocs.io/">
+  <img src="https://readthedocs.org/projects/fiesta-docs/badge/?version=latest" alt="Documentation Status">
+  </a>
+  <a href="https://github.com/knaidoo29/FIESTA">
+  <img src="https://img.shields.io/badge/GitHub-repo-blue?logo=github" alt="GitHub repository">
+  </a>
+  <a href="https://img.shields.io/github/stars/knaidoo29/fiesta">
+  <img src="https://img.shields.io/github/stars/knaidoo29/fiesta" alt="github: stars">
+  </a>
+  <a href="https://img.shields.io/github/stars/knaidoo29/fiesta">
+  <img src="https://img.shields.io/github/forks/knaidoo29/fiesta" alt="github: forks">
+  </a>
+  <a href="https://opensource.org/licenses/MIT">
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+  </a>
+  <a href="https://github.com/psf/black">
+  <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black">
+  </a>
+  <!-- <a href="https://doi.org/10.5281/zenodo.17093446">
+  <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.17093446.svg" alt="zenodo: DOI">
+  </a> -->
+</p><section id="fiesta-field-interpolation-and-estimation-using-spatial-techniques-and-algorithms">
+<h1>FIESTA: Field Interpolation and Estimation using Spatial Techniques and Algorithms<a class="headerlink" href="#fiesta-field-interpolation-and-estimation-using-spatial-techniques-and-algorithms" title="Link to this heading">¶</a></h1>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
-<p>FIESTA is a python library for general interpolation from uniform and non-uniform
-input points. The library is predominantly written in python with a backend of
-Fortran for speed.</p>
-<p>MPI functionality can be enabled through the installation of the python library
-mpi4py but will require the additional installation of MPIutils which handles
-all of the MPI enabled functions. The class MPI is passed as an additional argument
-for parallelisation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">FIESTA</span></code> is a python library for general interpolation from uniform and non-uniform input points. The library
+is written in python with numba acceleration for speed. The library has the <em>optional</em> capability to be used
+on large data-sets by distributing jobs across multiple processes via <code class="docutils literal notranslate"><span class="pre">MPI</span></code>. This relies on the <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code>
+library and the <code class="docutils literal notranslate"><span class="pre">MPI</span></code> object from the <code class="docutils literal notranslate"><span class="pre">shift-fft</span></code> package (see <a class="reference external" href="https://shift.readthedocs.io/en/latest/mpiutils.html">here</a>)
+which is passed as an additional object into <code class="docutils literal notranslate"><span class="pre">MPI</span></code> related functions.</p>
+</section>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
 </section>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h2>
@@ -279,52 +301,39 @@ for parallelisation.</p>
 <li><p><a class="reference external" href="https://numba.pydata.org/">numba</a></p></li>
 <li><p><a class="reference external" href="http://www.numpy.org/">numpy</a></p></li>
 <li><p><a class="reference external" href="https://scipy.org/">scipy</a></p></li>
-<li><p><a class="reference external" href="https://github.com/knaidoo29/SHIFT">SHIFT</a></p></li>
-<li><p><a class="reference external" href="https://mpi4py.readthedocs.io/en/stable/">mpi4py</a> [Optional: enables MPI parallelism]</p></li>
+<li><p><a class="reference external" href="https://shift.readthedocs.io/en/latest/index.html">shift-fft</a></p></li>
+<li><p><a class="reference external" href="https://mpi4py.readthedocs.io/en/stable/">mpi4py</a> [Optional: enables MPI distributed processes]</p></li>
 </ul>
 </section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
-<p>FIESTA can be installed by cloning the github repository:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">knaidoo29</span><span class="o">/</span><span class="n">FIESTA</span><span class="o">.</span><span class="n">git</span>
-<span class="n">cd</span> <span class="n">FIESTA</span>
-<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span>
-<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+<p>FIESTA can be installed via <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>fiesta-pkg
+</pre></div>
+</div>
+<p>or by cloning the repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/knaidoo29/FIESTA.git
+<span class="nb">cd</span><span class="w"> </span>FIESTA
+pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
 <p>Once this is done you should be able to call FIESTA from python:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">fiesta</span>
 </pre></div>
 </div>
+<p>To use the <code class="docutils literal notranslate"><span class="pre">MPI</span></code> functionality please take a look at the documentation in FIESTA
+which instructs users how to use the <code class="docutils literal notranslate"><span class="pre">shift-fft</span></code> <code class="docutils literal notranslate"><span class="pre">MPI</span></code> object and how to run
+these distributed jobs successfully without errors or MPI related hanging.</p>
+</section>
+<section id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Link to this heading">¶</a></h2>
+<p>If you use FIESTA in your work, please cite:</p>
 </section>
 <section id="support">
 <h2>Support<a class="headerlink" href="#support" title="Link to this heading">¶</a></h2>
 <p>If you have any issues with the code or want to suggest ways to improve it please
 open a new issue (<a class="reference external" href="https://github.com/knaidoo29/FIESTA/issues">here</a>)
 or (if you don’t have a github account) email <a class="reference external" href="mailto:krishna&#46;naidoo&#46;11&#37;&#52;&#48;ucl&#46;ac&#46;uk">krishna<span>&#46;</span>naidoo<span>&#46;</span>11<span>&#64;</span>ucl<span>&#46;</span>ac<span>&#46;</span>uk</a>.</p>
-</section>
-<section id="contents">
-<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">¶</a></h2>
-</section>
-<section id="version-history">
-<h2>Version History<a class="headerlink" href="#version-history" title="Link to this heading">¶</a></h2>
-<p><strong>Version 0.0</strong>:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>Interpolation and field assignments for cartesian coordinates up to 3 dimensions.</p></li>
-<li><p>Grid based methods:</p>
-<ul>
-<li><p>Field assignments: Nearest Grid Point, Cloud In Cell and Triangular Shaped Cloud.</p></li>
-<li><p>Interpolation: bilinear and trilinear interpolation.</p></li>
-</ul>
-</li>
-<li><p>Non-uniform based methods:</p>
-<ul>
-<li><p>Field assignments and interpolation estimation via voronoi tesselation, delaunay tesselation and smooth particle hydrodynamics.</p></li>
-</ul>
-</li>
-</ul>
-</div></blockquote>
 </section>
 </section>
 
@@ -333,7 +342,15 @@ or (if you don’t have a github account) email <a class="reference external" hr
       <footer>
         
         <div class="related-pages">
-          
+          <a class="next-page" href="api.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">&lt;no title&gt;</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
           
         </div>
         <div class="bottom-of-page">
@@ -365,13 +382,13 @@ or (if you don’t have a github account) email <a class="reference external" hr
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Field Interpolation and Estimation using Spatial Techniques and Algorithms</a><ul>
+<li><a class="reference internal" href="#">FIESTA: Field Interpolation and Estimation using Spatial Techniques and Algorithms</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#contents">Contents</a></li>
 <li><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#citation">Citation</a></li>
 <li><a class="reference internal" href="#support">Support</a></li>
-<li><a class="reference internal" href="#contents">Contents</a></li>
-<li><a class="reference internal" href="#version-history">Version History</a></li>
 </ul>
 </li>
 </ul>

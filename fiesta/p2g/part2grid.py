@@ -5,8 +5,14 @@ from typing import Union, List
 
 
 def part2grid2D(
-    x: np.ndarray, y: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[int, List[int]], 
-    method: str = 'TSC', periodic: bool = True, origin: Union[float, List[float]] = 0.
+    x: np.ndarray,
+    y: np.ndarray,
+    f: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: Union[int, List[int]],
+    method: str = "TSC",
+    periodic: Union[bool, List[bool]] = True,
+    origin: Union[float, List[float]] = 0.0,
 ) -> np.ndarray:
     """
     Returns the density contrast for the nearest grid point grid assignment.
@@ -19,15 +25,15 @@ def part2grid2D(
         Y coordinates of the particle.
     f : array
         Value of each particle to be assigned to the grid.
-    boxsize : float
+    boxsize : float or list
         Box size.
     ngrid : int
         Grid divisions across one axis.
     method : str, optional
         Grid assignment scheme, either 'NGP', 'CIC', 'TSC' or 'PCS'.
-    periodic : bool, optional
+    periodic : bool or list, optional
         Assign particles with periodic boundaries.
-    origin : float, optional
+    origin : float or list, optional
         Origin.
 
     Returns
@@ -53,20 +59,35 @@ def part2grid2D(
         periody = periodic
     else:
         periodx, periody = periodic[0], periodic[1]
-    if method == 'NGP':
-        fgrid = src.part2grid_ngp_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid)
-    elif method == 'CIC':
-        fgrid = src.part2grid_cic_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody)
-    elif method == 'TSC':
-        fgrid = src.part2grid_tsc_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody)
-    elif method == 'PCS':
-        fgrid = src.part2grid_pcs_2d(x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody)
+    if method == "NGP":
+        fgrid = src.part2grid_ngp_2d(
+            x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid
+        )
+    elif method == "CIC":
+        fgrid = src.part2grid_cic_2d(
+            x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody
+        )
+    elif method == "TSC":
+        fgrid = src.part2grid_tsc_2d(
+            x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody
+        )
+    elif method == "PCS":
+        fgrid = src.part2grid_pcs_2d(
+            x, y, f, xlength, ylength, xmin, ymin, nxgrid, nygrid, periodx, periody
+        )
     return fgrid.reshape(nxgrid, nygrid)
 
 
 def part2grid3D(
-    x: np.ndarray, y: np.ndarray, z: np.ndarray, f: np.ndarray, boxsize: Union[float, List[float]], ngrid: Union[float, List[float]], 
-    method: str = 'TSC', periodic: bool = True, origin: Union[float, List[float]] = 0.
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    f: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: Union[float, List[float]],
+    method: str = "TSC",
+    periodic: Union[bool, List[bool]] = True,
+    origin: Union[float, List[float]] = 0.0,
 ) -> np.ndarray:
     """
     Returns the density contrast for the nearest grid point grid assignment.
@@ -87,9 +108,9 @@ def part2grid3D(
         Grid divisions across one axis.
     method : str, optional
         Grid assignment scheme, either 'NGP', 'CIC', 'TSC' or 'PCS'.
-    periodic : bool, optional
+    periodic : bool or list, optional
         Assign particles with periodic boundaries.
-    origin : float, optional
+    origin : float or list, optional
         Origin.
 
     Returns
@@ -117,12 +138,77 @@ def part2grid3D(
         periodz = periodic
     else:
         periodx, periody, periodz = periodic[0], periodic[1], periodic[2]
-    if method == 'NGP':
-        fgrid = src.part2grid_ngp_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid)
-    elif method == 'CIC':
-        fgrid = src.part2grid_cic_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid, periodx, periody, periodz)
-    elif method == 'TSC':
-        fgrid = src.part2grid_tsc_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid, periodx, periody, periodz)
-    elif method == 'PCS':
-        fgrid = src.part2grid_pcs_3d(x, y, z, f, xlength, ylength, zlength, xmin, ymin, zmin, nxgrid, nygrid, nzgrid, periodx, periody, periodz)
+    if method == "NGP":
+        fgrid = src.part2grid_ngp_3d(
+            x,
+            y,
+            z,
+            f,
+            xlength,
+            ylength,
+            zlength,
+            xmin,
+            ymin,
+            zmin,
+            nxgrid,
+            nygrid,
+            nzgrid,
+        )
+    elif method == "CIC":
+        fgrid = src.part2grid_cic_3d(
+            x,
+            y,
+            z,
+            f,
+            xlength,
+            ylength,
+            zlength,
+            xmin,
+            ymin,
+            zmin,
+            nxgrid,
+            nygrid,
+            nzgrid,
+            periodx,
+            periody,
+            periodz,
+        )
+    elif method == "TSC":
+        fgrid = src.part2grid_tsc_3d(
+            x,
+            y,
+            z,
+            f,
+            xlength,
+            ylength,
+            zlength,
+            xmin,
+            ymin,
+            zmin,
+            nxgrid,
+            nygrid,
+            nzgrid,
+            periodx,
+            periody,
+            periodz,
+        )
+    elif method == "PCS":
+        fgrid = src.part2grid_pcs_3d(
+            x,
+            y,
+            z,
+            f,
+            xlength,
+            ylength,
+            zlength,
+            xmin,
+            ymin,
+            zmin,
+            nxgrid,
+            nygrid,
+            nzgrid,
+            periodx,
+            periody,
+            periodz,
+        )
     return fgrid.reshape(nxgrid, nygrid, nzgrid)

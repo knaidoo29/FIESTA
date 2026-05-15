@@ -8,12 +8,19 @@ from . import part2grid_wei
 
 @njit
 def part2grid_ngp_2d(
-    x: np.ndarray, y: np.ndarray, f: np.ndarray, xlength: float, ylength: float, xmin: float, ymin: float, 
-    nxgrid: int, nygrid: int
-) -> np.ndarray:
+    x: np.ndarray,
+    y: np.ndarray,
+    f: np.ndarray,
+    xlength: float,
+    ylength: float,
+    xmin: float,
+    ymin: float,
+    nxgrid: int,
+    nygrid: int,
+) -> np.ndarray:  # pragma: no cover
     """
     Nearest-grid-point assignment in 2D.
-    
+
     Parameters
     ----------
     x, y : array
@@ -26,7 +33,7 @@ def part2grid_ngp_2d(
         Minimum values along the x and y axis.
     nxgrid, nygrid : int
         Number of grids along x and y coordinates.
-    
+
     Returns
     -------
     fgrid : array
@@ -35,29 +42,38 @@ def part2grid_ngp_2d(
     npart = len(x)
     dx = xlength / nxgrid
     dy = ylength / nygrid
-    wngp = 1. / (dx * dy)
+    wngp = 1.0 / (dx * dy)
 
     # Initialize fgrid to zero
-    fgrid = np.zeros(nxgrid*nygrid)
+    fgrid = np.zeros(nxgrid * nygrid)
 
     for i in range(0, npart):
         xp, yp, fp = x[i], y[i], f[i]
-        
+
         xpix = part2grid_pix.ngp_pix(xp, dx, xmin)
         ypix = part2grid_pix.ngp_pix(yp, dy, ymin)
 
         if (xpix >= 0) and (xpix < nxgrid) and (ypix >= 0) and (ypix < nygrid):
             pix = part2grid_pix.pix1dto2d_scalar(xpix, ypix, nygrid)
             fgrid[pix] += fp * wngp
-    
+
     return fgrid
 
 
 @njit
 def part2grid_cic_2d(
-    x: np.ndarray, y: np.ndarray, f: np.ndarray, xlength: float, ylength: float, xmin: float, ymin: float, 
-    nxgrid: int, nygrid: int, periodx: bool, periody: bool
-) -> np.ndarray:
+    x: np.ndarray,
+    y: np.ndarray,
+    f: np.ndarray,
+    xlength: float,
+    ylength: float,
+    xmin: float,
+    ymin: float,
+    nxgrid: int,
+    nygrid: int,
+    periodx: bool,
+    periody: bool,
+) -> np.ndarray:  # pragma: no cover
     """
     Cloud-in-cell assignment in 2D.
 
@@ -77,7 +93,7 @@ def part2grid_cic_2d(
         Number of grids along x and y coordinates.
     periodx, periody : bool
         Periodic boundary conditions.
-    
+
     Returns
     -------
     fgrid : array
@@ -88,7 +104,7 @@ def part2grid_cic_2d(
     dy = ylength / nygrid
 
     # Initialize fgrid to zero
-    fgrid = np.zeros(nxgrid*nygrid)
+    fgrid = np.zeros(nxgrid * nygrid)
 
     for i in range(npart):
         xp, yp, fp = x[i], y[i], f[i]
@@ -96,7 +112,7 @@ def part2grid_cic_2d(
         # Call cic_pix to get xpix and ypix (not implemented here, assume it exists)
         xpix = part2grid_pix.cic_pix(xp, dx, xmin)
         ypix = part2grid_pix.cic_pix(yp, dy, ymin)
-        
+
         # Call xgrids to compute the grid positions (not implemented here, assume it exists)
         xg = grid.xgrids(xpix, dx, xmin)
         yg = grid.xgrids(ypix, dy, ymin)
@@ -108,7 +124,12 @@ def part2grid_cic_2d(
 
         for j1 in range(2):
             for j2 in range(2):
-                if (xpix[j1] >= 0) and (xpix[j1] < nxgrid) and (ypix[j2] >= 0) and (ypix[j2] < nygrid):
+                if (
+                    (xpix[j1] >= 0)
+                    and (xpix[j1] < nxgrid)
+                    and (ypix[j2] >= 0)
+                    and (ypix[j2] < nygrid)
+                ):
                     pix = part2grid_pix.pix1dto2d_scalar(xpix[j1], ypix[j2], nygrid)
                     wx = part2grid_wei.weight_cic(xp, xg[j1], dx)
                     wy = part2grid_wei.weight_cic(yp, yg[j2], dy)
@@ -118,12 +139,21 @@ def part2grid_cic_2d(
 
 @njit
 def part2grid_tsc_2d(
-    x: np.ndarray, y: np.ndarray, f: np.ndarray, xlength: float, ylength: float, xmin: float, ymin: float, 
-    nxgrid: int, nygrid: int, periodx: bool, periody: bool
-) -> np.ndarray:
+    x: np.ndarray,
+    y: np.ndarray,
+    f: np.ndarray,
+    xlength: float,
+    ylength: float,
+    xmin: float,
+    ymin: float,
+    nxgrid: int,
+    nygrid: int,
+    periodx: bool,
+    periody: bool,
+) -> np.ndarray:  # pragma: no cover
     """
     Triangular-shaped-cloud assignment in 2D.
-    
+
     Parameters
     ----------
     x, y : array
@@ -140,7 +170,7 @@ def part2grid_tsc_2d(
         Number of grids along x and y coordinates.
     periodx, periody : bool
         Periodic boundary conditions.
-    
+
     Returns
     -------
     fgrid : array
@@ -151,7 +181,7 @@ def part2grid_tsc_2d(
     dy = ylength / nygrid
 
     # Initialize fgrid to zero
-    fgrid = np.zeros(nxgrid*nygrid)
+    fgrid = np.zeros(nxgrid * nygrid)
 
     for i in range(npart):
         xp, yp, fp = x[i], y[i], f[i]
@@ -159,7 +189,7 @@ def part2grid_tsc_2d(
         # Call tsc_pix to get xpix and ypix (not implemented here, assume it exists)
         xpix = part2grid_pix.tsc_pix(xp, dx, xmin)
         ypix = part2grid_pix.tsc_pix(yp, dy, ymin)
-        
+
         # Call xgrids to compute the grid positions (not implemented here, assume it exists)
         xg = grid.xgrids(xpix, dx, xmin)
         yg = grid.xgrids(ypix, dy, ymin)
@@ -171,7 +201,12 @@ def part2grid_tsc_2d(
 
         for j1 in range(3):
             for j2 in range(3):
-                if (xpix[j1] >= 0) and (xpix[j1] < nxgrid) and (ypix[j2] >= 0) and (ypix[j2] < nygrid):
+                if (
+                    (xpix[j1] >= 0)
+                    and (xpix[j1] < nxgrid)
+                    and (ypix[j2] >= 0)
+                    and (ypix[j2] < nygrid)
+                ):
                     pix = part2grid_pix.pix1dto2d_scalar(xpix[j1], ypix[j2], nygrid)
                     wx = part2grid_wei.weight_tsc(xp, xg[j1], dx)
                     wy = part2grid_wei.weight_tsc(yp, yg[j2], dy)
@@ -181,9 +216,18 @@ def part2grid_tsc_2d(
 
 @njit
 def part2grid_pcs_2d(
-    x: np.ndarray, y: np.ndarray, f: np.ndarray, xlength: float, ylength: float, xmin: float, ymin: float, 
-    nxgrid: int, nygrid: int, periodx: bool, periody: bool
-) -> np.ndarray:
+    x: np.ndarray,
+    y: np.ndarray,
+    f: np.ndarray,
+    xlength: float,
+    ylength: float,
+    xmin: float,
+    ymin: float,
+    nxgrid: int,
+    nygrid: int,
+    periodx: bool,
+    periody: bool,
+) -> np.ndarray:  # pragma: no cover
     """
     Piecewise-Cubic-Spline assignment in 2D.
 
@@ -203,7 +247,7 @@ def part2grid_pcs_2d(
         Number of grids along x and y coordinates.
     periodx, periody : bool
         Periodic boundary conditions.
-    
+
     Returns
     -------
     fgrid : array
@@ -214,15 +258,15 @@ def part2grid_pcs_2d(
     dy = ylength / nygrid
 
     # Initialize fgrid to zero
-    fgrid = np.zeros(nxgrid*nygrid)
+    fgrid = np.zeros(nxgrid * nygrid)
 
     for i in range(npart):
         xp, yp, fp = x[i], y[i], f[i]
 
         # Call pcs_pix to get xpix and ypix (not implemented here, assume it exists)
-        xpix = part2grid_pix.pcs_pix(xp, dx, xmin) 
+        xpix = part2grid_pix.pcs_pix(xp, dx, xmin)
         ypix = part2grid_pix.pcs_pix(yp, dy, ymin)
-        
+
         # Call xgrids to compute the grid positions (not implemented here, assume it exists)
         xg = grid.xgrids(xpix, dx, xmin)
         yg = grid.xgrids(ypix, dy, ymin)
@@ -234,7 +278,12 @@ def part2grid_pcs_2d(
 
         for j1 in range(4):
             for j2 in range(4):
-                if (xpix[j1] >= 0) and (xpix[j1] < nxgrid) and (ypix[j2] >= 0) and (ypix[j2] < nygrid):
+                if (
+                    (xpix[j1] >= 0)
+                    and (xpix[j1] < nxgrid)
+                    and (ypix[j2] >= 0)
+                    and (ypix[j2] < nygrid)
+                ):
                     pix = part2grid_pix.pix1dto2d_scalar(xpix[j1], ypix[j2], nygrid)
                     wx = part2grid_wei.weight_pcs(xp, xg[j1], dx)
                     wy = part2grid_wei.weight_pcs(yp, yg[j2], dy)

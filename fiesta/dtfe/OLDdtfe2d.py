@@ -8,7 +8,6 @@ from .. import src
 
 class Delaunay2D:
 
-
     def __init__(self):
         """Initialises Delaunay2D class"""
         self.points = None
@@ -30,17 +29,15 @@ class Delaunay2D:
         self.useperiodic = False
         self.nperiodic = None
 
-
     def _extent(self):
-        """"Calculates and stores minimum and maximum of
+        """ "Calculates and stores minimum and maximum of
         input points in the variable extent."""
         if self.extent is None:
-            xmin = np.min(self.points[:self.npart, 0])
-            xmax = np.max(self.points[:self.npart, 0])
-            ymin = np.min(self.points[:self.npart, 1])
-            ymax = np.max(self.points[:self.npart, 1])
+            xmin = np.min(self.points[: self.npart, 0])
+            xmax = np.max(self.points[: self.npart, 0])
+            ymin = np.min(self.points[: self.npart, 1])
+            ymax = np.max(self.points[: self.npart, 1])
             self.extent = [xmin, xmax, ymin, ymax]
-
 
     def set_points(self, x, y, f, mass=None):
         """Sets the points for voronoi cells.
@@ -61,8 +58,7 @@ class Delaunay2D:
         self.npart = len(self.points)
         self.ntotal = self.npart
 
-
-    def set_buffer(self, boxsize, buffer_length, buffer_val=0., buffer_mass=None):
+    def set_buffer(self, boxsize, buffer_length, buffer_val=0.0, buffer_mass=None):
         """Defines buffer particles to be placed around a given box.
 
         Parameters
@@ -78,25 +74,39 @@ class Delaunay2D:
         """
         # check boxsize is consistent with particles.
         self._extent()
-        assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
-        assert self.extent[2] >= 0. and self.extent[3] <= boxsize, "Y coordinates exceed the range of the box, check or redefine boxsize."
+        assert (
+            self.extent[0] >= 0.0 and self.extent[1] <= boxsize
+        ), "X coordinates exceed the range of the box, check or redefine boxsize."
+        assert (
+            self.extent[2] >= 0.0 and self.extent[3] <= boxsize
+        ), "Y coordinates exceed the range of the box, check or redefine boxsize."
         self.boxsize = boxsize
         self.buffer_length = buffer_length
         self.usebuffer = True
         self.useperiodic = False
-        x_buffer, y_buffer = boundary.buffer_random_2D(self.npart, self.boxsize, self.buffer_length)
+        x_buffer, y_buffer = boundary.buffer_random_2D(
+            self.npart, self.boxsize, self.buffer_length
+        )
         if len(self.points[0]) == 3:
-            points_buffer = coords.coord2points([x_buffer, y_buffer, buffer_val*np.ones(len(x_buffer))])
+            points_buffer = coords.coord2points(
+                [x_buffer, y_buffer, buffer_val * np.ones(len(x_buffer))]
+            )
         else:
-            points_buffer = coords.coord2points([x_buffer, y_buffer, buffer_val*np.ones(len(x_buffer)), buffer_mass*np.ones(len(x_buffer))])
+            points_buffer = coords.coord2points(
+                [
+                    x_buffer,
+                    y_buffer,
+                    buffer_val * np.ones(len(x_buffer)),
+                    buffer_mass * np.ones(len(x_buffer)),
+                ]
+            )
         self.nbuffer = len(x_buffer)
         self.ntotal += self.nbuffer
         # redefine points to include buffer points and also define mask
         self.ispart = np.ones(self.npart + self.nbuffer)
-        self.ispart[self.npart:] = 0.
+        self.ispart[self.npart :] = 0.0
         # concatenate points and buffer
         self.points = np.vstack([self.points, points_buffer])
-
 
     def set_periodic(self, boxsize, buffer_length):
         """Defines periodic particles to be placed around a given box.
@@ -110,28 +120,32 @@ class Delaunay2D:
         """
         # check boxsize is consistent with particles.
         self._extent()
-        assert self.extent[0] >= 0. and self.extent[1] <= boxsize, "X coordinates exceed the range of the box, check or redefine boxsize."
-        assert self.extent[2] >= 0. and self.extent[3] <= boxsize, "Y coordinates exceed the range of the box, check or redefine boxsize."
+        assert (
+            self.extent[0] >= 0.0 and self.extent[1] <= boxsize
+        ), "X coordinates exceed the range of the box, check or redefine boxsize."
+        assert (
+            self.extent[2] >= 0.0 and self.extent[3] <= boxsize
+        ), "Y coordinates exceed the range of the box, check or redefine boxsize."
         self.boxsize = boxsize
         self.buffer_length = buffer_length
-        points_periodic = boundary.buffer_periodic_2D(self.points, self.boxsize, self.buffer_length)
+        points_periodic = boundary.buffer_periodic_2D(
+            self.points, self.boxsize, self.buffer_length
+        )
         self.nperiodic = len(points_periodic)
         self.ntotal += self.nperiodic
         self.usebuffer = False
         self.useperiodic = True
         # redefine points to include periodic points and also define mask
         self.ispart = np.ones(self.npart + self.nperiodic)
-        self.ispart[self.npart:] = 0.
+        self.ispart[self.npart :] = 0.0
         # concatenate points and buffer
         self.points = np.vstack([self.points, points_periodic])
 
-
     def construct(self):
         """Constructs Delaunay tesselation"""
-        self.delaunay = scDelaunay(self.points[:,:2])
+        self.delaunay = scDelaunay(self.points[:, :2])
         self.delaunay_simplices = self.delaunay.simplices
         self.nvert = len(self.delaunay_simplices[:, 0])
-
 
     def get_area(self):
         """Calculates the area of the delaunay simplex."""
@@ -139,8 +153,9 @@ class Delaunay2D:
         del_vert0 = self.delaunay_simplices[:, 0]
         del_vert1 = self.delaunay_simplices[:, 1]
         del_vert2 = self.delaunay_simplices[:, 2]
-        self.delaunay_area = src.delaunay_area_2d(x, y, del_vert0, del_vert1=del_vert1, del_vert2=del_vert2)
-
+        self.delaunay_area = src.delaunay_area_2d(
+            x, y, del_vert0, del_vert1=del_vert1, del_vert2=del_vert2
+        )
 
     def get_dens(self):
         """Calculates the density of each point in the delaunay tessellation."""
@@ -149,14 +164,15 @@ class Delaunay2D:
         del_vert0 = self.delaunay_simplices[:, 0]
         del_vert1 = self.delaunay_simplices[:, 1]
         del_vert2 = self.delaunay_simplices[:, 2]
-        point_area = src.sum_delaunay_area_4_points_2d(self.delaunay_area, del_vert0, del_vert1, del_vert2, self.ntotal)
+        point_area = src.sum_delaunay_area_4_points_2d(
+            self.delaunay_area, del_vert0, del_vert1, del_vert2, self.ntotal
+        )
         if len(self.points[0]) == 3:
-            self.points_dens = 1./point_area
+            self.points_dens = 1.0 / point_area
         else:
-            self.points_dens = self.points[:,3]/point_area
+            self.points_dens = self.points[:, 3] / point_area
 
-
-    def set_field(self, f=None, bufferval=0.):
+    def set_field(self, f=None, bufferval=0.0):
         """Sets the field values of the input points.
 
         Parameters
@@ -185,7 +201,6 @@ class Delaunay2D:
         simplices = self.delaunay.find_simplex(points)
         return simplices
 
-
     def estimate(self, x, y):
         """Estimates a field from the Delaunay tesselation.
 
@@ -202,9 +217,10 @@ class Delaunay2D:
             Estimates of the field
         """
         simplices = self.find_simplex(x, y)
-        f_est = src.delaunay_estimate_2d(simplices, x, y, self.x0, self.y0, self.f0, self.delf0)
+        f_est = src.delaunay_estimate_2d(
+            simplices, x, y, self.x0, self.y0, self.f0, self.delf0
+        )
         return f_est
-
 
     def clean(self):
         self.__init__()

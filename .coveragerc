@@ -1,0 +1,17 @@
+[run]
+source = fiesta
+parallel = True
+
+[report]
+omit =
+    */tests/*
+    */test_*.py
+    */build/*
+    */docs/*
+    fiesta/dtfe/OLDdtfe2d.py
+    fiesta/dtfe/OLDdtfe3d.py
+    fiesta/dtfe/OLDdtfethickslice.py
+    fiesta/dtfe/OLDmpi_dtfe4grid.py
+    fiesta/dtfe/OLDseries_dtfe2d.py
+    fiesta/dtfe/OLDseries_dtfe3d.py
+    fiesta/dtfe/OLDseries_dtfethickslice.py

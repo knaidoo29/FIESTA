@@ -3,7 +3,9 @@ from numba import njit
 
 
 @njit
-def triangle_area(xa: float, ya: float, xb: float, yb: float, xc: float, yc: float) -> float:
+def triangle_area(
+    xa: float, ya: float, xb: float, yb: float, xc: float, yc: float
+) -> float:  # pragma: no cover
     """
     Determines the area of a triangle given its vertex coordinates.
 
@@ -21,7 +23,7 @@ def triangle_area(xa: float, ya: float, xb: float, yb: float, xc: float, yc: flo
         X-axis coordinate for point C of the triangle.
     yc : float
         Y-axis coordinate for point C of the triangle.
-    
+
     Yields
     ------
     Area of the triangle.
@@ -31,8 +33,13 @@ def triangle_area(xa: float, ya: float, xb: float, yb: float, xc: float, yc: flo
 
 @njit
 def sum_triangle_area(
-    xas: np.ndarray, yas: np.ndarray, xbs: np.ndarray, ybs: np.ndarray, xcs: np.ndarray, ycs: np.ndarray
-) -> np.ndarray:
+    xas: np.ndarray,
+    yas: np.ndarray,
+    xbs: np.ndarray,
+    ybs: np.ndarray,
+    xcs: np.ndarray,
+    ycs: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
     """
     Computes the total area of multiple triangles.
 
@@ -50,7 +57,7 @@ def sum_triangle_area(
         X-axis coordinates for point C of the triangles.
     ycs : array
         Y-axis coordinates for point C of the triangles.
-    
+
     Returns
     -------
     total_area : array
@@ -58,8 +65,8 @@ def sum_triangle_area(
     """
     ntri = len(xas)
     total_area = 0.0
-    
+
     for i in range(ntri):
         total_area += triangle_area(xas[i], yas[i], xbs[i], ybs[i], xcs[i], ycs[i])
-    
+
     return total_area

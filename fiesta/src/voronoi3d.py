@@ -1,17 +1,26 @@
 import numpy as np
 from numba import njit
 
-from . import polyhedron 
+from . import polyhedron
 
 
-@njit 
+@njit
 def voronoi_3d_volume(
-    xpoints: np.ndarray, ypoints: np.ndarray, zpoints: np.ndarray, xverts: np.ndarray, yverts: np.ndarray, zverts: np.ndarray, 
-    ridge_point1: np.ndarray, ridge_point2: np.ndarray, ridge_vertices: np.ndarray, ridge_start: np.ndarray, ridge_end: np.ndarray
-) -> np.ndarray:
+    xpoints: np.ndarray,
+    ypoints: np.ndarray,
+    zpoints: np.ndarray,
+    xverts: np.ndarray,
+    yverts: np.ndarray,
+    zverts: np.ndarray,
+    ridge_point1: np.ndarray,
+    ridge_point2: np.ndarray,
+    ridge_vertices: np.ndarray,
+    ridge_start: np.ndarray,
+    ridge_end: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
     """
     Determines the volume of the voronoi cells.
-    
+
     Parameters
     ----------
     xpoints : array
@@ -36,7 +45,7 @@ def voronoi_3d_volume(
         Index in ridge vertex which specifies the start of vertices that make up a single ridge.
     ridge_end : array
         Index in ridge vertex which specifies the end of vertices that make up a single ridge.
-    
+
     Returns
     -------
     volume : array
@@ -47,7 +56,7 @@ def voronoi_3d_volume(
     # nvertices = len(xverts)
     nridge = len(ridge_point1)
     # nridge_vertices = len(ridge_vertices)
-    
+
     volume = np.zeros(npoints)
 
     # computes the volume of each voronoi cell by breaking it into tetrahedron between points and ridges.
@@ -57,7 +66,7 @@ def voronoi_3d_volume(
         for j in range(ridge_start[i], ridge_end[i]):
             if ridge_vertices[j] == -1:
                 check = 0
-            if ridge_vertices[j+1] == -1:
+            if ridge_vertices[j + 1] == -1:
                 check = 0
 
         if check == 1:
@@ -73,26 +82,30 @@ def voronoi_3d_volume(
             xb = xverts[ridge_vertices[ridge_start[i]]]
             yb = yverts[ridge_vertices[ridge_start[i]]]
             zb = zverts[ridge_vertices[ridge_start[i]]]
-            
-            for j in range(ridge_start[i], ridge_end[i]-1):
 
-                xc = xverts[ridge_vertices[j+1]]
-                yc = yverts[ridge_vertices[j+1]]
-                zc = zverts[ridge_vertices[j+1]]
+            for j in range(ridge_start[i], ridge_end[i] - 1):
 
-                xd = xverts[ridge_vertices[j+2]]
-                yd = yverts[ridge_vertices[j+2]]
-                zd = zverts[ridge_vertices[j+2]]
+                xc = xverts[ridge_vertices[j + 1]]
+                yc = yverts[ridge_vertices[j + 1]]
+                zc = zverts[ridge_vertices[j + 1]]
 
-                vol1 = polyhedron.tetrahedron_volume(xa1, ya1, za1, xb, yb, zb, xc, yc, zc, xd, yd, zd)
-                vol2 = polyhedron.tetrahedron_volume(xa2, ya2, za2, xb, yb, zb, xc, yc, zc, xd, yd, zd)
+                xd = xverts[ridge_vertices[j + 2]]
+                yd = yverts[ridge_vertices[j + 2]]
+                zd = zverts[ridge_vertices[j + 2]]
 
-                if volume[ridge_point1[i]] != -1.:
+                vol1 = polyhedron.tetrahedron_volume(
+                    xa1, ya1, za1, xb, yb, zb, xc, yc, zc, xd, yd, zd
+                )
+                vol2 = polyhedron.tetrahedron_volume(
+                    xa2, ya2, za2, xb, yb, zb, xc, yc, zc, xd, yd, zd
+                )
+
+                if volume[ridge_point1[i]] != -1.0:
                     volume[ridge_point1[i]] = volume[ridge_point1[i]] + vol1
 
-                if volume[ridge_point2[i]] != -1.:
+                if volume[ridge_point2[i]] != -1.0:
                     volume[ridge_point2[i]] = volume[ridge_point2[i]] + vol2
         else:
-            volume[ridge_point1[i]] = -1.
-            volume[ridge_point2[i]] = -1.
+            volume[ridge_point1[i]] = -1.0
+            volume[ridge_point2[i]] = -1.0
     return volume

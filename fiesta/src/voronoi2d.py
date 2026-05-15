@@ -6,9 +6,16 @@ from . import polygon
 
 @njit
 def voronoi_2d_area(
-    xpoints: np.ndarray, ypoints: np.ndarray, xverts: np.ndarray, yverts: np.ndarray, ridge_point1: np.ndarray, 
-    ridge_point2: np.ndarray, ridge_vertices: np.ndarray, ridge_start: np.ndarray, ridge_end: np.ndarray
-) -> np.ndarray:
+    xpoints: np.ndarray,
+    ypoints: np.ndarray,
+    xverts: np.ndarray,
+    yverts: np.ndarray,
+    ridge_point1: np.ndarray,
+    ridge_point2: np.ndarray,
+    ridge_vertices: np.ndarray,
+    ridge_start: np.ndarray,
+    ridge_end: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
     """
     Determines the area of the voronoi cells.
 
@@ -42,9 +49,9 @@ def voronoi_2d_area(
     # nvertices = len(xverts)
     nridge = len(ridge_point1)
     # nridge_vertices = len(ridge_vertices)
-    
+
     area = np.zeros(npoints)
-    
+
     # computes the area of each voronoi cell by breaking it into triangles between points and ridges.
 
     for i in range(0, nridge):
@@ -54,7 +61,7 @@ def voronoi_2d_area(
 
             if ridge_vertices[j] == -1:
                 check = 0
-            if ridge_vertices[j+1] == -1:
+            if ridge_vertices[j + 1] == -1:
                 check = 0
 
         if check == 1:
@@ -70,20 +77,20 @@ def voronoi_2d_area(
                 xb = xverts[ridge_vertices[j]]
                 yb = yverts[ridge_vertices[j]]
 
-                xc = xverts[ridge_vertices[j+1]]
-                yc = yverts[ridge_vertices[j+1]]
+                xc = xverts[ridge_vertices[j + 1]]
+                yc = yverts[ridge_vertices[j + 1]]
 
                 area1 = polygon.triangle_area(xa1, ya1, xb, yb, xc, yc)
                 area2 = polygon.triangle_area(xa2, ya2, xb, yb, xc, yc)
 
-                if area[ridge_point1[i]] != -1.:
+                if area[ridge_point1[i]] != -1.0:
                     area[ridge_point1[i]] = area[ridge_point1[i]] + area1
 
-                if area[ridge_point2[i]] != -1.:
-                    area[ridge_point2[i]] = area[ridge_point2[i]]+ area2
+                if area[ridge_point2[i]] != -1.0:
+                    area[ridge_point2[i]] = area[ridge_point2[i]] + area2
 
         else:
-            area[ridge_point1[i]] = -1.
-            area[ridge_point2[i]] = -1.
-    
+            area[ridge_point1[i]] = -1.0
+            area[ridge_point2[i]] = -1.0
+
     return area

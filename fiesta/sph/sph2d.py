@@ -8,7 +8,6 @@ from typing import Optional, Union
 
 
 class SPH2D(kdtree.KDTree2D):
-
     """
     Class for computing Smooth Particle Hydrodynamic (SPH) density and field estimation in 2D.
     """
@@ -18,8 +17,7 @@ class SPH2D(kdtree.KDTree2D):
         Initialises SPH in 2D.
         """
         kdtree.KDTree2D.__init__(self)
-        self.kernel_type = 'cubic'
-
+        self.kernel_type = "cubic"
 
     def assign_mass(self, mass: Optional[np.ndarray] = None) -> None:
         """
@@ -30,8 +28,9 @@ class SPH2D(kdtree.KDTree2D):
         else:
             self.mass = mass
 
-
-    def kernel(self, r: Union[float, np.ndarray], h: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    def kernel(
+        self, r: Union[float, np.ndarray], h: Union[float, np.ndarray]
+    ) -> Union[float, np.ndarray]:
         """
         Returns the SPH kernel value.
 
@@ -42,9 +41,8 @@ class SPH2D(kdtree.KDTree2D):
         h : float or array
             Smoothing length.
         """
-        if self.kernel_type == 'cubic':
+        if self.kernel_type == "cubic":
             return kernels.cubic_kernel(r, h, dim=2)
-
 
     def setup(self, k: int = 20, mass: Optional[np.ndarray] = None) -> None:
         """
@@ -60,9 +58,12 @@ class SPH2D(kdtree.KDTree2D):
         self.k = k
         self.assign_mass(mass=mass)
 
-
     def sph_estimate(
-        self, x: Union[float, np.ndarray], y: Union[float, np.ndarray], f: Optional[np.ndarray] = None, dens: Optional[np.ndarray] = None
+        self,
+        x: Union[float, np.ndarray],
+        y: Union[float, np.ndarray],
+        f: Optional[np.ndarray] = None,
+        dens: Optional[np.ndarray] = None,
     ) -> Union[float, np.ndarray]:
         """
         Estimates a field based on SPH k neighbours.
@@ -81,20 +82,31 @@ class SPH2D(kdtree.KDTree2D):
         f_est : float or array
             Field estimation.
         """
+        if f is not None:
+            self.set_field(f)
         nind, ndist = self.nearest(x, y, k=self.k, return_dist=True)
         h = np.max(ndist, axis=1)
         if dens is None:
-            w = np.array([self.mass[nind[i]]*self.kernel(ndist[i], h[i]) for i in range(0, len(h))])
+            w = np.array(
+                [
+                    self.mass[nind[i]] * self.kernel(ndist[i], h[i])
+                    for i in range(0, len(h))
+                ]
+            )
             dens = np.sum(w, axis=1)
         if f is None:
             return dens
         else:
             # calculating density at each points is slow so instead calculate field and then divide by density.
-            w = np.array([self.mass[nind[i]]*(self.f[nind[i]])*self.kernel(ndist[i], h[i]) for i in range(0, len(h))])
+            w = np.array(
+                [
+                    self.mass[nind[i]] * (self.f[nind[i]]) * self.kernel(ndist[i], h[i])
+                    for i in range(0, len(h))
+                ]
+            )
             f_est = np.sum(w, axis=1)
             f_est /= dens
             return f_est
-
 
     def get_density(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
@@ -113,7 +125,6 @@ class SPH2D(kdtree.KDTree2D):
         dens = self.sph_estimate(x, y, f=None)
         return dens
 
-
     def set_field(self, f: np.ndarray) -> None:
         """
         Sets the field values for SPH field estimation.
@@ -125,8 +136,12 @@ class SPH2D(kdtree.KDTree2D):
         """
         self.f = f
 
-
-    def estimate(self, x: Union[float, np.ndarray], y: Union[float, np.ndarray], dens: np.ndarray = None) -> Union[float, np.ndarray]:
+    def estimate(
+        self,
+        x: Union[float, np.ndarray],
+        y: Union[float, np.ndarray],
+        dens: np.ndarray = None,
+    ) -> Union[float, np.ndarray]:
         """
         Estimates field at points given.
 
@@ -145,8 +160,7 @@ class SPH2D(kdtree.KDTree2D):
         """
         return self.sph_estimate(x, y, f=self.f, dens=dens)
 
-
-    def clean(self) -> None:
+    def clean(self) -> None:  # pragma: no cover
         """
         Reinitialises the class.
         """

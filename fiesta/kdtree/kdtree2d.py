@@ -5,8 +5,8 @@ from .. import coords
 
 from typing import Optional, Tuple
 
-class KDTree2D:
 
+class KDTree2D:
 
     def __init__(self) -> None:
         """
@@ -17,8 +17,14 @@ class KDTree2D:
         self.usepara = None
         self.ncpu = None
 
-
-    def build_tree(self, x: np.ndarray, y: np.ndarray, boxsize: Optional[float] = None, usepara: bool = False, ncpu: int = 4) -> None:
+    def build_tree(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        boxsize: Optional[float] = None,
+        usepara: bool = False,
+        ncpu: int = 4,
+    ) -> None:
         """
         Function for building the KDTree.
 
@@ -40,8 +46,9 @@ class KDTree2D:
         self.points = coords.xy2points(x, y)
         self.KD = scKDTree(self.points, boxsize=boxsize)
 
-
-    def nearest(self, x: np.ndarray, y: np.ndarray, k: int = 1, return_dist: bool = False) -> Tuple[np.ndarray, np.ndarray]:
+    def nearest(
+        self, x: np.ndarray, y: np.ndarray, k: int = 1, return_dist: bool = False
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Returns the nearest index (and distance) of a point from the KDTree.
 
@@ -66,13 +73,12 @@ class KDTree2D:
         points = coords.xy2points(x, y)
         if self.usepara == False:
             ndist, nind = self.KD.query(points, k=k)
-        else:
+        else:  # pragma: no cover
             ndist, nind = self.KD.query(points, k=k, workers=self.ncpu)
         if return_dist == False:
             return nind
         else:
             return nind, ndist
-
 
     def find_points_in_r(self, x: np.ndarray, y: np.ndarray, r: float) -> np.ndarray:
         """
@@ -97,8 +103,7 @@ class KDTree2D:
         ind = self.KD.query_ball_point(points, r)
         return ind
 
-
-    def clean(self) -> None:
+    def clean(self) -> None:  # pragma: no cover
         """
         Reinitilises the class.
         """

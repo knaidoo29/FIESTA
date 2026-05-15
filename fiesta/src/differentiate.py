@@ -3,7 +3,7 @@ from numba import njit
 
 
 @njit
-def dfdx_1d_periodic(f: np.ndarray, boxsize: float) -> np.ndarray:
+def dfdx_1d_periodic(f: np.ndarray, boxsize: float) -> np.ndarray:  # pragma: no cover
     """
     Numerical differentiation assuming a uniform grid with periodic boundaries in 1D.
 
@@ -31,12 +31,14 @@ def dfdx_1d_periodic(f: np.ndarray, boxsize: float) -> np.ndarray:
             i2 = 0
         else:
             i2 = i + 1
-        df[i] = (f[i2] - f[i1])/(2*dl)
+        df[i] = (f[i2] - f[i1]) / (2 * dl)
     return df
 
 
 @njit
-def dfdx_2d_periodic(f: np.ndarray, xboxsize: float, nxgrid: int, nygrid: int) -> np.ndarray:
+def dfdx_2d_periodic(
+    f: np.ndarray, xboxsize: float, nxgrid: int, nygrid: int
+) -> np.ndarray:  # pragma: no cover
     """
     Numerical differentiation in x assuming a uniform grid with periodic boundaries in 2D.
 
@@ -57,7 +59,7 @@ def dfdx_2d_periodic(f: np.ndarray, xboxsize: float, nxgrid: int, nygrid: int) -
         Differentiated function along x.
     """
     dx = xboxsize / float(nxgrid)
-    df = np.zeros(nxgrid*nygrid)
+    df = np.zeros(nxgrid * nygrid)
     for i in range(0, nxgrid):
         if i == 0:
             i1 = nxgrid - 1
@@ -68,12 +70,14 @@ def dfdx_2d_periodic(f: np.ndarray, xboxsize: float, nxgrid: int, nygrid: int) -
         else:
             i2 = i + 1
         for j in range(0, nygrid):
-            df[j + nygrid*i] = (f[j + nygrid*i2] - f[j + nygrid*i1])/(2*dx)
+            df[j + nygrid * i] = (f[j + nygrid * i2] - f[j + nygrid * i1]) / (2 * dx)
     return df
 
 
 @njit
-def dfdy_2d_periodic(f: np.ndarray, yboxsize: float, nxgrid: int, nygrid: int):
+def dfdy_2d_periodic(
+    f: np.ndarray, yboxsize: float, nxgrid: int, nygrid: int
+):  # pragma: no cover
     """
     Numerical differentiation in y assuming a uniform grid with periodic boundaries in 2D.
 
@@ -87,14 +91,14 @@ def dfdy_2d_periodic(f: np.ndarray, yboxsize: float, nxgrid: int, nygrid: int):
         Number of grid points along the x-axis grid.
     nygrid : int
         Number of grid points along the y-axis grid.
-    
+
     Returns
     -------
     df : array
         Differentiated function along x.
     """
     dy = yboxsize / float(nygrid)
-    df = np.zeros(nxgrid*nygrid)
+    df = np.zeros(nxgrid * nygrid)
     for j in range(0, nygrid):
         if j == 0:
             j1 = nygrid - 1
@@ -105,12 +109,14 @@ def dfdy_2d_periodic(f: np.ndarray, yboxsize: float, nxgrid: int, nygrid: int):
         else:
             j2 = j + 1
         for i in range(0, nxgrid):
-            df[j + nygrid*i] = (f[j2 + nygrid*i] - f[j1 + nygrid*i])/(2*dy)
+            df[j + nygrid * i] = (f[j2 + nygrid * i] - f[j1 + nygrid * i]) / (2 * dy)
     return df
 
 
 @njit
-def dfdx_3d_periodic(f: np.ndarray, xboxsize: float, nxgrid: int, nygrid: int, nzgrid: int) -> np.ndarray:
+def dfdx_3d_periodic(
+    f: np.ndarray, xboxsize: float, nxgrid: int, nygrid: int, nzgrid: int
+) -> np.ndarray:  # pragma: no cover
     """
     Numerical differentiation in x assuming a uniform grid with periodic boundaries in 3D.
 
@@ -126,14 +132,14 @@ def dfdx_3d_periodic(f: np.ndarray, xboxsize: float, nxgrid: int, nygrid: int, n
         Number of grid points along the y-axis grid.
     nzgrid : int
         Number of grid points along the z-axis grid.
-    
+
     Returns
     -------
     df : array
         Differentiated function along x.
     """
     dx = xboxsize / float(nxgrid)
-    df = np.zeros(nxgrid*nygrid*nzgrid)
+    df = np.zeros(nxgrid * nygrid * nzgrid)
     for i in range(0, nxgrid):
         if i == 0:
             i1 = nxgrid - 1
@@ -145,12 +151,17 @@ def dfdx_3d_periodic(f: np.ndarray, xboxsize: float, nxgrid: int, nygrid: int, n
             i2 = i + 1
         for j in range(0, nygrid):
             for k in range(0, nzgrid):
-                df[k + nzgrid*(j + nygrid*i)] = (f[k + nzgrid*(j + nygrid*i2)] - f[k + nzgrid*(j + nygrid*i1)])/(2*dx)
+                df[k + nzgrid * (j + nygrid * i)] = (
+                    f[k + nzgrid * (j + nygrid * i2)]
+                    - f[k + nzgrid * (j + nygrid * i1)]
+                ) / (2 * dx)
     return df
 
 
 @njit
-def dfdy_3d_periodic(f: np.ndarray, yboxsize: float, nxgrid: int, nygrid: int, nzgrid: int) -> np.ndarray:
+def dfdy_3d_periodic(
+    f: np.ndarray, yboxsize: float, nxgrid: int, nygrid: int, nzgrid: int
+) -> np.ndarray:  # pragma: no cover
     """
     Numerical differentiation in x assuming a uniform grid with periodic boundaries in 3D.
 
@@ -166,14 +177,14 @@ def dfdy_3d_periodic(f: np.ndarray, yboxsize: float, nxgrid: int, nygrid: int, n
         Number of grid points along the y-axis grid.
     nzgrid : int
         Number of grid points along the z-axis grid.
-    
+
     Returns
     -------
     df : array
         Differentiated function along x.
     """
     dy = yboxsize / float(nygrid)
-    df = np.zeros(nxgrid*nygrid*nzgrid)
+    df = np.zeros(nxgrid * nygrid * nzgrid)
     for j in range(0, nygrid):
         if j == 0:
             j1 = nygrid - 1
@@ -185,12 +196,17 @@ def dfdy_3d_periodic(f: np.ndarray, yboxsize: float, nxgrid: int, nygrid: int, n
             j2 = j + 1
         for i in range(0, nxgrid):
             for k in range(0, nzgrid):
-                df[k + nzgrid*(j + nygrid*i)] = (f[k + nzgrid*(j2 + nygrid*i)] - f[k + nzgrid*(j1 + nygrid*i)])/(2*dy)
+                df[k + nzgrid * (j + nygrid * i)] = (
+                    f[k + nzgrid * (j2 + nygrid * i)]
+                    - f[k + nzgrid * (j1 + nygrid * i)]
+                ) / (2 * dy)
     return df
 
 
 @njit
-def dfdz_3d_periodic(f: np.ndarray, zboxsize: float, nxgrid: int, nygrid: int, nzgrid: int) -> np.ndarray:
+def dfdz_3d_periodic(
+    f: np.ndarray, zboxsize: float, nxgrid: int, nygrid: int, nzgrid: int
+) -> np.ndarray:  # pragma: no cover
     """
     Numerical differentiation in x assuming a uniform grid with periodic boundaries in 3D.
 
@@ -206,14 +222,14 @@ def dfdz_3d_periodic(f: np.ndarray, zboxsize: float, nxgrid: int, nygrid: int, n
         Number of grid points along the y-axis grid.
     nzgrid : int
         Number of grid points along the z-axis grid.
-    
+
     Returns
     -------
     df : array
         Differentiated function along x.
     """
     dz = zboxsize / float(nzgrid)
-    df = np.zeros(nxgrid*nygrid*nzgrid)
+    df = np.zeros(nxgrid * nygrid * nzgrid)
     for k in range(0, nzgrid):
         if k == 0:
             k1 = nzgrid - 1
@@ -225,5 +241,8 @@ def dfdz_3d_periodic(f: np.ndarray, zboxsize: float, nxgrid: int, nygrid: int, n
             k2 = k + 1
         for j in range(0, nygrid):
             for i in range(0, nxgrid):
-                df[k + nzgrid*(j + nygrid*i)] = (f[k2 + nzgrid*(j + nygrid*i)] - f[k1 + nzgrid*(j + nygrid*i)])/(2*dz)
+                df[k + nzgrid * (j + nygrid * i)] = (
+                    f[k2 + nzgrid * (j + nygrid * i)]
+                    - f[k1 + nzgrid * (j + nygrid * i)]
+                ) / (2 * dz)
     return df

@@ -2,8 +2,16 @@ import numpy as np
 
 from . import periodic
 
+from typing import Union, List
 
-def mpi_buffer_periodic_2D(data: np.ndarray, boxsize: float, buffer_length: float, MPI: object, origin: float = 0.) -> np.ndarray:
+
+def mpi_buffer_periodic_2D(
+    data: np.ndarray,
+    boxsize: Union[float, List[float]],
+    buffer_length: float,
+    MPI: object,
+    origin: Union[float, List[float]] = 0.0,
+) -> np.ndarray:
     """
     Generates random buffer particles around a 2D box.
 
@@ -11,13 +19,13 @@ def mpi_buffer_periodic_2D(data: np.ndarray, boxsize: float, buffer_length: floa
     ----------
     data : array
         Where columns 0 and 1 are x and y.
-    boxsize : float
+    boxsize : float or list
         Boxsize.
     buffer_length : float
         Length of the buffer region.
     MPI : class object
         MPIutils MPI class object.
-    origin : float, optional
+    origin : float or list, optional
         Origin point.
 
     Returns
@@ -34,19 +42,25 @@ def mpi_buffer_periodic_2D(data: np.ndarray, boxsize: float, buffer_length: floa
     else:
         xboxsize, yboxsize = boxsize[0], boxsize[1]
     datap = periodic.buffer_periodic(data, 1, yboxsize, buffer_length, origin=yorigin)
-    cond = np.where(datap[:,0] <= xorigin+buffer_length)[0]
+    cond = np.where(datap[:, 0] <= xorigin + buffer_length)[0]
     data_send_down = MPI.send_down(datap[cond])
-    cond = np.where(datap[:,0] >= xorigin+xboxsize-buffer_length)[0]
+    cond = np.where(datap[:, 0] >= xorigin + xboxsize - buffer_length)[0]
     data_send_up = MPI.send_up(datap[cond])
     if MPI.rank == 0:
-        data_send_up[:,0] -= xboxsize
+        data_send_up[:, 0] -= xboxsize
     elif MPI.rank == MPI.size - 1:
-        data_send_down[:,0] += xboxsize
+        data_send_down[:, 0] += xboxsize
     datap = np.vstack([datap, data_send_down, data_send_up])
     return datap
 
 
-def mpi_buffer_periodic_3D(data: np.ndarray, boxsize: float, buffer_length: float, MPI: object, origin : float = 0.) -> np.ndarray:
+def mpi_buffer_periodic_3D(
+    data: np.ndarray,
+    boxsize: Union[float, List[float]],
+    buffer_length: float,
+    MPI: object,
+    origin: Union[float, List[float]] = 0.0,
+) -> np.ndarray:
     """
     Generates random buffer particles around a 3D box.
 
@@ -54,13 +68,13 @@ def mpi_buffer_periodic_3D(data: np.ndarray, boxsize: float, buffer_length: floa
     ----------
     data : array
         Where columns 0, 1 and 2 correspond to the x, y and z coordinates.
-    xboxsize : float
+    xboxsize : float or list
         Boxsize along x-axis.
     buffer_length : float
         Length of the buffer region.
     MPI : class object
         MPIutils MPI class object.
-    origin : float, optional
+    origin : float or list, optional
         Origin point.
 
     Returns
@@ -78,19 +92,25 @@ def mpi_buffer_periodic_3D(data: np.ndarray, boxsize: float, buffer_length: floa
         xboxsize, yboxsize, zboxsize = boxsize[0], boxsize[1], boxsize[2]
     datap = periodic.buffer_periodic(data, 1, yboxsize, buffer_length, origin=yorigin)
     datap = periodic.buffer_periodic(datap, 2, zboxsize, buffer_length, origin=zorigin)
-    cond = np.where(datap[:,0] <= xorigin+buffer_length)[0]
+    cond = np.where(datap[:, 0] <= xorigin + buffer_length)[0]
     data_send_down = MPI.send_down(datap[cond])
-    cond = np.where(datap[:,0] >= xorigin+xboxsize-buffer_length)[0]
+    cond = np.where(datap[:, 0] >= xorigin + xboxsize - buffer_length)[0]
     data_send_up = MPI.send_up(datap[cond])
     if MPI.rank == 0:
-        data_send_up[:,0] -= xboxsize
+        data_send_up[:, 0] -= xboxsize
     elif MPI.rank == MPI.size - 1:
-        data_send_down[:,0] += xboxsize
+        data_send_down[:, 0] += xboxsize
     datap = np.vstack([datap, data_send_down, data_send_up])
     return datap
 
 
-def mpi_buffer_internal_3D(data: np.ndarray, boxsize: float, buffer_length: float, MPI: object, origin: float = 0.) -> np.ndarray:
+def mpi_buffer_internal_3D(
+    data: np.ndarray,
+    boxsize: float,
+    buffer_length: float,
+    MPI: object,
+    origin: float = 0.0,
+) -> np.ndarray:
     """
     Internal buffer particles between partitions are moved up and down.
 
@@ -120,15 +140,15 @@ def mpi_buffer_internal_3D(data: np.ndarray, boxsize: float, buffer_length: floa
         xboxsize = boxsize
     else:
         xboxsize = boxsize[0]
-    cond = np.where(data[:,0] <= xorigin+buffer_length)[0]
+    cond = np.where(data[:, 0] <= xorigin + buffer_length)[0]
     data_send_down = MPI.send_down(data[cond])
-    cond = np.where(data[:,0] >= xorigin+xboxsize-buffer_length)[0]
+    cond = np.where(data[:, 0] >= xorigin + xboxsize - buffer_length)[0]
     data_send_up = MPI.send_up(data[cond])
     if MPI.rank == 0:
-        #data_send_up[:,0] -= xboxsize
+        # data_send_up[:,0] -= xboxsize
         datap = np.vstack([data, data_send_down])
     elif MPI.rank == MPI.size - 1:
-        #data_send_down[:,0] += xboxsize
+        # data_send_down[:,0] += xboxsize
         datap = np.vstack([data, data_send_up])
     else:
         datap = np.vstack([data, data_send_down, data_send_up])

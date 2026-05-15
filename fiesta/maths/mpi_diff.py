@@ -3,7 +3,9 @@ import numpy as np
 from . import diff
 
 
-def mpi_dfdx(xgrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = False) -> np.ndarray:
+def mpi_dfdx(
+    xgrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = False
+) -> np.ndarray:
     """
     Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.
@@ -24,11 +26,11 @@ def mpi_dfdx(xgrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = Fal
     dfdx : array
         Numerical differentiation values for f evaluated at points x.
     """
-    dx = xgrid[1]-xgrid[0]
-    _xgrid = np.zeros(len(xgrid)+2)
+    dx = xgrid[1] - xgrid[0]
+    _xgrid = np.zeros(len(xgrid) + 2)
     _xgrid[1:-1] = xgrid
-    _xgrid[0] = xgrid[0]-dx
-    _xgrid[-1] = xgrid[-1]+dx
+    _xgrid[0] = xgrid[0] - dx
+    _xgrid[-1] = xgrid[-1] + dx
     shape = np.array(np.shape(f))
     shape[0] += 2
     _f = np.zeros(shape)
@@ -41,7 +43,7 @@ def mpi_dfdx(xgrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = Fal
         if MPI.rank == 0:
             _xgrid = _xgrid[1:]
             _f = _f[1:]
-        elif MPI.rank == MPI.size-1:
+        elif MPI.rank == MPI.size - 1:
             _xgrid = _xgrid[:-1]
             _f = _f[:-1]
     dfdx = diff.dfdx(_xgrid, _f, periodic=False)
@@ -50,7 +52,7 @@ def mpi_dfdx(xgrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = Fal
     else:
         if MPI.rank == 0:
             dfdx = dfdx[:-1]
-        elif MPI.rank == MPI.size-1:
+        elif MPI.rank == MPI.size - 1:
             dfdx = dfdx[1:]
         else:
             dfdx = dfdx[1:-1]
@@ -60,7 +62,9 @@ def mpi_dfdx(xgrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = Fal
 # TODO: MPI is kept in mpi_dfdy and mpi_dfdz to mirror mpi_dfdz, but is not used in those functions, should we removed it?
 
 
-def mpi_dfdy(ygrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = False) -> np.ndarray:
+def mpi_dfdy(
+    ygrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = False
+) -> np.ndarray:
     """
     Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.
@@ -85,8 +89,9 @@ def mpi_dfdy(ygrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = Fal
     return dfdy
 
 
-
-def mpi_dfdz(zgrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = False) -> np.ndarray:
+def mpi_dfdz(
+    zgrid: np.ndarray, f: np.ndarray, MPI: object, periodic: bool = False
+) -> np.ndarray:
     """
     Differentiate using a symmetric two-point derivative and the non-symmetric
     three point derivative estimator.

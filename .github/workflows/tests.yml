@@ -29,7 +29,9 @@ jobs:
       - name: Install MPI and system deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y mpich libmpich-dev
+          # Use OpenMPI instead of MPICH — OpenMPI supports --oversubscribe,
+          # which is required to run 3 ranks on a 2-core GitHub Actions runner.
+          sudo apt-get install -y libopenmpi-dev openmpi-bin
 
       - name: Install Python dependencies
         run: |
@@ -64,21 +66,17 @@ jobs:
       - name: Run tests with coverage
         env:
           COVERAGE_PROCESS_START: .coveragerc
-          # Allow MPICH to oversubscribe cores (GitHub Actions runners have 2
-          # cores but we need 3 ranks). MPICH uses this env var instead of
-          # OpenMPI's --oversubscribe flag.
-          HYDRA_TOPO_DEBUG: 0
-          MPICH_CPUMASK_DISPLAY: 0
+          # Suppress OpenMPI warnings about oversubscription
+          OMPI_MCA_rmaps_base_oversubscribe: 1
         run: |
           coverage erase
 
           # Run standard tests
           coverage run --parallel-mode -m pytest tests/normal_tests
 
-          # Run MPI tests with 3 ranks. Use 'localhost:3' to explicitly tell
-          # MPICH to place all 3 ranks on the local machine, bypassing any
-          # core-count restrictions on the CI runner.
-          mpirun -n 3 -host localhost:3 coverage run --parallel-mode -m pytest -s -v tests/mpi_tests
+          # Run MPI tests with 3 ranks. --oversubscribe allows more ranks than
+          # physical cores, which is needed on 2-core GitHub Actions runners.
+          mpirun -n 3 --oversubscribe coverage run --parallel-mode -m pytest -s -v tests/mpi_tests
 
           # Merge all .coverage.* files produced by parallel/MPI runs
           coverage combine

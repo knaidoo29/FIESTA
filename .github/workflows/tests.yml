@@ -70,12 +70,10 @@ jobs:
           # Run standard tests
           coverage run --parallel-mode -m pytest tests/normal_tests
 
-          # Run MPI tests — MPICH (not OpenMPI) is installed, so --oversubscribe
-          # is not needed or supported; MPICH allows oversubscription by default.
-          # -x forwards env vars into MPI ranks.
-          mpirun -n 2 \
-            -x COVERAGE_PROCESS_START \
-            coverage run --parallel-mode -m pytest -s -v tests/mpi_tests
+          # Run MPI tests — MPICH (not OpenMPI) is installed.
+          # MPICH inherits env vars from the parent process automatically,
+          # so no special flag is needed to forward COVERAGE_PROCESS_START.
+          mpirun -n 3 coverage run --parallel-mode -m pytest -s -v tests/mpi_tests
 
           # Merge all .coverage.* files produced by parallel/MPI runs
           coverage combine

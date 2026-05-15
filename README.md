@@ -8,7 +8,7 @@ https://raw.githubusercontent.com/knaidoo29/FIESTA/main/docs/source/_static/FiEs
     <img src="https://github.com/knaidoo29/FIESTA/actions/workflows/tests.yml/badge.svg" alt="Python Tests">
     </a>
     <a href="https://codecov.io/gh/knaidoo29/FIESTA" > 
-    <img src="https://codecov.io/gh/knaidoo29/FIESTA/graph/badge.svg?token=RFSEAKTTKG"/> 
+    <img src="https://codecov.io/gh/knaidoo29/FIESTA/branch/main/graph/badge.svg?token=RFSEAKTTKG"/> 
     </a>
     <a href="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12-blue">
     <img src="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12-blue" alt="Python Version Support">

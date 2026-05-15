@@ -3,20 +3,30 @@ from scipy.spatial import KDTree as scKDTree
 
 from .. import coords
 
+from typing import Optional, Tuple
+
 
 class KDTree2D:
 
-
-    def __init__(self):
-        """Initialises the 2D KDTree class"""
+    def __init__(self) -> None:
+        """
+        Initialises the 2D KDTree class.
+        """
         self.points = None
         self.KD = None
         self.usepara = None
         self.ncpu = None
 
-
-    def build_tree(self, x, y, boxsize=None, usepara=False, ncpu=4):
-        """Function for building the KDTree.
+    def build_tree(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        boxsize: Optional[float] = None,
+        usepara: bool = False,
+        ncpu: int = 4,
+    ) -> None:
+        """
+        Function for building the KDTree.
 
         Parameters
         ----------
@@ -36,9 +46,11 @@ class KDTree2D:
         self.points = coords.xy2points(x, y)
         self.KD = scKDTree(self.points, boxsize=boxsize)
 
-
-    def nearest(self, x, y, k=1, return_dist=False):
-        """Returns the nearest index (and distance) of a point from the KDTree.
+    def nearest(
+        self, x: np.ndarray, y: np.ndarray, k: int = 1, return_dist: bool = False
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Returns the nearest index (and distance) of a point from the KDTree.
 
         Parameters
         ----------
@@ -61,16 +73,16 @@ class KDTree2D:
         points = coords.xy2points(x, y)
         if self.usepara == False:
             ndist, nind = self.KD.query(points, k=k)
-        else:
+        else:  # pragma: no cover
             ndist, nind = self.KD.query(points, k=k, workers=self.ncpu)
         if return_dist == False:
             return nind
         else:
             return nind, ndist
 
-
-    def find_points_in_r(self, x, y, r):
-        """Returns the nearest index (and distance) of a point from the KDTree.
+    def find_points_in_r(self, x: np.ndarray, y: np.ndarray, r: float) -> np.ndarray:
+        """
+        Returns the nearest index (and distance) of a point from the KDTree.
 
         Parameters
         ----------
@@ -91,7 +103,8 @@ class KDTree2D:
         ind = self.KD.query_ball_point(points, r)
         return ind
 
-
-    def clean(self):
-        """Reinitilises the class."""
+    def clean(self) -> None:  # pragma: no cover
+        """
+        Reinitilises the class.
+        """
         self.__init__()

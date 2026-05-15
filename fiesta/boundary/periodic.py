@@ -1,8 +1,17 @@
 import numpy as np
 
+from typing import List, Union
 
-def buffer_periodic(data, axis, boxsize, buffer_length, origin=0.):
-    """Returns periodic boundary conditions.
+
+def buffer_periodic(
+    data: np.ndarray,
+    axis: int,
+    boxsize: float,
+    buffer_length: float,
+    origin: float = 0.0,
+) -> np.ndarray:
+    """
+    Returns periodic boundary conditions.
 
     Parameters
     ----------
@@ -22,19 +31,27 @@ def buffer_periodic(data, axis, boxsize, buffer_length, origin=0.):
     datap : array
         Data with periodic buffer particles.
     """
-    cond1 = np.where(data[:,axis] >= origin+boxsize-buffer_length)[0]
+    cond1 = np.where(data[:, axis] >= origin + boxsize - buffer_length)[0]
     _d1 = data[cond1]
-    _d1[:,axis] -= boxsize
-    cond2 = np.where(data[:,axis] <= origin+buffer_length)[0]
+    _d1[:, axis] -= boxsize
+    cond2 = np.where(data[:, axis] <= origin + buffer_length)[0]
     _d2 = data[cond2]
-    _d2[:,axis] += boxsize
+    _d2[:, axis] += boxsize
     datap = np.vstack([data, _d1, _d2])
     return datap
 
 
-def subbox_buffer_periodic(data, axis, boxsize, buffer_length, subboxsize,
-    origin=0., subbox_origin=0.):
-    """Returns periodic boundary conditions in a subbox.
+def subbox_buffer_periodic(
+    data: np.ndarray,
+    axis: int,
+    boxsize: float,
+    buffer_length: float,
+    subboxsize: float,
+    origin: float = 0.0,
+    subbox_origin: float = 0.0,
+) -> np.ndarray:
+    """
+    Returns periodic boundary conditions in a subbox.
 
     Parameters
     ----------
@@ -59,24 +76,32 @@ def subbox_buffer_periodic(data, axis, boxsize, buffer_length, subboxsize,
         Data with periodic buffer particles.
     """
     datap = buffer_periodic(data, axis, boxsize, buffer_length, origin=origin)
-    cond = np.where((datap[:,axis] >= subbox_origin-buffer_length) &
-        (datap[:,axis] <= subbox_origin+subboxsize+buffer_length))[0]
+    cond = np.where(
+        (datap[:, axis] >= subbox_origin - buffer_length)
+        & (datap[:, axis] <= subbox_origin + subboxsize + buffer_length)
+    )[0]
     datap = datap[cond]
     return datap
 
 
-def buffer_periodic_2D(data, boxsize, buffer_length, origin=0.):
-    """Generates random buffer particles around a 2D box.
+def buffer_periodic_2D(
+    data: np.ndarray,
+    boxsize: Union[float, List[float]],
+    buffer_length: float,
+    origin: Union[float, List[float]] = 0.0,
+) -> np.ndarray:
+    """
+    Generates random buffer particles around a 2D box.
 
     Parameters
     ----------
     data : array
         Where columns 0 and 1 are x and y.
-    boxsize : float
+    boxsize : float or list
         Box size.
     buffer_length : float
         Length of the buffer region.
-    origin : float, optional
+    origin : float or list, optional
         Origin point.
 
     Returns
@@ -97,9 +122,16 @@ def buffer_periodic_2D(data, boxsize, buffer_length, origin=0.):
     return datap
 
 
-def subbox_buffer_periodic_2D(data, boxsize, buffer_length, subboxsize,
-    origin=0., subbox_origin=0.):
-    """Generates random buffer particles around a 2D box.
+def subbox_buffer_periodic_2D(
+    data: np.ndarray,
+    boxsize: Union[float, List[float]],
+    buffer_length: float,
+    subboxsize: Union[float, List[float]],
+    origin: Union[float, List[float]] = 0.0,
+    subbox_origin: Union[float, List[float]] = 0.0,
+) -> np.ndarray:
+    """
+    Generates random buffer particles around a 2D box.
 
     Parameters
     ----------
@@ -107,15 +139,15 @@ def subbox_buffer_periodic_2D(data, boxsize, buffer_length, subboxsize,
         Data for which we want periodic boundaries.
     axis : int
         The axis which we want periodic boundaries.
-    boxsize : float
+    boxsize : float or list
         Box size.
     buffer_length : float
         Length of the buffer region.
-    subboxsize : float
+    subboxsize : float or list
         Size of subbox.
-    origin : float, optional
+    origin : float or list, optional
         Origin point.
-    subbox_origin : float, optional
+    subbox_origin : float or list, optional
         Origin point for the subbox.
 
     Returns
@@ -139,25 +171,45 @@ def subbox_buffer_periodic_2D(data, boxsize, buffer_length, subboxsize,
         xsubboxsize, ysubboxsize = subboxsize, subboxsize
     else:
         xsubboxsize, ysubboxsize = subboxsize[0], subboxsize[1]
-    datap = subbox_buffer_periodic(data, 0, xboxsize, buffer_length,
-        xsubboxsize, origin=xorigin, subbox_origin=subbox_xorigin)
-    datap = subbox_buffer_periodic(datap, 1, yboxsize, buffer_length,
-        ysubboxsize, origin=yorigin, subbox_origin=subbox_yorigin)
+    datap = subbox_buffer_periodic(
+        data,
+        0,
+        xboxsize,
+        buffer_length,
+        xsubboxsize,
+        origin=xorigin,
+        subbox_origin=subbox_xorigin,
+    )
+    datap = subbox_buffer_periodic(
+        datap,
+        1,
+        yboxsize,
+        buffer_length,
+        ysubboxsize,
+        origin=yorigin,
+        subbox_origin=subbox_yorigin,
+    )
     return datap
 
 
-def buffer_periodic_3D(data, boxsize, buffer_length, origin=0.):
-    """Generates random buffer particles around a 3D box.
+def buffer_periodic_3D(
+    data: np.ndarray,
+    boxsize: Union[float, List[float]],
+    buffer_length: float,
+    origin: Union[float, List[float]] = 0.0,
+) -> np.ndarray:
+    """
+    Generates random buffer particles around a 3D box.
 
     Parameters
     ----------
     data : array
         Where columns 0, 1 and 2 correspond to the x, y and z coordinates.
-    boxsize : float
+    boxsize : float or list
         Box size.
     buffer_length : float
         Length of the buffer region.
-    origin : float, optional
+    origin : float or list, optional
         Origin point.
 
     Returns
@@ -179,9 +231,16 @@ def buffer_periodic_3D(data, boxsize, buffer_length, origin=0.):
     return datap
 
 
-def subbox_buffer_periodic_3D(data, boxsize, buffer_length, subboxsize,
-    origin=0., subbox_origin=0.):
-    """Generates random buffer particles around a 3D box.
+def subbox_buffer_periodic_3D(
+    data: np.ndarray,
+    boxsize: Union[float, List[float]],
+    buffer_length: float,
+    subboxsize: Union[float, List[float]],
+    origin: Union[float, List[float]] = 0.0,
+    subbox_origin: Union[float, List[float]] = 0.0,
+) -> np.ndarray:
+    """
+    Generates random buffer particles around a 3D box.
 
     Parameters
     ----------
@@ -189,15 +248,15 @@ def subbox_buffer_periodic_3D(data, boxsize, buffer_length, subboxsize,
         Data for which we want periodic boundaries.
     axis : int
         The axis which we want periodic boundaries.
-    boxsize : float
+    boxsize : float or list
         Box size.
     buffer_length : float
         Length of the buffer region.
-    subboxsize : float
+    subboxsize : float or list
         Size of subbox.
-    origin : float, optional
+    origin : float or list, optional
         Origin point.
-    subbox_origin : float, optional
+    subbox_origin : float or list, optional
         Origin point for the subbox.
 
     Returns
@@ -214,21 +273,50 @@ def subbox_buffer_periodic_3D(data, boxsize, buffer_length, subboxsize,
     else:
         xboxsize, yboxsize, zboxsize = boxsize[0], boxsize[1], boxsize[2]
     if np.isscalar(subbox_origin):
-        subbox_xorigin, subbox_yorigin, subbox_zorigin = \
-            subbox_origin, subbox_origin, subbox_origin
+        subbox_xorigin, subbox_yorigin, subbox_zorigin = (
+            subbox_origin,
+            subbox_origin,
+            subbox_origin,
+        )
     else:
-        subbox_xorigin, subbox_yorigin, subbox_zorigin = \
-            subbox_origin[0], subbox_origin[1], subbox_origin[2]
+        subbox_xorigin, subbox_yorigin, subbox_zorigin = (
+            subbox_origin[0],
+            subbox_origin[1],
+            subbox_origin[2],
+        )
     if np.isscalar(subboxsize):
-        xsubboxsize, ysubboxsize, zsubboxsize = \
-            subboxsize, subboxsize, subboxsize
+        xsubboxsize, ysubboxsize, zsubboxsize = subboxsize, subboxsize, subboxsize
     else:
-        xsubboxsize, ysubboxsize, zsubboxsize = \
-            subboxsize[0], subboxsize[1], subboxsize[2]
-    datap = subbox_buffer_periodic(data, 0, xboxsize, buffer_length,
-        xsubboxsize, origin=xorigin, subbox_origin=subbox_xorigin)
-    datap = subbox_buffer_periodic(datap, 1, yboxsize, buffer_length,
-        ysubboxsize, origin=yorigin, subbox_origin=subbox_yorigin)
-    datap = subbox_buffer_periodic(datap, 2, zboxsize, buffer_length,
-        zsubboxsize, origin=zorigin, subbox_origin=subbox_zorigin)
+        xsubboxsize, ysubboxsize, zsubboxsize = (
+            subboxsize[0],
+            subboxsize[1],
+            subboxsize[2],
+        )
+    datap = subbox_buffer_periodic(
+        data,
+        0,
+        xboxsize,
+        buffer_length,
+        xsubboxsize,
+        origin=xorigin,
+        subbox_origin=subbox_xorigin,
+    )
+    datap = subbox_buffer_periodic(
+        datap,
+        1,
+        yboxsize,
+        buffer_length,
+        ysubboxsize,
+        origin=yorigin,
+        subbox_origin=subbox_yorigin,
+    )
+    datap = subbox_buffer_periodic(
+        datap,
+        2,
+        zboxsize,
+        buffer_length,
+        zsubboxsize,
+        origin=zorigin,
+        subbox_origin=subbox_zorigin,
+    )
     return datap

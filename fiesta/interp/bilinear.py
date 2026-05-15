@@ -1,20 +1,34 @@
 import numpy as np
+
 from .. import src
 
+from typing import Union, List
 
-def bilinear(fgrid, boxsize, x, y, origin=0., fill_value=np.nan, periodic=True):
-    """ Bilinear interpolation from a 2D grid defined in box of [0., boxsize].
+
+def bilinear(
+    fgrid: np.ndarray,
+    boxsize: Union[float, List[float]],
+    x: np.ndarray,
+    y: np.ndarray,
+    origin: Union[float, List[float]] = 0.0,
+    fill_value: float = np.nan,
+    periodic: bool = True,
+) -> np.ndarray:
+    """
+    Bilinear interpolation from a 2D grid defined in box of [0., boxsize].
 
     Parameter
     ---------
     fgrid : array
         Field values on a 2D grid.
-    boxsize : float
+    boxsize : float or list
         Box size.
     x : array
         x coordinate values.
     y : array
         y coordinate values.
+    origin : float or list, optional
+        Origin for x and y coordinates.
     fill_value : float, optional
         Fill outside boundary values.
     periodic : bool, optional
@@ -39,15 +53,19 @@ def bilinear(fgrid, boxsize, x, y, origin=0., fill_value=np.nan, periodic=True):
         _x = np.copy(x) - origin[0]
         _y = np.copy(y) - origin[1]
     # check if particles are inside the box
-    cond = np.where((_x >= 0.) & (_x < xbox) & (_y >= 0.) & (_y < ybox))[0]
+    cond = np.where((_x >= 0.0) & (_x < xbox) & (_y >= 0.0) & (_y < ybox))[0]
     if len(cond) == len(_x):
         # All particles are within the boundaries so no boundary management is necessary.
         npart = len(_x)
         if np.isscalar(periodic):
             if periodic == True:
-                f = src.bilinear_periodic(fgrid.flatten(), _x, _y, xbox, ybox, ngrids[0], ngrids[1])
+                f = src.bilinear_periodic(
+                    fgrid.flatten(), _x, _y, xbox, ybox, ngrids[0], ngrids[1]
+                )
             else:
-                f = src.bilinear_nonperiodic(fgrid.flatten(), _x, _y, xbox, ybox, ngrids[0], ngrids[1])
+                f = src.bilinear_nonperiodic(
+                    fgrid.flatten(), _x, _y, xbox, ybox, ngrids[0], ngrids[1]
+                )
         else:
             if periodic[0] is True:
                 perix = 1
@@ -57,22 +75,39 @@ def bilinear(fgrid, boxsize, x, y, origin=0., fill_value=np.nan, periodic=True):
                 periy = 1
             else:
                 periy = 0
-            f = src.bilinear_axisperiodic(fgrid.flatten(), _x, _y,
-                xbox, ybox, perix, periy, ngrids[0], ngrids[1])
+            f = src.bilinear_axisperiodic(
+                fgrid.flatten(), _x, _y, xbox, ybox, perix, periy, ngrids[0], ngrids[1]
+            )
     else:
         # Some particles are outside the boundary.
         # create a mask for in and outside the boxmask = np.zeros(len(x))
         mask = np.zeros(len(_x))
         # assign particles in the boundary a binary mask of 1
-        mask[cond] = 1.
+        mask[cond] = 1.0
         # find bilinear interpolation for points inside the boundary.
         npart = len(x[cond])
         f = np.zeros(len(_x))
         if np.isscalar(periodic):
             if periodic == True:
-                f[cond] = src.bilinear_periodic(fgrid.flatten(), _x[cond], _y[cond], xbox, ybox, ngrids[0], ngrids[1])
+                f[cond] = src.bilinear_periodic(
+                    fgrid.flatten(),
+                    _x[cond],
+                    _y[cond],
+                    xbox,
+                    ybox,
+                    ngrids[0],
+                    ngrids[1],
+                )
             else:
-                f[cond] = src.bilinear_nonperiodic(fgrid.flatten(), _x[cond], _y[cond], xbox, ybox, ngrids[0], ngrids[1])
+                f[cond] = src.bilinear_nonperiodic(
+                    fgrid.flatten(),
+                    _x[cond],
+                    _y[cond],
+                    xbox,
+                    ybox,
+                    ngrids[0],
+                    ngrids[1],
+                )
         else:
             if periodic[0] is True:
                 perix = 1
@@ -82,8 +117,18 @@ def bilinear(fgrid, boxsize, x, y, origin=0., fill_value=np.nan, periodic=True):
                 periy = 1
             else:
                 periy = 0
-            f[cond] = src.bilinear_axisperiodic(fgrid.flatten(), _x[cond], _y[cond], xbox, ybox, perix, periy, ngrids[0], ngrids[1])
+            f[cond] = src.bilinear_axisperiodic(
+                fgrid.flatten(),
+                _x[cond],
+                _y[cond],
+                xbox,
+                ybox,
+                perix,
+                periy,
+                ngrids[0],
+                ngrids[1],
+            )
         # fill outside boundary with fill values.
-        cond = np.where(mask == 0.)[0]
+        cond = np.where(mask == 0.0)[0]
         f[cond] = fill_value
     return f

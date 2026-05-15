@@ -1,12 +1,3 @@
-
-from .grid import grid1D
-from .grid import grid2D
-from .grid import grid3D
-
-from .mpi_grid import mpi_grid1D
-from .mpi_grid import mpi_grid2D
-from .mpi_grid import mpi_grid3D
-
 from .points import x2points
 from .points import points2x
 from .points import xy2points
@@ -22,3 +13,4 @@ from .mpi_points import mpi_open_2D
 from .mpi_points import mpi_open_3D
 from .mpi_points import check_coords_at_MPI_0
 from .mpi_points import MPI_SortByX
+from .mpi_points import distribute_points_by_x

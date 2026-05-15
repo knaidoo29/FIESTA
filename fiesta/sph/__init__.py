@@ -1,4 +1,3 @@
-
 from .kernels import cubic_kernel
 from .kernels import dcubic_kernel
 

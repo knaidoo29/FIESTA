@@ -1,15 +1,27 @@
 import numpy as np
+
 from .. import src
 
+from typing import Union, List
 
-def trilinear(fgrid, boxsize, x, y, z, origin=0., fill_value=np.nan, periodic=True):
-    """ Trilinear interpolation from a 3D grid defined in box of [0., boxsize].
+
+def trilinear(
+    fgrid: np.ndarray,
+    boxsize: Union[float, List[float]],
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    origin: Union[float, List[float]] = 0.0,
+    fill_value: float = np.nan,
+    periodic: bool = True,
+) -> np.ndarray:
+    """Trilinear interpolation from a 3D grid defined in box of [0., boxsize].
 
     Parameter
     ---------
     fgrid : array
         Field values on a 3D grid.
-    boxsize : float/array
+    boxsize : float or list
         Box size in one or all axes.
     x : array
         x coordinate values.
@@ -17,7 +29,7 @@ def trilinear(fgrid, boxsize, x, y, z, origin=0., fill_value=np.nan, periodic=Tr
         y coordinate values.
     z : array
         z coordinate values.
-    origin : float/array
+    origin : float or list, optional
         Origin for the axes.
     fill_value : float, optional
         Fill outside boundary values.
@@ -46,16 +58,44 @@ def trilinear(fgrid, boxsize, x, y, z, origin=0., fill_value=np.nan, periodic=Tr
         _y = np.copy(y) - origin[1]
         _z = np.copy(z) - origin[2]
     # check if particles are inside the box
-    cond = np.where((_x >= 0.) & (_x < xbox) & (_y >= 0.) & (_y < ybox)
-                    & (_z >= 0.) & (_z < zbox))[0]
+    cond = np.where(
+        (_x >= 0.0)
+        & (_x < xbox)
+        & (_y >= 0.0)
+        & (_y < ybox)
+        & (_z >= 0.0)
+        & (_z < zbox)
+    )[0]
     if len(cond) == len(_x):
         # All particles are within the boundaries so no boundary management is necessary.
         npart = len(_x)
         if np.isscalar(periodic):
             if periodic == True:
-                f = src.trilinear_periodic(fgrid.flatten(), _x, _y, _z, xbox, ybox, zbox, ngrids[0], ngrids[1], ngrids[2])
+                f = src.trilinear_periodic(
+                    fgrid.flatten(),
+                    _x,
+                    _y,
+                    _z,
+                    xbox,
+                    ybox,
+                    zbox,
+                    ngrids[0],
+                    ngrids[1],
+                    ngrids[2],
+                )
             else:
-                f = src.trilinear_nonperiodic(fgrid.flatten(), _x, _y, _z, xbox, ybox, zbox, ngrids[0], ngrids[1], ngrids[2])
+                f = src.trilinear_nonperiodic(
+                    fgrid.flatten(),
+                    _x,
+                    _y,
+                    _z,
+                    xbox,
+                    ybox,
+                    zbox,
+                    ngrids[0],
+                    ngrids[1],
+                    ngrids[2],
+                )
         else:
             if periodic[0] is True:
                 perix = 1
@@ -69,23 +109,57 @@ def trilinear(fgrid, boxsize, x, y, z, origin=0., fill_value=np.nan, periodic=Tr
                 periz = 1
             else:
                 periz = 0
-            f = src.trilinear_axisperiodic(fgrid.flatten(), _x, _y, _z,
-                                           xbox, ybox, zbox, perix, periy, periz,
-                                           ngrids[0], ngrids[1], ngrids[2])
+            f = src.trilinear_axisperiodic(
+                fgrid.flatten(),
+                _x,
+                _y,
+                _z,
+                xbox,
+                ybox,
+                zbox,
+                perix,
+                periy,
+                periz,
+                ngrids[0],
+                ngrids[1],
+                ngrids[2],
+            )
     else:
         # Some particles are outside the boundary.
         # create a mask for in and outside the box
         mask = np.zeros(len(_x))
         # assign particles in the boundary a binary mask of 1.
-        mask[cond] = 1.
+        mask[cond] = 1.0
         # find trilinear interpolation for points inside the boundary.
         npart = len(x[cond])
         f = np.zeros(len(_x))
         if np.isscalar(periodic):
             if periodic == True:
-                f[cond] = src.trilinear_periodic(fgrid.flatten(), _x[cond], _y[cond], _z[cond], xbox, ybox, zbox, ngrids[0], ngrids[1], ngrids[2])
+                f[cond] = src.trilinear_periodic(
+                    fgrid.flatten(),
+                    _x[cond],
+                    _y[cond],
+                    _z[cond],
+                    xbox,
+                    ybox,
+                    zbox,
+                    ngrids[0],
+                    ngrids[1],
+                    ngrids[2],
+                )
             else:
-                f[cond] = src.trilinear_nonperiodic(fgrid.flatten(), _x[cond], _y[cond], _z[cond], xbox, ybox, zbox, ngrids[0], ngrids[1], ngrids[2])
+                f[cond] = src.trilinear_nonperiodic(
+                    fgrid.flatten(),
+                    _x[cond],
+                    _y[cond],
+                    _z[cond],
+                    xbox,
+                    ybox,
+                    zbox,
+                    ngrids[0],
+                    ngrids[1],
+                    ngrids[2],
+                )
         else:
             if periodic[0] is True:
                 perix = 1
@@ -99,8 +173,22 @@ def trilinear(fgrid, boxsize, x, y, z, origin=0., fill_value=np.nan, periodic=Tr
                 periz = 1
             else:
                 periz = 0
-            f[cond] = src.trilinear_axisperiodic(fgrid.flatten(), _x[cond], _y[cond], _z[cond], xbox, ybox, zbox, perix, periy, periz, ngrids[0], ngrids[1], ngrids[2])
+            f[cond] = src.trilinear_axisperiodic(
+                fgrid.flatten(),
+                _x[cond],
+                _y[cond],
+                _z[cond],
+                xbox,
+                ybox,
+                zbox,
+                perix,
+                periy,
+                periz,
+                ngrids[0],
+                ngrids[1],
+                ngrids[2],
+            )
         # fill outside boundary with fill values.
-        cond = np.where(mask == 0.)[0]
+        cond = np.where(mask == 0.0)[0]
         f[cond] = fill_value
     return f

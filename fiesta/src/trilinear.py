@@ -5,7 +5,18 @@ from . import grid
 
 
 @njit
-def trilinear_periodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngridz):
+def trilinear_periodic(
+    fgrid: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    xbox: float,
+    ybox: float,
+    zbox: float,
+    ngridx: int,
+    ngridy: int,
+    ngridz: int,
+) -> np.ndarray:  # pragma: no cover
     """
     Trilinear interpolation of field defined on a grid.
 
@@ -33,21 +44,21 @@ def trilinear_periodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngridz)
     """
     npart = len(x)
     f = np.zeros(npart)
-    minx = 0.
+    minx = 0.0
     dx = xbox / float(ngridx)
     dy = ybox / float(ngridy)
     dz = zbox / float(ngridz)
     for i in range(0, npart):
         xp, yp, zp = x[i], y[i], z[i]
 
-        if xp - dx/2. < 0.:
+        if xp - dx / 2.0 < 0.0:
             xp = xp + xbox
-        if yp - dy/2. < 0.:
+        if yp - dy / 2.0 < 0.0:
             yp = yp + ybox
-        if zp - dz/2. < 0.:
+        if zp - dz / 2.0 < 0.0:
             zp = zp + zbox
 
-        ix1 = int((xp - dx/2.) / dx)
+        ix1 = int((xp - dx / 2.0) / dx)
         xg1 = grid.xgrid(ix1, dx, minx)
 
         ix2 = ix1 + 1
@@ -56,7 +67,7 @@ def trilinear_periodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngridz)
         if ix2 == ngridx:
             ix2 = ix2 - ngridx
 
-        iy1 = int((yp - dy/2.) / dy)
+        iy1 = int((yp - dy / 2.0) / dy)
         yg1 = grid.xgrid(iy1, dy, minx)
 
         iy2 = iy1 + 1
@@ -65,7 +76,7 @@ def trilinear_periodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngridz)
         if iy2 == ngridy:
             iy2 = iy2 - ngridy
 
-        iz1 = int((zp - dz/2.) / dz)
+        iz1 = int((zp - dz / 2.0) / dz)
         zg1 = grid.xgrid(iz1, dz, minx)
 
         iz2 = iz1 + 1
@@ -76,14 +87,14 @@ def trilinear_periodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngridz)
 
         # surround points in the grid of a single point for interpolation.
 
-        q111 = iz1 + ngridz*(iy1 + ngridy*ix1)
-        q112 = iz1 + ngridz*(iy1 + ngridy*ix2)
-        q121 = iz1 + ngridz*(iy2 + ngridy*ix1) 
-        q122 = iz1 + ngridz*(iy2 + ngridy*ix2) 
-        q211 = iz2 + ngridz*(iy1 + ngridy*ix1) 
-        q212 = iz2 + ngridz*(iy1 + ngridy*ix2) 
-        q221 = iz2 + ngridz*(iy2 + ngridy*ix1)
-        q222 = iz2 + ngridz*(iy2 + ngridy*ix2)
+        q111 = iz1 + ngridz * (iy1 + ngridy * ix1)
+        q112 = iz1 + ngridz * (iy1 + ngridy * ix2)
+        q121 = iz1 + ngridz * (iy2 + ngridy * ix1)
+        q122 = iz1 + ngridz * (iy2 + ngridy * ix2)
+        q211 = iz2 + ngridz * (iy1 + ngridy * ix1)
+        q212 = iz2 + ngridz * (iy1 + ngridy * ix2)
+        q221 = iz2 + ngridz * (iy2 + ngridy * ix1)
+        q222 = iz2 + ngridz * (iy2 + ngridy * ix2)
 
         f111 = fgrid[q111]
         f112 = fgrid[q112]
@@ -98,24 +109,35 @@ def trilinear_periodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngridz)
         yd = (yp - yg1) / (yg2 - yg1)
         zd = (zp - zg1) / (zg2 - zg1)
 
-        f11 = f111*(1-xd) + f112*xd
-        f21 = f211*(1-xd) + f212*xd
-        f12 = f121*(1-xd) + f122*xd
-        f22 = f221*(1-xd) + f222*xd
+        f11 = f111 * (1 - xd) + f112 * xd
+        f21 = f211 * (1 - xd) + f212 * xd
+        f12 = f121 * (1 - xd) + f122 * xd
+        f22 = f221 * (1 - xd) + f222 * xd
 
-        f1 = f11*(1-yd) + f12*yd
-        f2 = f21*(1-yd) + f22*yd
+        f1 = f11 * (1 - yd) + f12 * yd
+        f2 = f21 * (1 - yd) + f22 * yd
 
-        f[i] = f1*(1-zd) + f2*zd
+        f[i] = f1 * (1 - zd) + f2 * zd
 
     return f
 
 
 @njit
-def trilinear_nonperiodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngridz):
+def trilinear_nonperiodic(
+    fgrid: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    xbox: float,
+    ybox: float,
+    zbox: float,
+    ngridx: int,
+    ngridy: int,
+    ngridz: int,
+) -> np.ndarray:  # pragma: no cover
     """
     Trilinear interpolation of field defined on a grid.
-  
+
     Parameters
     ----------
     fgrid : array
@@ -130,7 +152,7 @@ def trilinear_nonperiodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngri
         Size of the box.
     ngridx, ngridy, ngridz : int
         Size of the grid along each axis.
-    
+
     Returns
     -------
     f : array
@@ -138,77 +160,77 @@ def trilinear_nonperiodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngri
     """
     npart = len(x)
     f = np.zeros(npart)
-    minx = 0.
+    minx = 0.0
     dx = xbox / float(ngridx)
     dy = ybox / float(ngridy)
     dz = zbox / float(ngridz)
     for i in range(0, npart):
         xp, yp, zp = x[i], y[i], z[i]
 
-        if xp - dx/2. < 0.:
+        if xp - dx / 2.0 < 0.0:
             ix1 = -1
             ix2 = 0
             xg1 = grid.xgrid(ix1, dx, minx)
             xg2 = grid.xgrid(ix2, dx, minx)
             ix1 = 0
-        elif xp > xbox - dx/2.:
+        elif xp > xbox - dx / 2.0:
             ix1 = ngridx - 1
             ix2 = ngridx
             xg1 = grid.xgrid(ix1, dx, minx)
             xg2 = grid.xgrid(ix2, dx, minx)
             ix2 = ngridx - 1
         else:
-            ix1 = int((xp - dx/2.) / dx)
+            ix1 = int((xp - dx / 2.0) / dx)
             ix2 = ix1 + 1
             xg1 = grid.xgrid(ix1, dy, minx)
             xg2 = grid.xgrid(ix2, dy, minx)
 
-        if yp - dy/2. < 0.:
+        if yp - dy / 2.0 < 0.0:
             iy1 = -1
             iy2 = 0
             yg1 = grid.xgrid(iy1, dy, minx)
             yg2 = grid.xgrid(iy2, dy, minx)
             iy1 = 0
-        elif yp > ybox - dy/2.:
+        elif yp > ybox - dy / 2.0:
             iy1 = ngridy - 1
             iy2 = ngridy
             yg1 = grid.xgrid(iy1, dy, minx)
             yg2 = grid.xgrid(iy2, dy, minx)
             iy2 = ngridy - 1
         else:
-            iy1 = int((yp - dy/2.) / dy)
+            iy1 = int((yp - dy / 2.0) / dy)
             iy2 = iy1 + 1
             yg1 = grid.xgrid(iy1, dy, minx)
             yg2 = grid.xgrid(iy2, dy, minx)
 
-        if zp - dz/2. < 0.:
+        if zp - dz / 2.0 < 0.0:
             iz1 = -1
             iz2 = 0
             zg1 = grid.xgrid(iz1, dz, minx)
             zg2 = grid.xgrid(iz2, dz, minx)
             iz1 = 0
-        elif zp > zbox - dz/2.:
+        elif zp > zbox - dz / 2.0:
             iz1 = ngridz - 1
             iz2 = ngridz
             zg1 = grid.xgrid(iz1, dz, minx)
             zg2 = grid.xgrid(iz2, dz, minx)
             iz2 = ngridz - 1
         else:
-            iz1 = int((zp - dz/2.) / dz)
+            iz1 = int((zp - dz / 2.0) / dz)
             iz2 = iz1 + 1
             zg1 = grid.xgrid(iz1, dz, minx)
             zg2 = grid.xgrid(iz2, dz, minx)
 
         # surround points in the grid of a single point for interpolation.
 
-        q111 = iz1 + ngridz*(iy1 + ngridy*ix1)
-        q112 = iz1 + ngridz*(iy1 + ngridy*ix2)        
-        q121 = iz1 + ngridz*(iy2 + ngridy*ix1) 
-        q122 = iz1 + ngridz*(iy2 + ngridy*ix2) 
-        q211 = iz2 + ngridz*(iy1 + ngridy*ix1) 
-        q212 = iz2 + ngridz*(iy1 + ngridy*ix2) 
-        q221 = iz2 + ngridz*(iy2 + ngridy*ix1) 
-        q222 = iz2 + ngridz*(iy2 + ngridy*ix2)
+        q111 = iz1 + ngridz * (iy1 + ngridy * ix1)
+        q112 = iz1 + ngridz * (iy1 + ngridy * ix2)
+        q121 = iz1 + ngridz * (iy2 + ngridy * ix1)
+        q122 = iz1 + ngridz * (iy2 + ngridy * ix2)
+        q211 = iz2 + ngridz * (iy1 + ngridy * ix1)
+        q212 = iz2 + ngridz * (iy1 + ngridy * ix2)
+        q221 = iz2 + ngridz * (iy2 + ngridy * ix1)
+        q222 = iz2 + ngridz * (iy2 + ngridy * ix2)
 
         f111 = fgrid[q111]
         f112 = fgrid[q112]
@@ -223,21 +245,35 @@ def trilinear_nonperiodic(fgrid, x, y, z, xbox, ybox, zbox, ngridx, ngridy, ngri
         yd = (yp - yg1) / (yg2 - yg1)
         zd = (zp - zg1) / (zg2 - zg1)
 
-        f11 = f111*(1-xd) + f112*xd
-        f21 = f211*(1-xd) + f212*xd
-        f12 = f121*(1-xd) + f122*xd
-        f22 = f221*(1-xd) + f222*xd
+        f11 = f111 * (1 - xd) + f112 * xd
+        f21 = f211 * (1 - xd) + f212 * xd
+        f12 = f121 * (1 - xd) + f122 * xd
+        f22 = f221 * (1 - xd) + f222 * xd
 
-        f1 = f11*(1-yd) + f12*yd
-        f2 = f21*(1-yd) + f22*yd
+        f1 = f11 * (1 - yd) + f12 * yd
+        f2 = f21 * (1 - yd) + f22 * yd
 
-        f[i] = f1*(1-zd) + f2*zd
+        f[i] = f1 * (1 - zd) + f2 * zd
 
     return f
 
 
 @njit
-def trilinear_axisperiodic(fgrid, x, y, z, xbox, ybox, zbox, perix, periy, periz, ngridx, ngridy, ngridz):
+def trilinear_axisperiodic(
+    fgrid: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    xbox: float,
+    ybox: float,
+    zbox: float,
+    perix: int,
+    periy: int,
+    periz: int,
+    ngridx: int,
+    ngridy: int,
+    ngridz: int,
+) -> np.ndarray:  # pragma: no cover
     """
     Trilinear interpolation of field defined on a grid.
 
@@ -257,8 +293,6 @@ def trilinear_axisperiodic(fgrid, x, y, z, xbox, ybox, zbox, perix, periy, periz
         0 = non-periodic, 1 = periodic
     ngridx, ngridy, ngridz : int
         Size of the grid along each axis.
-    npart : int
-        Number of particles.
 
     Returns
     -------
@@ -267,7 +301,7 @@ def trilinear_axisperiodic(fgrid, x, y, z, xbox, ybox, zbox, perix, periy, periz
     """
     npart = len(x)
     f = np.zeros(npart)
-    minx = 0.
+    minx = 0.0
     dx = xbox / float(ngridx)
     dy = ybox / float(ngridy)
     dz = zbox / float(ngridz)
@@ -275,99 +309,99 @@ def trilinear_axisperiodic(fgrid, x, y, z, xbox, ybox, zbox, perix, periy, periz
         xp, yp, zp = x[i], y[i], z[i]
 
         if perix == 1:
-            if xp - dx/2. < 0.:
+            if xp - dx / 2.0 < 0.0:
                 xp = xp + xbox
-            ix1 = int((xp - dx/2.) / dx)
+            ix1 = int((xp - dx / 2.0) / dx)
             xg1 = grid.xgrid(ix1, dx, minx)
             ix2 = ix1 + 1
             xg2 = grid.xgrid(ix2, dx, minx)
             if ix2 == ngridx:
                 ix2 = ix2 - ngridx
         else:
-            if xp - dx/2. < 0.:
+            if xp - dx / 2.0 < 0.0:
                 ix1 = -1
                 ix2 = 0
                 xg1 = grid.xgrid(ix1, dx, minx)
                 xg2 = grid.xgrid(ix2, dx, minx)
                 ix1 = 0
-            elif xp > xbox - dx/2.:
+            elif xp > xbox - dx / 2.0:
                 ix1 = ngridx - 1
                 ix2 = ngridx
                 xg1 = grid.xgrid(ix1, dx, minx)
                 xg2 = grid.xgrid(ix2, dx, minx)
                 ix2 = ngridx - 1
             else:
-                ix1 = int((xp - dx/2.) / dx)
+                ix1 = int((xp - dx / 2.0) / dx)
                 ix2 = ix1 + 1
                 xg1 = grid.xgrid(ix1, dy, minx)
                 xg2 = grid.xgrid(ix2, dy, minx)
 
         if periy == 1:
-            if yp - dy/2. < 0.:
+            if yp - dy / 2.0 < 0.0:
                 yp = yp + ybox
-            iy1 = int((yp - dy/2.) / dy)
+            iy1 = int((yp - dy / 2.0) / dy)
             yg1 = grid.xgrid(iy1, dy, minx)
             iy2 = iy1 + 1
             yg2 = grid.xgrid(iy2, dy, minx)
             if iy2 == ngridy:
                 iy2 = iy2 - ngridy
         else:
-            if yp - dy/2. < 0.:
+            if yp - dy / 2.0 < 0.0:
                 iy1 = -1
                 iy2 = 0
                 yg1 = grid.xgrid(iy1, dy, minx)
                 yg2 = grid.xgrid(iy2, dy, minx)
                 iy1 = 0
-            elif yp > ybox - dy/2.:
+            elif yp > ybox - dy / 2.0:
                 iy1 = ngridy - 1
                 iy2 = ngridy
                 yg1 = grid.xgrid(iy1, dy, minx)
                 yg2 = grid.xgrid(iy2, dy, minx)
                 iy2 = ngridy - 1
             else:
-                iy1 = int((yp - dy/2.) / dy)
+                iy1 = int((yp - dy / 2.0) / dy)
                 iy2 = iy1 + 1
                 yg1 = grid.xgrid(iy1, dy, minx)
                 yg2 = grid.xgrid(iy2, dy, minx)
 
         if periz == 1:
-            if zp - dz/2. < 0.:
+            if zp - dz / 2.0 < 0.0:
                 zp = zp + zbox
-            iz1 = int((zp - dz/2.) / dz)
+            iz1 = int((zp - dz / 2.0) / dz)
             zg1 = grid.xgrid(iz1, dz, minx)
             iz2 = iz1 + 1
             zg2 = grid.xgrid(iz2, dz, minx)
             if iz2 == ngridz:
                 iz2 = iz2 - ngridz
         else:
-            if zp - dz/2. < 0.:
+            if zp - dz / 2.0 < 0.0:
                 iz1 = -1
                 iz2 = 0
                 zg1 = grid.xgrid(iz1, dz, minx)
                 zg2 = grid.xgrid(iz2, dz, minx)
                 iz1 = 0
-            elif zp > zbox - dz/2.:
+            elif zp > zbox - dz / 2.0:
                 iz1 = ngridz - 1
                 iz2 = ngridz
                 zg1 = grid.xgrid(iz1, dz, minx)
                 zg2 = grid.xgrid(iz2, dz, minx)
                 iz2 = ngridz - 1
             else:
-                iz1 = int((zp - dz/2.) / dz)
+                iz1 = int((zp - dz / 2.0) / dz)
                 iz2 = iz1 + 1
                 zg1 = grid.xgrid(iz1, dz, minx)
                 zg2 = grid.xgrid(iz2, dz, minx)
 
         # surround points in the grid of a single point for interpolation.
 
-        q111 = iz1 + ngridz*(iy1 + ngridy*ix1)
-        q112 = iz1 + ngridz*(iy1 + ngridy*ix2)
-        q121 = iz1 + ngridz*(iy2 + ngridy*ix1)
-        q122 = iz1 + ngridz*(iy2 + ngridy*ix2)
-        q211 = iz2 + ngridz*(iy1 + ngridy*ix1)
-        q212 = iz2 + ngridz*(iy1 + ngridy*ix2)
-        q221 = iz2 + ngridz*(iy2 + ngridy*ix1)
-        q222 = iz2 + ngridz*(iy2 + ngridy*ix2)
+        q111 = iz1 + ngridz * (iy1 + ngridy * ix1)
+        q112 = iz1 + ngridz * (iy1 + ngridy * ix2)
+        q121 = iz1 + ngridz * (iy2 + ngridy * ix1)
+        q122 = iz1 + ngridz * (iy2 + ngridy * ix2)
+        q211 = iz2 + ngridz * (iy1 + ngridy * ix1)
+        q212 = iz2 + ngridz * (iy1 + ngridy * ix2)
+        q221 = iz2 + ngridz * (iy2 + ngridy * ix1)
+        q222 = iz2 + ngridz * (iy2 + ngridy * ix2)
 
         f111 = fgrid[q111]
         f112 = fgrid[q112]
@@ -382,14 +416,14 @@ def trilinear_axisperiodic(fgrid, x, y, z, xbox, ybox, zbox, perix, periy, periz
         yd = (yp - yg1) / (yg2 - yg1)
         zd = (zp - zg1) / (zg2 - zg1)
 
-        f11 = f111*(1-xd) + f112*xd
-        f21 = f211*(1-xd) + f212*xd
-        f12 = f121*(1-xd) + f122*xd
-        f22 = f221*(1-xd) + f222*xd
+        f11 = f111 * (1 - xd) + f112 * xd
+        f21 = f211 * (1 - xd) + f212 * xd
+        f12 = f121 * (1 - xd) + f122 * xd
+        f22 = f221 * (1 - xd) + f222 * xd
 
-        f1 = f11*(1-yd) + f12*yd
-        f2 = f21*(1-yd) + f22*yd
+        f1 = f11 * (1 - yd) + f12 * yd
+        f2 = f21 * (1 - yd) + f22 * yd
 
-        f[i] = f1*(1-zd) + f2*zd
+        f[i] = f1 * (1 - zd) + f2 * zd
 
     return f

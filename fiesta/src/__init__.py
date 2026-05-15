@@ -62,3 +62,8 @@ from .differentiate import dfdy_2d_periodic
 from .differentiate import dfdx_3d_periodic
 from .differentiate import dfdy_3d_periodic
 from .differentiate import dfdz_3d_periodic
+
+from .gridsph import sum_from_integral_image_2D
+from .gridsph import sum_from_integral_image_3D
+from .gridsph import get_volume_enclosing_box_2D
+from .gridsph import get_volume_enclosing_box_3D

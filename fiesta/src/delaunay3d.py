@@ -6,7 +6,15 @@ from . import polyhedron
 
 
 @njit
-def delaunay_volume_3d(x, y, z, del_vert0, del_vert1, del_vert2, del_vert3):
+def delaunay_volume_3d(
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    del_vert0: np.ndarray,
+    del_vert1: np.ndarray,
+    del_vert2: np.ndarray,
+    del_vert3: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
     """
     Determines the volume for each simplex.
 
@@ -26,11 +34,7 @@ def delaunay_volume_3d(x, y, z, del_vert0, del_vert1, del_vert2, del_vert3):
         Index for vertex 2 of each simplices.
     del_vert3 : array
         Index for vertex 3 of each simplices.
-    npart : int
-        Number of points.
-    nvert : int
-        Number of vertices.
-    
+
     Returns
     -------
     volumes : array
@@ -43,15 +47,35 @@ def delaunay_volume_3d(x, y, z, del_vert0, del_vert1, del_vert2, del_vert3):
         i1 = del_vert1[i]
         i2 = del_vert2[i]
         i3 = del_vert3[i]
-        volumes[i] = polyhedron.tetrahedron_volume(x[i0], y[i0], z[i0], x[i1], y[i1], z[i1], x[i2], y[i2], z[i2], x[i3], y[i3], z[i3])
+        volumes[i] = polyhedron.tetrahedron_volume(
+            x[i0],
+            y[i0],
+            z[i0],
+            x[i1],
+            y[i1],
+            z[i1],
+            x[i2],
+            y[i2],
+            z[i2],
+            x[i3],
+            y[i3],
+            z[i3],
+        )
     return volumes
 
 
 @njit
-def sum_delaunay_vol_4_points_3d(delaunay_vol, del_vert0, del_vert1, del_vert2, del_vert3, npart):
+def sum_delaunay_vol_4_points_3d(
+    delaunay_vol: np.ndarray,
+    del_vert0: np.ndarray,
+    del_vert1: np.ndarray,
+    del_vert2: np.ndarray,
+    del_vert3: np.ndarray,
+    npart: int,
+) -> np.ndarray:  # pragma: no cover
     """
     Finds the Delaunay volume for each point.
-    
+
     Parameters
     ----------
     delaunay_vol : array
@@ -64,7 +88,7 @@ def sum_delaunay_vol_4_points_3d(delaunay_vol, del_vert0, del_vert1, del_vert2, 
         Index for vertex 2 of each simplices.
     npart : int
         Number of points.
-    
+
     Returns
     -------
     point_vol : array
@@ -77,15 +101,24 @@ def sum_delaunay_vol_4_points_3d(delaunay_vol, del_vert0, del_vert1, del_vert2, 
         i1 = del_vert1[i]
         i2 = del_vert2[i]
         i3 = del_vert3[i]
-        point_vol[i0] = point_vol[i0] + delaunay_vol[i]/4.
-        point_vol[i1] = point_vol[i1] + delaunay_vol[i]/4.
-        point_vol[i2] = point_vol[i2] + delaunay_vol[i]/4.
-        point_vol[i3] = point_vol[i3] + delaunay_vol[i]/4.
+        point_vol[i0] = point_vol[i0] + delaunay_vol[i] / 4.0
+        point_vol[i1] = point_vol[i1] + delaunay_vol[i] / 4.0
+        point_vol[i2] = point_vol[i2] + delaunay_vol[i] / 4.0
+        point_vol[i3] = point_vol[i3] + delaunay_vol[i] / 4.0
     return point_vol
 
 
 @njit
-def get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3):
+def get_delf0_3d(
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    f: np.ndarray,
+    del_vert0: np.ndarray,
+    del_vert1: np.ndarray,
+    del_vert2: np.ndarray,
+    del_vert3: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
     """
     Determines delf0 for each simplices.
 
@@ -107,14 +140,14 @@ def get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3):
         Index for vertex 2 of each simplices.
     del_vert3 : array
         Index for vertex 3 of each simplices.
-    
+
     Returns
     -------
     delf0 : array
         The 3D difference in each simplices.
     """
     nvert = len(del_vert0)
-    delf0 = np.zeros(3*nvert)
+    delf0 = np.zeros(3 * nvert)
     m = np.zeros(9)
     for i in range(0, nvert):
         i0 = del_vert0[i]
@@ -152,15 +185,25 @@ def get_delf0_3d(x, y, z, f, del_vert0, del_vert1, del_vert2, del_vert3):
 
         invm = matrix.inv3by3(m)
 
-        delf0[3*i]   = invm[0]*df1 + invm[1]*df2 + invm[2]*df3
-        delf0[3*i+1] = invm[3]*df1 + invm[4]*df2 + invm[5]*df3
-        delf0[3*i+2] = invm[6]*df1 + invm[7]*df2 + invm[8]*df3
+        delf0[3 * i] = invm[0] * df1 + invm[1] * df2 + invm[2] * df3
+        delf0[3 * i + 1] = invm[3] * df1 + invm[4] * df2 + invm[5] * df3
+        delf0[3 * i + 2] = invm[6] * df1 + invm[7] * df2 + invm[8] * df3
 
     return delf0
 
 
 @njit
-def delaunay_estimate_3d(simplices, x, y, z, x0, y0, z0, f0, delf0):
+def delaunay_estimate_3d(
+    simplices: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    x0: np.ndarray,
+    y0: np.ndarray,
+    z0: np.ndarray,
+    f0: np.ndarray,
+    delf0: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
     """
     Estimates a field from Delaunay tesselation.
 
@@ -182,7 +225,7 @@ def delaunay_estimate_3d(simplices, x, y, z, x0, y0, z0, f0, delf0):
         Field values at vertex 0 of each simplices.
     delf0 : array
         The 3D difference in each simplices.
-    
+
     Returns
     -------
     f_est : array
@@ -192,5 +235,10 @@ def delaunay_estimate_3d(simplices, x, y, z, x0, y0, z0, f0, delf0):
     f_est = np.zeros(npart)
     for i in range(0, npart):
         j = simplices[i]
-        f_est[i] = f0[j] + delf0[3*j]*(x[i] - x0[j]) + delf0[3*j+1]*(y[i] - y0[j]) + delf0[3*j+2]*(z[i] - z0[j])
+        f_est[i] = (
+            f0[j]
+            + delf0[3 * j] * (x[i] - x0[j])
+            + delf0[3 * j + 1] * (y[i] - y0[j])
+            + delf0[3 * j + 2] * (z[i] - z0[j])
+        )
     return f_est

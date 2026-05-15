@@ -39,7 +39,7 @@ jobs:
         run: |
           coverage erase
           coverage run --parallel-mode -m pytest tests/normal_tests
-          mpirun -n 2 coverage run --parallel-mode -m pytest tests/mpi_tests
+          mpirun -n 3 coverage run --parallel-mode -m pytest tests/mpi_tests
           coverage combine
           coverage report -m
 
@@ -54,4 +54,4 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: knaidoo29/SHIFT
+          slug: knaidoo29/FIESTA

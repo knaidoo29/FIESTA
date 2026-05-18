@@ -15,17 +15,17 @@ def mpi_sph4grid2D(
     ngrid: Union[int, List[int]],
     MPI: object,
     f: Optional[np.ndarray] = None,
-    origin: Union[float, List[float]] = 0.,
+    origin: Union[float, List[float]] = 0.0,
     mass: Optional[np.ndarray] = None,
     k: int = 20,
     periodic: bool = True,
     subsampling: int = 1,
     outputgrid: bool = False,
-    buffer_length: float = 0.,
+    buffer_length: float = 0.0,
 ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
     """
     Estimates a field on a regular grid based on SPH k neighbours.
-    
+
     Parameters
     ----------
     x, y : array
@@ -80,7 +80,7 @@ def mpi_sph4grid2D(
         nxgrid, nygrid = ngrid, ngrid
     else:
         nxgrid, nygrid = ngrid[0], ngrid[1]
-    
+
     # collapse data
     if x is not None:
         if f is None:
@@ -95,19 +95,19 @@ def mpi_sph4grid2D(
                 data = coords.coord2points([x, y, f, mass])
     else:  # pragma: no cover
         data = None
-    
+
     if f is not None:
         fieldexist = True
     else:
         fieldexist = False
-    
+
     fieldexists = MPI.collect(fieldexist)
 
     if MPI.rank == 0:
         fieldexist = any(fieldexists)
     else:
         fieldexist = None
-        
+
     fieldexist = MPI.broadcast(fieldexist)
 
     # sort coordinates and distribute by coordinate system
@@ -116,13 +116,17 @@ def mpi_sph4grid2D(
     MPI_SBX.input(data)
     MPI_SBX.limits4grid()
     data = MPI_SBX.distribute()
-    
+
     assert buffer_length <= xboxsize, "buffer_length must be smaller than slab length."
 
     if periodic:
-        data = boundary.mpi_buffer_periodic_2D(data, boxsize, buffer_length, MPI, origin, include_internal=True)
+        data = boundary.mpi_buffer_periodic_2D(
+            data, boxsize, buffer_length, MPI, origin, include_internal=True
+        )
     else:
-        data = boundary.mpi_buffer_internal_2D(data, boxsize, buffer_length, MPI, origin)
+        data = boundary.mpi_buffer_internal_2D(
+            data, boxsize, buffer_length, MPI, origin
+        )
 
     # coordinates only inside slab
     x, y = data[:, 0], data[:, 1]
@@ -131,7 +135,7 @@ def mpi_sph4grid2D(
         mass = data[:, 3]
     else:
         mass = data[:, 2]
-    
+
     xedges, xgrid = shift.cart.mpi_grid1D(xboxsize, nxgrid, MPI, origin=xorigin)
 
     # local grid, we will use an underscore to differentiate from global
@@ -141,8 +145,17 @@ def mpi_sph4grid2D(
     _nxgrid = len(xgrid)
 
     return sph4grid.sph4grid2D(
-        x, y, [_xboxsize, yboxsize], [_nxgrid, nygrid], f=f, origin=[_xorigin, yorigin], 
-        mass=mass, k=k, periodic=False, subsampling=subsampling, outputgrid=outputgrid
+        x,
+        y,
+        [_xboxsize, yboxsize],
+        [_nxgrid, nygrid],
+        f=f,
+        origin=[_xorigin, yorigin],
+        mass=mass,
+        k=k,
+        periodic=False,
+        subsampling=subsampling,
+        outputgrid=outputgrid,
     )
 
 
@@ -154,17 +167,17 @@ def mpi_sph4grid3D(
     ngrid: Union[int, List[int]],
     MPI: object,
     f: Optional[np.ndarray] = None,
-    origin: Union[float, List[float]] = 0.,
+    origin: Union[float, List[float]] = 0.0,
     mass: Optional[np.ndarray] = None,
     k: int = 20,
     periodic: bool = True,
     subsampling: int = 1,
     outputgrid: bool = False,
-    buffer_length: float = 0.,
+    buffer_length: float = 0.0,
 ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
     """
     Estimates a field on a regular grid based on SPH k neighbours.
-    
+
     Parameters
     ----------
     x, y, z : array
@@ -219,7 +232,7 @@ def mpi_sph4grid3D(
         nxgrid, nygrid, nzgrid = ngrid, ngrid, ngrid
     else:
         nxgrid, nygrid, nzgrid = ngrid[0], ngrid[1], ngrid[2]
-    
+
     # collapse data
     if x is not None:
         if f is None:
@@ -239,14 +252,14 @@ def mpi_sph4grid3D(
         fieldexist = True
     else:
         fieldexist = False
-    
+
     fieldexists = MPI.collect(fieldexist)
 
     if MPI.rank == 0:
         fieldexist = any(fieldexists)
     else:
         fieldexist = None
-        
+
     fieldexist = MPI.broadcast(fieldexist)
 
     # sort coordinates and distribute by coordinate system
@@ -255,13 +268,17 @@ def mpi_sph4grid3D(
     MPI_SBX.input(data)
     MPI_SBX.limits4grid()
     data = MPI_SBX.distribute()
-    
+
     assert buffer_length <= xboxsize, "buffer_length must be smaller than slab length."
 
     if periodic:
-        data = boundary.mpi_buffer_periodic_3D(data, boxsize, buffer_length, MPI, origin, include_internal=True)
+        data = boundary.mpi_buffer_periodic_3D(
+            data, boxsize, buffer_length, MPI, origin, include_internal=True
+        )
     else:
-        data = boundary.mpi_buffer_internal_3D(data, boxsize, buffer_length, MPI, origin)
+        data = boundary.mpi_buffer_internal_3D(
+            data, boxsize, buffer_length, MPI, origin
+        )
 
     # coordinates only inside slab
     x, y, z = data[:, 0], data[:, 1], data[:, 2]
@@ -270,7 +287,7 @@ def mpi_sph4grid3D(
         mass = data[:, 4]
     else:
         mass = data[:, 3]
-    
+
     xedges, xgrid = shift.cart.mpi_grid1D(xboxsize, nxgrid, MPI, origin=xorigin)
 
     # local grid, we will use an underscore to differentiate from global
@@ -280,7 +297,16 @@ def mpi_sph4grid3D(
     _nxgrid = len(xgrid)
 
     return sph4grid.sph4grid3D(
-        x, y, z, [_xboxsize, yboxsize, zboxsize], [_nxgrid, nygrid, nzgrid], f=f, 
-        origin=[_xorigin, yorigin, zorigin], mass=mass, k=k, periodic=False, 
-        subsampling=subsampling, outputgrid=outputgrid
+        x,
+        y,
+        z,
+        [_xboxsize, yboxsize, zboxsize],
+        [_nxgrid, nygrid, nzgrid],
+        f=f,
+        origin=[_xorigin, yorigin, zorigin],
+        mass=mass,
+        k=k,
+        periodic=False,
+        subsampling=subsampling,
+        outputgrid=outputgrid,
     )

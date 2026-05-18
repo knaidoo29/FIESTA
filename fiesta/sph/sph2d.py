@@ -43,7 +43,7 @@ class SPH2D(kdtree.KDTree2D):
         """
         if self.kernel_type == "cubic":
             return kernels.cubic_kernel(r, h, dim=2)
-    
+
     def setup(self, k: int = 20, mass: Optional[np.ndarray] = None) -> None:
         """
         Set basic settings for the SPH data.

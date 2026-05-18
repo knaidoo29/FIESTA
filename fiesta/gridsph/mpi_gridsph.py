@@ -9,7 +9,6 @@ from .. import p2g
 from .. import src
 
 
-
 def mpi_gridSPH2D(
     boxsize: Union[float, List[float]],
     ngrid: int,
@@ -20,7 +19,7 @@ def mpi_gridSPH2D(
     w: Optional[np.ndarray] = None,
     f: Optional[np.ndarray] = None,
     periodic: Union[bool, List[bool]] = True,
-    buffer_size: int = 2
+    buffer_size: int = 2,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     The grid SPH method. This method is similar to a k-Nearest Neighbour method although
@@ -45,7 +44,7 @@ def mpi_gridSPH2D(
     periodic : bool or list, optional
         Periodic boundary condition.
     buffer_size : float, optional
-        Buffer size for MPI communication for padding the grid for the SPH estimation. 
+        Buffer size for MPI communication for padding the grid for the SPH estimation.
         This should be at least the size of the largest SPH kernel in units of the grid cell size.
 
     Returns
@@ -77,13 +76,13 @@ def mpi_gridSPH2D(
         w = np.ones(len(x))
 
     dgrid = p2g.mpi_part2grid2D(
-        x, y, w, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.
+        x, y, w, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.0
     )
     if f is not None:
         fgrid = p2g.mpi_part2grid2D(
-            x, y, f, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.
+            x, y, f, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.0
         )
-    
+
     dgrid_send_up = MPI.send_up(dgrid[-buffer_size:])
     dgrid_send_down = MPI.send_down(dgrid[:buffer_size])
     dgrid = np.concatenate([dgrid_send_up, dgrid, dgrid_send_down], axis=0)
@@ -92,20 +91,20 @@ def mpi_gridSPH2D(
         fgrid_send_up = MPI.send_up(fgrid[-buffer_size:])
         fgrid_send_down = MPI.send_down(fgrid[:buffer_size])
         fgrid = np.concatenate([fgrid_send_up, fgrid, fgrid_send_down], axis=0)
-    
+
     idgrid = integral_image.get_integral_image2D(dgrid)
     idgrid = idgrid.astype(np.float64)
     if f is not None:
         ifgrid = integral_image.get_integral_image2D(fgrid)
         ifgrid = ifgrid.astype(np.float64)
-    
+
     xboxsize = xmax - xmin
     if np.isscalar(boxsize):
         yboxsize = boxsize
     else:
         yboxsize = boxsize[1]
-    
-    xperiodic = False 
+
+    xperiodic = False
     if np.isscalar(periodic):
         yperiodic = periodic
     else:
@@ -119,7 +118,7 @@ def mpi_gridSPH2D(
             idgrid,
             minpart,
             xperiodic=xperiodic,
-            yperiodic=yperiodic
+            yperiodic=yperiodic,
         )
         dgridSPH = minpart / vgrid
         dgridSPH = dgridSPH[buffer_size:-buffer_size]
@@ -150,7 +149,7 @@ def mpi_gridSPH3D(
     w: Optional[np.ndarray] = None,
     f: Optional[np.ndarray] = None,
     periodic: Union[bool, List[bool]] = True,
-    buffer_size: int = 2
+    buffer_size: int = 2,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     The grid SPH method. This method is similar to a k-Nearest Neighbour method although
@@ -175,7 +174,7 @@ def mpi_gridSPH3D(
     periodic : bool or list, optional
         Periodic boundary condition.
     buffer_size : float, optional
-        Buffer size for MPI communication for padding the grid for the SPH estimation. 
+        Buffer size for MPI communication for padding the grid for the SPH estimation.
         This should be at least the size of the largest SPH kernel in units of the grid cell size.
 
     Returns
@@ -207,13 +206,13 @@ def mpi_gridSPH3D(
         w = np.ones(len(x))
 
     dgrid = p2g.mpi_part2grid3D(
-        x, y, z, w, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.
+        x, y, z, w, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.0
     )
     if f is not None:
         fgrid = p2g.mpi_part2grid3D(
-            x, y, z, f, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.
+            x, y, z, f, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.0
         )
-    
+
     dgrid_send_up = MPI.send_up(dgrid[-buffer_size:])
     dgrid_send_down = MPI.send_down(dgrid[:buffer_size])
     dgrid = np.concatenate([dgrid_send_up, dgrid, dgrid_send_down], axis=0)
@@ -222,13 +221,13 @@ def mpi_gridSPH3D(
         fgrid_send_up = MPI.send_up(fgrid[-buffer_size:])
         fgrid_send_down = MPI.send_down(fgrid[:buffer_size])
         fgrid = np.concatenate([fgrid_send_up, fgrid, fgrid_send_down], axis=0)
-    
+
     idgrid = integral_image.get_integral_image3D(dgrid)
     idgrid = idgrid.astype(np.float64)
     if f is not None:
         ifgrid = integral_image.get_integral_image3D(fgrid)
         ifgrid = ifgrid.astype(np.float64)
-    
+
     xboxsize = xmax - xmin
     if np.isscalar(boxsize):
         yboxsize = boxsize
@@ -236,8 +235,8 @@ def mpi_gridSPH3D(
     else:
         yboxsize = boxsize[1]
         zboxsize = boxsize[2]
-    
-    xperiodic = False 
+
+    xperiodic = False
     if np.isscalar(periodic):
         yperiodic = periodic
         zperiodic = periodic
@@ -255,7 +254,7 @@ def mpi_gridSPH3D(
             minpart,
             xperiodic=xperiodic,
             yperiodic=yperiodic,
-            zperiodic=zperiodic
+            zperiodic=zperiodic,
         )
         dgridSPH = minpart / vgrid
         dgridSPH = dgridSPH[buffer_size:-buffer_size]

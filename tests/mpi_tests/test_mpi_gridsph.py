@@ -30,7 +30,7 @@ def test_mpi_gridSPH2D():
 
     dgrid = mpi_gridSPH2D(
         [1.0, 1.0],
-        [20,20],
+        [20, 20],
         x2d.ravel(),
         y2d.ravel(),
         mpi,

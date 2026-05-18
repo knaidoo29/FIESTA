@@ -5,7 +5,6 @@ from . import periodic
 from typing import Union, List
 
 
-
 def mpi_buffer_internal_2D(
     data: np.ndarray,
     boxsize: float,
@@ -215,4 +214,3 @@ def mpi_buffer_periodic_3D(
     if include_internal:
         datap = mpi_buffer_internal_3D(datap, boxsize, buffer_length, MPI, origin)
     return datap
-

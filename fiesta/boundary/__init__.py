@@ -10,6 +10,7 @@ from .randoms import buffer_random_3D
 
 from .mpi_periodic import mpi_buffer_periodic_2D
 from .mpi_periodic import mpi_buffer_periodic_3D
+from .mpi_periodic import mpi_buffer_internal_2D
 from .mpi_periodic import mpi_buffer_internal_3D
 
 from .mpi_randoms import mpi_buffer_random_2D

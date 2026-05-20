@@ -15,8 +15,8 @@
     <a href="https://codecov.io/gh/knaidoo29/FIESTA" > 
     <img src="https://codecov.io/gh/knaidoo29/FIESTA/branch/main/graph/badge.svg?token=RFSEAKTTKG"/> 
     </a>
-    <a href="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue">
-    <img src="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue" alt="Python Version Support">
+    <a href="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12-blue">
+    <img src="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12-blue" alt="Python Version Support">
     </a>
     <a href="https://img.shields.io/github/v/release/knaidoo29/FIESTA">  
     <img src="https://img.shields.io/github/v/release/knaidoo29/FIESTA" alt="Version">

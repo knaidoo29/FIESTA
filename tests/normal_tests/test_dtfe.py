@@ -14,6 +14,7 @@ from fiesta.dtfe import (
 
 class TestDTFE:
     def test_delaunay2d_setup(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         delaunay = Delaunay2D()
@@ -22,6 +23,7 @@ class TestDTFE:
         assert delaunay.y is not None
 
     def test_delaunay2d_construct(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         delaunay = Delaunay2D()
@@ -31,6 +33,7 @@ class TestDTFE:
         assert delaunay.simplices is not None
 
     def test_delaunay2d_get_area(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         delaunay = Delaunay2D()
@@ -40,6 +43,7 @@ class TestDTFE:
         assert delaunay.delaunay_area is not None
 
     def test_delaunay2d_get_dens(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         delaunay = Delaunay2D()
@@ -50,6 +54,7 @@ class TestDTFE:
         assert delaunay.point_dens is not None
 
     def test_delaunay2d_run(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         delaunay = Delaunay2D()
@@ -59,6 +64,7 @@ class TestDTFE:
         assert delaunay.point_type is not None
 
     def test_delaunay2d_estimate(self):
+        np.random.seed(0)
         x = np.random.rand(10) * 0.6 + 0.2
         y = np.random.rand(10) * 0.6 + 0.2
         f = np.random.rand(10)
@@ -73,6 +79,7 @@ class TestDTFE:
         assert not np.all(np.isnan(est))
 
     def test_delaunay2d_set_field(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         f = np.random.rand(10)
@@ -84,6 +91,7 @@ class TestDTFE:
         assert delaunay.dtfe_mode == "field"
 
     def test_delaunay2d_set_field2dens(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         delaunay = Delaunay2D()
@@ -95,6 +103,7 @@ class TestDTFE:
         assert delaunay.dtfe_mode == "density"
 
     def test_delaunay3d_setup(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         z = np.random.rand(10)
@@ -105,6 +114,7 @@ class TestDTFE:
         assert delaunay.z is not None
 
     def test_delaunay3d_construct(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         z = np.random.rand(10)
@@ -115,6 +125,7 @@ class TestDTFE:
         assert delaunay.simplices is not None
 
     def test_delaunay3d_run(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         z = np.random.rand(10)
@@ -125,6 +136,7 @@ class TestDTFE:
         assert delaunay.point_type is not None
 
     def test_delaunay3d_get_volume(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         z = np.random.rand(10)
@@ -135,6 +147,7 @@ class TestDTFE:
         assert delaunay.delaunay_volume is not None
 
     def test_delaunay3d_get_dens(self):
+        np.random.seed(0)
         x = np.random.rand(10)
         y = np.random.rand(10)
         z = np.random.rand(10)
@@ -146,6 +159,7 @@ class TestDTFE:
         assert delaunay.point_dens is not None
 
     def test_delaunay3d_estimate(self):
+        np.random.seed(0)
         x = np.random.rand(10) * 0.6 + 0.2
         y = np.random.rand(10) * 0.6 + 0.2
         z = np.random.rand(10) * 0.6 + 0.2
@@ -167,6 +181,7 @@ class TestDTFE:
         assert not np.all(np.isnan(est))
 
     def test_delaunay_merger2d(self):
+        np.random.seed(0)
         x = np.random.rand(20)
         y = np.random.rand(20)
         delaunay1 = Delaunay2D()
@@ -195,6 +210,7 @@ class TestDTFE:
         delaunay1.get_border()
 
     def test_delaunay_merger3d(self):
+        np.random.seed(0)
         x = np.random.rand(20)
         y = np.random.rand(20)
         z = np.random.rand(20)
@@ -223,12 +239,14 @@ class TestDTFE:
         delaunay1.get_border()
 
     def test_delaunay_density4grid2d(self):
+        np.random.seed(0)
         x = np.random.rand(50)
         y = np.random.rand(50)
         dens = delaunay_density4grid2D(x, y, boxsize=1.0, ngrid=10)
         assert dens.shape == (10, 10)
 
     def test_delaunay_field4grid2d(self):
+        np.random.seed(0)
         x = np.random.rand(50)
         y = np.random.rand(50)
         f = np.random.rand(50)
@@ -236,6 +254,7 @@ class TestDTFE:
         assert field.shape == (10, 10)
 
     def test_delaunay_density4grid3d(self):
+        np.random.seed(0)
         x = np.random.rand(50)
         y = np.random.rand(50)
         z = np.random.rand(50)
@@ -243,6 +262,7 @@ class TestDTFE:
         assert dens.shape == (5, 5, 5)
 
     def test_delaunay_field4grid3d(self):
+        np.random.seed(0)
         x = np.random.rand(50)
         y = np.random.rand(50)
         z = np.random.rand(50)
@@ -253,6 +273,7 @@ class TestDTFE:
     # Tests for partition > 1 coverage (2D)
     def test_delaunay_density4grid2d_partition(self):
         """Test 2D density with partition > 1."""
+        np.random.seed(0)
         x = np.random.rand(100)
         y = np.random.rand(100)
         dens = delaunay_density4grid2D(x, y, boxsize=1.0, ngrid=10, partition=2)
@@ -261,6 +282,7 @@ class TestDTFE:
 
     def test_delaunay_density4grid2d_partition_2x2(self):
         """Test 2D density with 2x2 partition."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         dens = delaunay_density4grid2D(x, y, boxsize=1.0, ngrid=10, partition=[2, 2])
@@ -269,6 +291,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid2d_partition(self):
         """Test 2D field with partition > 1."""
+        np.random.seed(0)
         x = np.random.rand(100)
         y = np.random.rand(100)
         f = np.random.rand(100)
@@ -279,6 +302,7 @@ class TestDTFE:
     # Tests for periodic boundaries (2D)
     def test_delaunay_density4grid2d_periodic(self):
         """Test 2D density with periodic boundaries."""
+        np.random.seed(0)
         x = np.random.rand(100)
         y = np.random.rand(100)
         dens = delaunay_density4grid2D(x, y, boxsize=1.0, ngrid=10, periodic=True)
@@ -287,6 +311,7 @@ class TestDTFE:
 
     def test_delaunay_density4grid2d_periodic_list(self):
         """Test 2D density with list-based periodic."""
+        np.random.seed(0)
         x = np.random.rand(100)
         y = np.random.rand(100)
         dens = delaunay_density4grid2D(
@@ -297,6 +322,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid2d_periodic(self):
         """Test 2D field with periodic boundaries."""
+        np.random.seed(0)
         x = np.random.rand(100)
         y = np.random.rand(100)
         f = np.random.rand(100)
@@ -333,6 +359,7 @@ class TestDTFE:
     # Tests for output flags (2D)
     def test_delaunay_density4grid2d_outputgrid(self):
         """Test 2D density with outputgrid=True."""
+        np.random.seed(0)
         x = np.random.rand(100)
         y = np.random.rand(100)
         result = delaunay_density4grid2D(x, y, boxsize=1.0, ngrid=10, outputgrid=True)
@@ -344,6 +371,7 @@ class TestDTFE:
 
     def test_delaunay_density4grid2d_outputexterior(self):
         """Test 2D density with outputexterior=True."""
+        np.random.seed(0)
         x = np.random.rand(100)
         y = np.random.rand(100)
         result = delaunay_density4grid2D(
@@ -358,6 +386,7 @@ class TestDTFE:
 
     def test_delaunay_density4grid2d_both_outputs(self):
         """Test 2D density with both outputgrid and outputexterior."""
+        np.random.seed(0)
         x = np.random.rand(100)
         y = np.random.rand(100)
         result = delaunay_density4grid2D(
@@ -370,6 +399,7 @@ class TestDTFE:
     # Tests for partition and periodic combination (2D)
     def test_delaunay_density4grid2d_partition_periodic(self):
         """Test 2D density with partition and periodic boundaries."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         dens = delaunay_density4grid2D(
@@ -384,6 +414,7 @@ class TestDTFE:
     # Tests for 3D partition
     def test_delaunay_density4grid3d_partition(self):
         """Test 3D density with partition > 1."""
+        np.random.seed(0)
         x = np.random.rand(500)
         y = np.random.rand(500)
         z = np.random.rand(500)
@@ -393,6 +424,7 @@ class TestDTFE:
 
     def test_delaunay_density4grid3d_partition_2x2x2(self):
         """Test 3D density with 2x2x2 partition."""
+        np.random.seed(0)
         x = np.random.rand(200)
         y = np.random.rand(200)
         z = np.random.rand(200)
@@ -404,6 +436,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid3d_partition(self):
         """Test 3D field with partition > 1."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -415,6 +448,7 @@ class TestDTFE:
     # Tests for 3D periodic boundaries
     def test_delaunay_density4grid3d_periodic(self):
         """Test 3D density with periodic boundaries."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -424,6 +458,7 @@ class TestDTFE:
 
     def test_delaunay_density4grid3d_periodic_list(self):
         """Test 3D density with list-based periodic."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -435,6 +470,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid3d_periodic(self):
         """Test 3D field with periodic boundaries."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -446,6 +482,7 @@ class TestDTFE:
     # Tests for 3D output flags
     def test_delaunay_density4grid3d_outputgrid(self):
         """Test 3D density with outputgrid=True."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -457,6 +494,7 @@ class TestDTFE:
 
     def test_delaunay_density4grid3d_outputexterior(self):
         """Test 3D density with outputexterior=True."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -469,6 +507,7 @@ class TestDTFE:
 
     def test_delaunay_density4grid3d_both_outputs(self):
         """Test 3D density with both outputgrid and outputexterior."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -481,6 +520,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid3d_outputexterior(self):
         """Test 3D field with outputexterior=True."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -494,6 +534,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid3d_both_outputs(self):
         """Test 3D field with both outputgrid and outputexterior."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -502,6 +543,7 @@ class TestDTFE:
             x, y, z, f, boxsize=1.0, ngrid=5, outputgrid=True, outputexterior=True
         )
         assert len(result) == 7
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -515,6 +557,7 @@ class TestDTFE:
     # Tests for 3D partition and periodic combination
     def test_delaunay_density4grid3d_partition_periodic(self):
         """Test 3D density with partition and periodic boundaries."""
+        np.random.seed(0)
         x = np.random.rand(200)
         y = np.random.rand(200)
         z = np.random.rand(200)
@@ -529,6 +572,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid3d_partition_periodic(self):
         """Test 3D field with partition and periodic boundaries."""
+        np.random.seed(0)
         x = np.random.rand(200)
         y = np.random.rand(200)
         z = np.random.rand(200)
@@ -545,6 +589,7 @@ class TestDTFE:
     # Tests with list parameters for boxsize, ngrid, origin
     def test_delaunay_density4grid2d_list_params(self):
         """Test 2D density with list boxsize and ngrid."""
+        np.random.seed(0)
         x = np.random.rand(100) * 1.0
         y = np.random.rand(100) * 0.8
         dens = delaunay_density4grid2D(
@@ -560,6 +605,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid2d_list_params(self):
         """Test 2D field with list boxsize and ngrid."""
+        np.random.seed(0)
         x = np.random.rand(100) * 1.0
         y = np.random.rand(100) * 0.8
         f = np.random.rand(100)
@@ -576,6 +622,7 @@ class TestDTFE:
 
     def test_delaunay_density4grid3d_list_params(self):
         """Test 3D density with list parameters."""
+        np.random.seed(0)
         x = np.random.rand(150) * 1.0
         y = np.random.rand(150) * 0.8
         z = np.random.rand(150) * 0.6
@@ -587,6 +634,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid3d_list_params(self):
         """Test 3D field with list parameters."""
+        np.random.seed(0)
         x = np.random.rand(500) * 1.0
         y = np.random.rand(500) * 0.8
         z = np.random.rand(500) * 0.6
@@ -600,6 +648,7 @@ class TestDTFE:
     # Tests for list-based subsampling
     def test_delaunay_density4grid2d_list_subsampling(self):
         """Test 2D density with list-based subsampling."""
+        np.random.seed(0)
         x = np.random.rand(100)
         y = np.random.rand(100)
         dens = delaunay_density4grid2D(
@@ -610,6 +659,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid2d_list_subsampling(self):
         """Test 2D field with list-based subsampling."""
+        np.random.seed(0)
         x = np.random.rand(100)
         y = np.random.rand(100)
         f = np.random.rand(100)
@@ -621,6 +671,7 @@ class TestDTFE:
 
     def test_delaunay_density4grid3d_list_subsampling(self):
         """Test 3D density with list-based subsampling."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -632,6 +683,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid3d_list_subsampling(self):
         """Test 3D field with list-based subsampling."""
+        np.random.seed(0)
         x = np.random.rand(150)
         y = np.random.rand(150)
         z = np.random.rand(150)
@@ -652,6 +704,7 @@ class TestDTFE:
     # Tests with list-based origin
     def test_delaunay_density4grid2d_list_origin(self):
         """Test 2D density with list-based origin."""
+        np.random.seed(0)
         x = np.random.rand(100) + 0.1
         y = np.random.rand(100) + 0.1
         dens = delaunay_density4grid2D(x, y, boxsize=1.0, ngrid=10, origin=[0.1, 0.1])
@@ -660,6 +713,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid2d_list_origin(self):
         """Test 2D field with list-based origin."""
+        np.random.seed(0)
         x = np.random.rand(100) + 0.1
         y = np.random.rand(100) + 0.1
         f = np.random.rand(100)
@@ -669,6 +723,7 @@ class TestDTFE:
 
     def test_delaunay_density4grid3d_list_origin(self):
         """Test 3D density with list-based origin."""
+        np.random.seed(0)
         x = np.random.rand(150) + 0.1
         y = np.random.rand(150) + 0.1
         z = np.random.rand(150) + 0.1
@@ -680,6 +735,7 @@ class TestDTFE:
 
     def test_delaunay_field4grid3d_list_origin(self):
         """Test 3D field with list-based origin."""
+        np.random.seed(0)
         x = np.random.rand(150) + 0.1
         y = np.random.rand(150) + 0.1
         z = np.random.rand(150) + 0.1

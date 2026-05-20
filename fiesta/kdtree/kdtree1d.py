@@ -15,13 +15,8 @@ class KDTree1D:
         """
         self.points = None
         self.KD = None
-    
 
-    def build_tree(
-        self,
-        x: np.ndarray,
-        boxsize: Optional[float] = None
-    ) -> None:
+    def build_tree(self, x: np.ndarray, boxsize: Optional[float] = None) -> None:
         """
         Function for building the KDTree.
 
@@ -34,7 +29,6 @@ class KDTree1D:
         """
         self.points = coords.x2points(x)
         self.KD = scKDTree(self.points, boxsize=boxsize)
-
 
     def nearest(
         self, x: np.ndarray, k: int = 1, return_dist: bool = False
@@ -65,7 +59,6 @@ class KDTree1D:
         else:
             return nind, ndist
 
-
     def find_points_in_r(self, x: np.ndarray, r: float) -> np.ndarray:
         """
         Returns the nearest index (and distance) of a point from the KDTree.
@@ -87,7 +80,6 @@ class KDTree1D:
         ind = self.KD.query_ball_point(points, r)
         return ind
 
-    
     def clean(self) -> None:  # pragma: no cover
         """
         Reinitilises the class.

@@ -15,14 +15,13 @@ class KDTree3D:
         """
         self.points = None
         self.KD = None
-    
 
     def build_tree(
         self,
         x: np.ndarray,
         y: np.ndarray,
         z: np.ndarray,
-        boxsize: Optional[float] = None
+        boxsize: Optional[float] = None,
     ) -> None:
         """
         Function for building the KDTree.
@@ -40,7 +39,6 @@ class KDTree3D:
         """
         self.points = coords.xyz2points(x, y, z)
         self.KD = scKDTree(self.points, boxsize=boxsize)
-
 
     def nearest(
         self,
@@ -80,7 +78,6 @@ class KDTree3D:
         else:
             return nind, ndist
 
-
     def find_points_in_r(
         self, x: np.ndarray, y: np.ndarray, z: np.ndarray, r: float
     ) -> np.ndarray:
@@ -107,7 +104,6 @@ class KDTree3D:
         points = coords.xyz2points(x, y, z)
         ind = self.KD.query_ball_point(points, r)
         return ind
-
 
     def clean(self) -> None:  # pragma: no cover
         """

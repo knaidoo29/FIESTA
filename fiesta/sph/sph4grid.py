@@ -14,7 +14,7 @@ def sph4grid2D(
     boxsize: Union[float, List[float]],
     ngrid: Union[int, List[int]],
     f: Optional[np.ndarray] = None,
-    origin: Union[float, List[float]] = 0.,
+    origin: Union[float, List[float]] = 0.0,
     mass: Optional[np.ndarray] = None,
     k: int = 20,
     periodic: bool = True,
@@ -23,7 +23,7 @@ def sph4grid2D(
 ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
     """
     Estimates a field on a regular grid based on SPH k neighbours.
-    
+
     Parameters
     ----------
     x, y : array
@@ -62,10 +62,10 @@ def sph4grid2D(
         SPH.build_tree(x, y, boxsize=boxsize)
     else:
         SPH.build_tree(x, y)
-    
+
     if mass is None:
         mass = np.ones(len(x))
-    
+
     SPH.setup(k=k, mass=mass)
 
     # define boxsize on each axis
@@ -141,7 +141,7 @@ def sph4grid3D(
     boxsize: Union[float, List[float]],
     ngrid: Union[int, List[int]],
     f: Optional[np.ndarray] = None,
-    origin: Union[float, List[float]] = 0.,
+    origin: Union[float, List[float]] = 0.0,
     mass: Optional[np.ndarray] = None,
     k: int = 32,
     periodic: bool = True,
@@ -150,7 +150,7 @@ def sph4grid3D(
 ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
     """
     Estimates a field on a regular grid based on SPH k neighbours.
-    
+
     Parameters
     ----------
     x, y, z : array
@@ -189,10 +189,10 @@ def sph4grid3D(
         SPH.build_tree(x, y, z, boxsize=boxsize)
     else:
         SPH.build_tree(x, y, z)
-    
+
     if mass is None:
         mass = np.ones(len(x))
-    
+
     SPH.setup(k=k, mass=mass)
 
     # define boxsize on each axis
@@ -214,7 +214,9 @@ def sph4grid3D(
         nxgrid, nygrid, nzgrid = ngrid[0], ngrid[1], ngrid[2]
 
     # define grid coordinates
-    x3d, y3d, z3d = shift.cart.grid3D(boxsize, ngrid, origin=[xorigin, yorigin, zorigin])
+    x3d, y3d, z3d = shift.cart.grid3D(
+        boxsize, ngrid, origin=[xorigin, yorigin, zorigin]
+    )
     x3d, y3d, z3d = x3d.flatten(), y3d.flatten(), z3d.flatten()
     dgrid = np.zeros(len(x3d))
     if f is not None:
@@ -229,7 +231,9 @@ def sph4grid3D(
 
     # define subsampling points for each pixel
     dx3d, dy3d, dz3d = shift.cart.grid3D(
-        [dx, dy, dz], [dnxgrid, dnygrid, dnzgrid], origin=[-dx / 2.0, -dy / 2.0, -dz / 2.0]
+        [dx, dy, dz],
+        [dnxgrid, dnygrid, dnzgrid],
+        origin=[-dx / 2.0, -dy / 2.0, -dz / 2.0],
     )
     dx3d, dy3d, dz3d = dx3d.flatten(), dy3d.flatten(), dz3d.flatten()
 

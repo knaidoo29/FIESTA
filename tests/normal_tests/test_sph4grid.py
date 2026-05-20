@@ -8,7 +8,11 @@ BOXSIZE = 1.0
 
 # Shared random data
 X2, Y2 = RNG.uniform(0, BOXSIZE, N), RNG.uniform(0, BOXSIZE, N)
-X3, Y3, Z3 = RNG.uniform(0, BOXSIZE, N), RNG.uniform(0, BOXSIZE, N), RNG.uniform(0, BOXSIZE, N)
+X3, Y3, Z3 = (
+    RNG.uniform(0, BOXSIZE, N),
+    RNG.uniform(0, BOXSIZE, N),
+    RNG.uniform(0, BOXSIZE, N),
+)
 F2 = RNG.standard_normal(N)
 F3 = RNG.standard_normal(N)
 
@@ -16,6 +20,7 @@ F3 = RNG.standard_normal(N)
 # ===========================================================================
 # sph4grid2D
 # ===========================================================================
+
 
 class TestSph4grid2DShape:
 
@@ -36,7 +41,9 @@ class TestSph4grid2DShape:
         assert dgrid.shape == x2d.shape == y2d.shape == (8, 8)
 
     def test_outputgrid_field_returns_tuple(self):
-        fgrid, x2d, y2d = sph4grid2D(X2, Y2, boxsize=BOXSIZE, ngrid=8, f=F2, outputgrid=True)
+        fgrid, x2d, y2d = sph4grid2D(
+            X2, Y2, boxsize=BOXSIZE, ngrid=8, f=F2, outputgrid=True
+        )
         assert fgrid.shape == x2d.shape == y2d.shape == (8, 8)
 
     def test_list_boxsize(self):
@@ -111,7 +118,7 @@ class TestSph4grid2DListParams:
 
     def test_list_boxsize_matches_scalar_boxsize(self):
         r_scalar = sph4grid2D(X2, Y2, boxsize=1.0, ngrid=8)
-        r_list   = sph4grid2D(X2, Y2, boxsize=[1.0, 1.0], ngrid=8)
+        r_list = sph4grid2D(X2, Y2, boxsize=[1.0, 1.0], ngrid=8)
         np.testing.assert_array_equal(r_scalar, r_list)
 
     # --- ngrid ---
@@ -125,7 +132,7 @@ class TestSph4grid2DListParams:
 
     def test_list_ngrid_matches_scalar_ngrid(self):
         r_scalar = sph4grid2D(X2, Y2, boxsize=BOXSIZE, ngrid=8)
-        r_list   = sph4grid2D(X2, Y2, boxsize=BOXSIZE, ngrid=[8, 8])
+        r_list = sph4grid2D(X2, Y2, boxsize=BOXSIZE, ngrid=[8, 8])
         np.testing.assert_array_equal(r_scalar, r_list)
 
     # --- origin ---
@@ -139,22 +146,27 @@ class TestSph4grid2DListParams:
 
     def test_list_origin_matches_scalar_origin(self):
         r_scalar = sph4grid2D(X2, Y2, boxsize=BOXSIZE, ngrid=8, origin=0.0)
-        r_list   = sph4grid2D(X2, Y2, boxsize=BOXSIZE, ngrid=8, origin=[0.0, 0.0])
+        r_list = sph4grid2D(X2, Y2, boxsize=BOXSIZE, ngrid=8, origin=[0.0, 0.0])
         np.testing.assert_array_equal(r_scalar, r_list)
 
     # --- all list ---
     def test_all_list_params(self):
-        result = sph4grid2D(X2, Y2, boxsize=[1.0, 2.0], ngrid=[4, 6], origin=[0.1, 0.2], subsampling=2)
+        result = sph4grid2D(
+            X2, Y2, boxsize=[1.0, 2.0], ngrid=[4, 6], origin=[0.1, 0.2], subsampling=2
+        )
         assert result.shape == (4, 6)
 
     def test_all_list_params_finite(self):
-        result = sph4grid2D(X2, Y2, boxsize=[1.0, 2.0], ngrid=[4, 6], origin=[0.1, 0.2], subsampling=2)
+        result = sph4grid2D(
+            X2, Y2, boxsize=[1.0, 2.0], ngrid=[4, 6], origin=[0.1, 0.2], subsampling=2
+        )
         assert np.all(np.isfinite(result))
 
 
 # ===========================================================================
 # sph4grid3D
 # ===========================================================================
+
 
 class TestSph4grid3DShape:
 
@@ -171,11 +183,15 @@ class TestSph4grid3DShape:
         assert result.shape == (4, 4, 4)
 
     def test_outputgrid_density_returns_tuple(self):
-        dgrid, x3d, y3d, z3d = sph4grid3D(X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, outputgrid=True)
+        dgrid, x3d, y3d, z3d = sph4grid3D(
+            X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, outputgrid=True
+        )
         assert dgrid.shape == x3d.shape == y3d.shape == z3d.shape == (4, 4, 4)
 
     def test_outputgrid_field_returns_tuple(self):
-        fgrid, x3d, y3d, z3d = sph4grid3D(X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, f=F3, outputgrid=True)
+        fgrid, x3d, y3d, z3d = sph4grid3D(
+            X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, f=F3, outputgrid=True
+        )
         assert fgrid.shape == x3d.shape == y3d.shape == z3d.shape == (4, 4, 4)
 
     def test_list_boxsize(self):
@@ -229,7 +245,9 @@ class TestSph4grid3DOptions:
         assert result.shape == (4, 4, 4)
 
     def test_list_origin(self):
-        result = sph4grid3D(X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, origin=[0.0, 0.0, 0.0])
+        result = sph4grid3D(
+            X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, origin=[0.0, 0.0, 0.0]
+        )
         assert result.shape == (4, 4, 4)
 
     def test_custom_k(self):
@@ -250,7 +268,7 @@ class TestSph4grid3DListParams:
 
     def test_list_boxsize_matches_scalar_boxsize(self):
         r_scalar = sph4grid3D(X3, Y3, Z3, boxsize=1.0, ngrid=4)
-        r_list   = sph4grid3D(X3, Y3, Z3, boxsize=[1.0, 1.0, 1.0], ngrid=4)
+        r_list = sph4grid3D(X3, Y3, Z3, boxsize=[1.0, 1.0, 1.0], ngrid=4)
         np.testing.assert_array_equal(r_scalar, r_list)
 
     # --- ngrid ---
@@ -264,28 +282,50 @@ class TestSph4grid3DListParams:
 
     def test_list_ngrid_matches_scalar_ngrid(self):
         r_scalar = sph4grid3D(X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4)
-        r_list   = sph4grid3D(X3, Y3, Z3, boxsize=BOXSIZE, ngrid=[4, 4, 4])
+        r_list = sph4grid3D(X3, Y3, Z3, boxsize=BOXSIZE, ngrid=[4, 4, 4])
         np.testing.assert_array_equal(r_scalar, r_list)
 
     # --- origin ---
     def test_list_origin_zeros(self):
-        result = sph4grid3D(X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, origin=[0.0, 0.0, 0.0])
+        result = sph4grid3D(
+            X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, origin=[0.0, 0.0, 0.0]
+        )
         assert result.shape == (4, 4, 4)
 
     def test_list_origin_asymmetric(self):
-        result = sph4grid3D(X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, origin=[0.1, 0.2, 0.3])
+        result = sph4grid3D(
+            X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, origin=[0.1, 0.2, 0.3]
+        )
         assert result.shape == (4, 4, 4)
 
     def test_list_origin_matches_scalar_origin(self):
         r_scalar = sph4grid3D(X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, origin=0.0)
-        r_list   = sph4grid3D(X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, origin=[0.0, 0.0, 0.0])
+        r_list = sph4grid3D(
+            X3, Y3, Z3, boxsize=BOXSIZE, ngrid=4, origin=[0.0, 0.0, 0.0]
+        )
         np.testing.assert_array_equal(r_scalar, r_list)
 
     # --- all list ---
     def test_all_list_params(self):
-        result = sph4grid3D(X3, Y3, Z3, boxsize=[1.0, 2.0, 3.0], ngrid=[3, 4, 5], origin=[0.1, 0.2, 0.3], subsampling=2)
+        result = sph4grid3D(
+            X3,
+            Y3,
+            Z3,
+            boxsize=[1.0, 2.0, 3.0],
+            ngrid=[3, 4, 5],
+            origin=[0.1, 0.2, 0.3],
+            subsampling=2,
+        )
         assert result.shape == (3, 4, 5)
 
     def test_all_list_params_finite(self):
-        result = sph4grid3D(X3, Y3, Z3, boxsize=[1.0, 2.0, 3.0], ngrid=[3, 4, 5], origin=[0.1, 0.2, 0.3], subsampling=2)
+        result = sph4grid3D(
+            X3,
+            Y3,
+            Z3,
+            boxsize=[1.0, 2.0, 3.0],
+            ngrid=[3, 4, 5],
+            origin=[0.1, 0.2, 0.3],
+            subsampling=2,
+        )
         assert np.all(np.isfinite(result))

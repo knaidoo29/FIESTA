@@ -110,7 +110,7 @@ def gridSPH3D(
     periodic: Union[bool, List[bool]] = True,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
-    The grid SPH method. This method is similar to a k-Nearest Neighbour method although 
+    The grid SPH method. This method is similar to a k-Nearest Neighbour method although
     performed on a grid for speed.
 
     Parameters

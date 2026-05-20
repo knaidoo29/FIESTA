@@ -133,17 +133,17 @@ def sum_from_integral_image_2D(
             else:
                 xbox1 = True
             if ixmax2 == -2 * lenx:
-                xbox2 = False            
+                xbox2 = False
             else:
                 xbox2 = True
-            
+
             if iymin1 == -2 * leny:
                 ybox1 = False
-            else:                
+            else:
                 ybox1 = True
             if iymax2 == -2 * leny:
                 ybox2 = False
-            else:                
+            else:
                 ybox2 = True
 
             if not xbox1 and not xbox2:
@@ -182,8 +182,8 @@ def sum_from_integral_image_2D(
                     ixmins.append(_ixmins[i])
                     ixmaxs.append(_ixmaxs[i])
                     iymins.append(_iymins[j])
-                    iymaxs.append(_iymaxs[j])         
-            
+                    iymaxs.append(_iymaxs[j])
+
             isum = 0
             for i in range(0, len(ixmins)):
                 isum += (
@@ -400,7 +400,7 @@ def sum_from_integral_image_3D(
     ------
     The sum of the integral image within a rectangle.
     """
-    (lenx, leny, lenz) = np.shape(igrid)
+    lenx, leny, lenz = np.shape(igrid)
     if (
         ixmin >= 0
         and ixmax < lenx
@@ -546,26 +546,26 @@ def sum_from_integral_image_3D(
             else:
                 xbox1 = True
             if ixmax2 == -2 * lenx:
-                xbox2 = False            
+                xbox2 = False
             else:
                 xbox2 = True
-            
+
             if iymin1 == -2 * leny:
                 ybox1 = False
-            else:                
+            else:
                 ybox1 = True
             if iymax2 == -2 * leny:
                 ybox2 = False
-            else:                
+            else:
                 ybox2 = True
 
             if izmin1 == -2 * lenz:
                 zbox1 = False
-            else:         
+            else:
                 zbox1 = True
             if izmax2 == -2 * lenz:
                 zbox2 = False
-            else:                
+            else:
                 zbox2 = True
 
             if not xbox1 and not xbox2:
@@ -594,7 +594,7 @@ def sum_from_integral_image_3D(
                 _iymins = [iymin1, iymin2]
                 _iymaxs = [iymax1, iymax2]
 
-            if not zbox1 and not zbox2:  
+            if not zbox1 and not zbox2:
                 _izmins = [izmin]
                 _izmaxs = [izmax]
             elif zbox1 and not zbox2:
@@ -622,7 +622,7 @@ def sum_from_integral_image_3D(
                         iymins.append(_iymins[j])
                         iymaxs.append(_iymaxs[j])
                         izmins.append(_izmins[k])
-                        izmaxs.append(_izmaxs[k])            
+                        izmaxs.append(_izmaxs[k])
             isum = 0
             for i in range(0, len(ixmins)):
                 isum += (

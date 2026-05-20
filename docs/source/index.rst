@@ -13,7 +13,7 @@
     <img src="https://github.com/knaidoo29/FIESTA/actions/workflows/tests.yml/badge.svg" alt="Python Tests">
     </a>
     <a href="https://codecov.io/gh/knaidoo29/FIESTA" > 
-    <img src="https://codecov.io/gh/knaidoo29/FIESTA/graph/badge.svg?token=HX4OB31MS3"/> 
+    <img src="https://codecov.io/gh/knaidoo29/FIESTA/branch/main/graph/badge.svg?token=RFSEAKTTKG"/> 
     </a>
     <a href="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue">
     <img src="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue" alt="Python Version Support">
@@ -30,10 +30,10 @@
     <a href="https://github.com/knaidoo29/FIESTA">
     <img src="https://img.shields.io/badge/GitHub-repo-blue?logo=github" alt="GitHub repository">
     </a>
-    <a href="https://img.shields.io/github/stars/knaidoo29/fiesta">
+    <a href="https://github.com/knaidoo29/FIESTA/stargazers">
     <img src="https://img.shields.io/github/stars/knaidoo29/fiesta" alt="github: stars">
     </a>
-    <a href="https://img.shields.io/github/stars/knaidoo29/fiesta">
+    <a href="https://github.com/knaidoo29/FIESTA/network/members">
     <img src="https://img.shields.io/github/forks/knaidoo29/fiesta" alt="github: forks">
     </a>
     <a href="https://opensource.org/licenses/MIT">
@@ -64,8 +64,10 @@ Contents
 ========
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 1
 
+  tutorial
+  mpi_tutorial
   api
 
 Dependencies

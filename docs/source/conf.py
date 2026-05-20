@@ -9,7 +9,7 @@ import vinfo
 # -- Project information
 
 project = "FIESTA"
-copyright = "2021-2025, Krishna Naidoo"
+copyright = "2021-2026, Krishna Naidoo"
 author = "Krishna Naidoo"
 
 version = vinfo.vstr

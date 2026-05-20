@@ -207,7 +207,7 @@ def get_part2grid3D_kernel(
     return Wk
 
 
-def deconvolve_part2grid_2D(
+def deconvolve_part2grid2D(
     field: np.ndarray, boxsize: Union[float, List[float]], method: str = "TSC"
 ) -> np.ndarray:
     """
@@ -231,7 +231,7 @@ def deconvolve_part2grid_2D(
     return field
 
 
-def deconvolve_part2grid_3D(
+def deconvolve_part2grid3D(
     field: np.ndarray, boxsize: Union[float, List[float]], method: str = "TSC"
 ) -> np.ndarray:
     """

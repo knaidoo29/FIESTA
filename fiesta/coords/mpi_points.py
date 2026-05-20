@@ -286,7 +286,7 @@ class MPI_SortByX:
     def settings(
         self,
         boxsize: Union[float, List[float]],
-        ngrid: int,
+        ngrid: Union[int, List[int]],
         origin: Union[float, List[float]] = 0.0,
         buffer_length: float = 0.0,
     ) -> None:
@@ -333,8 +333,12 @@ class MPI_SortByX:
             xorigin = self.origin
         else:
             xorigin = self.origin[0]
+        if np.isscalar(self.ngrid):
+            xngrid = self.ngrid
+        else:
+            xngrid = self.ngrid[0]
         xedges, xgrid = shift.cart.mpi_grid1D(
-            xboxsize, self.ngrid, self.MPI, origin=xorigin
+            xboxsize, xngrid, self.MPI, origin=xorigin
         )
         self.limits = [xedges[0], xedges[-1]]
         self.ngrid_rank = len(xgrid)

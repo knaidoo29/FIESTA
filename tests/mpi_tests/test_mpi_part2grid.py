@@ -81,9 +81,18 @@ def test_mpi_part2grid2d_returns_valid_local_grid_list(method, periodic):
 
     xedges, _ = shift.cart.mpi_grid1D(boxsize[0], ngrid[0], mpi, origin=origin[0])
     local_mask = get_local_partition(x_flat, xedges[0], xedges[-1], mpi.rank, mpi.size)
-    x_local = x_flat[local_mask]
-    y_local = y_flat[local_mask]
-    f_local = f[local_mask]
+    # x_local = x_flat[local_mask]
+    # y_local = y_flat[local_mask]
+    f_local2 = f[local_mask]
+
+    if mpi.rank == 0:
+        x_local = x_flat
+        y_local = y_flat
+        f_local = f
+    else:
+        x_local = None
+        y_local = None
+        f_local = None
 
     grid = mpi_part2grid2D(
         x_local,
@@ -103,7 +112,7 @@ def test_mpi_part2grid2d_returns_valid_local_grid_list(method, periodic):
         dx = xedges[1] - xedges[0]
         dy = boxsize[1] / ngrid[1]
         assert np.isclose(
-            grid.sum() * dx * dy, float(len(f_local)), atol=1e-8, rtol=1e-8
+            grid.sum() * dx * dy, float(len(f_local2)), atol=1e-8, rtol=1e-8
         )
     else:
         assert grid.sum() > 0
@@ -128,11 +137,22 @@ def test_mpi_part2grid3d_returns_valid_local_grid(method, periodic):
 
     xedges, _ = shift.cart.mpi_grid1D(boxsize, ngrid, mpi, origin=origin)
     local_mask = get_local_partition(x_flat, xedges[0], xedges[-1], mpi.rank, mpi.size)
-    x_local = x_flat[local_mask]
-    y_local = y_flat[local_mask]
-    z_local = z_flat[local_mask]
-    f_local = f[local_mask]
+    # x_local = x_flat[local_mask]
+    # y_local = y_flat[local_mask]
+    # z_local = z_flat[local_mask]
+    f_local2 = f[local_mask]
 
+    if mpi.rank == 0:
+        x_local = x_flat
+        y_local = y_flat
+        z_local = z_flat
+        f_local = f
+    else:
+        x_local = None
+        y_local = None
+        z_local = None
+        f_local = None
+    
     grid = mpi_part2grid3D(
         x_local,
         y_local,
@@ -151,7 +171,7 @@ def test_mpi_part2grid3d_returns_valid_local_grid(method, periodic):
         dy = boxsize / ngrid
         dz = boxsize / ngrid
         assert np.isclose(
-            grid.sum() * dx * dy * dz, float(len(f_local)), atol=1e-8, rtol=1e-8
+            grid.sum() * dx * dy * dz, float(len(f_local2)), atol=1e-8, rtol=1e-8
         )
     else:
         assert grid.sum() > 0

@@ -5,8 +5,8 @@ from fiesta.p2g import part2grid2D, part2grid3D, get_deconvol_p
 from fiesta.p2g.deconvol import (
     get_part2grid2D_kernel,
     get_part2grid3D_kernel,
-    deconvolve_part2grid_2D,
-    deconvolve_part2grid_3D,
+    deconvolve_part2grid2D,
+    deconvolve_part2grid3D,
 )
 
 
@@ -145,33 +145,33 @@ class TestP2G:
         assert Wk.shape == kx3d.shape
         assert np.all(np.isfinite(Wk))
 
-    def test_deconvolve_part2grid_2D(self):
-        """Test deconvolve_part2grid_2D function."""
+    def test_deconvolve_part2grid2D(self):
+        """Test deconvolve_part2grid2D function."""
         # Create a simple 2D field
         field = np.random.rand(16, 16)
-        deconvolved = deconvolve_part2grid_2D(field, boxsize=1.0, method="TSC")
+        deconvolved = deconvolve_part2grid2D(field, boxsize=1.0, method="TSC")
         assert deconvolved.shape == field.shape
         assert np.all(np.isfinite(deconvolved))
 
-    def test_deconvolve_part2grid_2D_list_params(self):
-        """Test deconvolve_part2grid_2D with list boxsize."""
+    def test_deconvolve_part2grid2D_list_params(self):
+        """Test deconvolve_part2grid2D with list boxsize."""
         field = np.random.rand(16, 12)
-        deconvolved = deconvolve_part2grid_2D(field, boxsize=[1.0, 0.75], method="TSC")
+        deconvolved = deconvolve_part2grid2D(field, boxsize=[1.0, 0.75], method="TSC")
         assert deconvolved.shape == field.shape
         assert np.all(np.isfinite(deconvolved))
 
-    def test_deconvolve_part2grid_3D(self):
-        """Test deconvolve_part2grid_3D function."""
+    def test_deconvolve_part2grid3D(self):
+        """Test deconvolve_part2grid3D function."""
         # Create a simple 3D field
         field = np.random.rand(8, 8, 8)
-        deconvolved = deconvolve_part2grid_3D(field, boxsize=1.0, method="TSC")
+        deconvolved = deconvolve_part2grid3D(field, boxsize=1.0, method="TSC")
         assert deconvolved.shape == field.shape
         assert np.all(np.isfinite(deconvolved))
 
-    def test_deconvolve_part2grid_3D_list_params(self):
-        """Test deconvolve_part2grid_3D with list boxsize."""
+    def test_deconvolve_part2grid3D_list_params(self):
+        """Test deconvolve_part2grid3D with list boxsize."""
         field = np.random.rand(8, 6, 4)
-        deconvolved = deconvolve_part2grid_3D(
+        deconvolved = deconvolve_part2grid3D(
             field, boxsize=[1.0, 0.75, 0.5], method="TSC"
         )
         assert deconvolved.shape == field.shape

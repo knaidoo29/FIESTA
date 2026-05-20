@@ -13,10 +13,10 @@ def test_mpi_gridSPH2D():
     x2d, y2d = np.meshgrid(x, y, indexing="ij")
 
     dgrid = mpi_gridSPH2D(
-        1.0,
-        20,
         x2d.ravel(),
         y2d.ravel(),
+        1.0,
+        20,
         mpi,
         minpart=1,
     )
@@ -29,10 +29,10 @@ def test_mpi_gridSPH2D():
     assert np.all(np.isfinite(dgrid))
 
     dgrid = mpi_gridSPH2D(
-        [1.0, 1.0],
-        [20, 20],
         x2d.ravel(),
         y2d.ravel(),
+        [1.0, 1.0],
+        [20, 20],
         mpi,
         minpart=1,
         periodic=[True, True],
@@ -57,10 +57,10 @@ def test_mpi_gridSPH2D_field():
     f = np.cos(2 * np.pi * x2d.ravel())
 
     fgrid = mpi_gridSPH2D(
-        1.0,
-        20,
         x2d.ravel(),
         y2d.ravel(),
+        1.0,
+        20,
         mpi,
         minpart=1,
         f=f,
@@ -84,11 +84,11 @@ def test_mpi_gridSPH3D():
     x3d, y3d, z3d = np.meshgrid(x, y, z, indexing="ij")
 
     dgrid = mpi_gridSPH3D(
-        1.0,
-        20,
         x3d.ravel(),
         y3d.ravel(),
         z3d.ravel(),
+        1.0,
+        20,
         mpi,
         minpart=1,
     )
@@ -101,11 +101,11 @@ def test_mpi_gridSPH3D():
     assert np.all(np.isfinite(dgrid))
 
     dgrid = mpi_gridSPH3D(
-        [1.0, 1.0, 1.0],
-        [20, 20, 20],
         x3d.ravel(),
         y3d.ravel(),
         z3d.ravel(),
+        [1.0, 1.0, 1.0],
+        [20, 20, 20],
         mpi,
         minpart=1,
         periodic=[True, True, True],
@@ -131,11 +131,11 @@ def test_mpi_gridSPH3D_field():
     f = np.sin(2 * np.pi * x3d.ravel())
 
     fgrid = mpi_gridSPH3D(
-        1.0,
-        20,
         x3d.ravel(),
         y3d.ravel(),
         z3d.ravel(),
+        1.0,
+        20,
         mpi,
         minpart=1,
         f=f,

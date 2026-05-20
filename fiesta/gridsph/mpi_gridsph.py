@@ -10,10 +10,10 @@ from .. import src
 
 
 def mpi_gridSPH2D(
-    boxsize: Union[float, List[float]],
-    ngrid: int,
     x: np.ndarray,
     y: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: int,
     MPI: object,
     minpart: int = 1,
     w: Optional[np.ndarray] = None,
@@ -27,12 +27,12 @@ def mpi_gridSPH2D(
 
     Parameters
     ----------
+    x, y : array
+        X and Y coordinates of the points.
     boxsize : float or list
         Size of the 2D grid.
     ngrid : int or list
        Grid size.
-    x, y : array
-        X and Y coordinates of the points.
     MPI : class
         MPIutils MPI class object.
     minpart : int, optional
@@ -139,11 +139,11 @@ def mpi_gridSPH2D(
 
 
 def mpi_gridSPH3D(
-    boxsize: Union[float, List[float]],
-    ngrid: int,
     x: np.ndarray,
     y: np.ndarray,
     z: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: int,
     MPI: object,
     minpart: int = 1,
     w: Optional[np.ndarray] = None,
@@ -157,12 +157,12 @@ def mpi_gridSPH3D(
 
     Parameters
     ----------
+    x, y, z : array
+        X, Y, and Z coordinates of the points.
     boxsize : float or list
         Size of the 3D grid.
     ngrid : int or list
        Grid size.
-    x, y, z : array
-        X, Y, and Z coordinates of the points.
     MPI : class
         MPIutils MPI class object.
     minpart : int, optional

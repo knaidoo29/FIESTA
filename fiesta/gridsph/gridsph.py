@@ -9,10 +9,10 @@ from typing import Optional, Tuple, Union, List
 
 
 def gridSPH2D(
-    boxsize: Union[float, List[float]],
-    ngrid: int,
     x: np.ndarray,
     y: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: int,
     minpart: int = 1,
     w: Optional[np.ndarray] = None,
     f: Optional[np.ndarray] = None,
@@ -24,12 +24,12 @@ def gridSPH2D(
 
     Parameters
     ----------
+    x, y : array
+        X and Y coordinates of the points.
     boxsize : float or list
         Size of the 2D grid.
     ngrid : int or list
        Grid size.
-    x, y : array
-        X and Y coordinates of the points.
     minpart : int, optional
         Minimum number of particles.
     w : array, optional
@@ -99,11 +99,11 @@ def gridSPH2D(
 
 
 def gridSPH3D(
-    boxsize: Union[float, List[float]],
-    ngrid: int,
     x: np.ndarray,
     y: np.ndarray,
     z: np.ndarray,
+    boxsize: Union[float, List[float]],
+    ngrid: int,
     minpart: int = 1,
     w: Optional[np.ndarray] = None,
     f: Optional[np.ndarray] = None,
@@ -115,12 +115,12 @@ def gridSPH3D(
 
     Parameters
     ----------
+    x, y, z : array
+        X, Y, and Z coordinates of the points.
     boxsize : float
         Size of the 3D grid.
     ngrid : int
        Grid size.
-    x, y, z : array
-        X, Y, and Z coordinates of the points.
     minpart : int, optional
         Minimum number of particles.
     w : array, optional

@@ -230,10 +230,10 @@ class TestVEFE:
         x = np.linspace(0.1, 0.9, 9)
         y = np.linspace(0.1, 0.9, 9)
         x2d, y2d = np.meshgrid(x, y)
-        dgrid = gridSPH2D(1.0, 3, x2d.ravel(), y2d.ravel(), minpart=1)
+        dgrid = gridSPH2D(x2d.ravel(), y2d.ravel(), 1.0, 3, minpart=1)
         assert dgrid.shape == (3, 3)
         dgrid = gridSPH2D(
-            [1.0, 1.0], 3, x2d.ravel(), y2d.ravel(), minpart=1, periodic=[True, True]
+            x2d.ravel(), y2d.ravel(), [1.0, 1.0], 3, minpart=1, periodic=[True, True]
         )
         assert dgrid.shape == (3, 3)
 
@@ -242,7 +242,7 @@ class TestVEFE:
         y = np.linspace(0.1, 0.9, 9)
         x2d, y2d = np.meshgrid(x, y)
         f = np.cos(2 * np.pi * x2d.ravel())
-        fgrid = gridSPH2D(1.0, 3, x2d.ravel(), y2d.ravel(), minpart=1, f=f)
+        fgrid = gridSPH2D(x2d.ravel(), y2d.ravel(), 1.0, 3, minpart=1, f=f)
         assert fgrid.shape == (3, 3)
         assert np.all(np.isfinite(fgrid))
 
@@ -251,14 +251,14 @@ class TestVEFE:
         y = np.linspace(0.2, 0.8, 8)
         z = np.linspace(0.2, 0.8, 8)
         x3d, y3d, z3d = np.meshgrid(x, y, z, indexing="ij")
-        dgrid = gridSPH3D(1.0, 2, x3d.ravel(), y3d.ravel(), z3d.ravel(), minpart=1)
+        dgrid = gridSPH3D(x3d.ravel(), y3d.ravel(), z3d.ravel(), 1.0, 2, minpart=1)
         assert dgrid.shape == (2, 2, 2)
         dgrid = gridSPH3D(
-            [1.0, 1.0, 1.0],
-            2,
             x3d.ravel(),
             y3d.ravel(),
             z3d.ravel(),
+            [1.0, 1.0, 1.0],
+            2,
             minpart=1,
             periodic=[True, True, True],
         )
@@ -270,6 +270,6 @@ class TestVEFE:
         z = np.linspace(0.2, 0.8, 8)
         x3d, y3d, z3d = np.meshgrid(x, y, z, indexing="ij")
         f = np.sin(2 * np.pi * x3d.ravel())
-        fgrid = gridSPH3D(1.0, 2, x3d.ravel(), y3d.ravel(), z3d.ravel(), minpart=1, f=f)
+        fgrid = gridSPH3D(x3d.ravel(), y3d.ravel(), z3d.ravel(), 1.0, 2, minpart=1, f=f)
         assert fgrid.shape == (2, 2, 2)
         assert np.all(np.isfinite(fgrid))

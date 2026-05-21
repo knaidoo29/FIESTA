@@ -227,6 +227,7 @@
 <li class="toctree-l2"><a class="reference internal" href="mpi_tutorial_sph_grid.html">MPI SPH Grid Estimation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mpi_tutorial_gridsph.html">MPI Grid-SPH Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mpi_tutorial_diff.html">MPI Numerical Differentiation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpi_tutorial_interp.html">MPI Bilinear and Trilinear Interpolation</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -293,8 +294,8 @@
   <a href="https://codecov.io/gh/knaidoo29/FIESTA" >
   <img src="https://codecov.io/gh/knaidoo29/FIESTA/branch/main/graph/badge.svg?token=RFSEAKTTKG"/>
   </a>
-  <a href="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue">
-  <img src="https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue" alt="Python Version Support">
+  <a href="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12-blue">
+  <img src="https://img.shields.io/badge/Python-3.9%20|%203.10%20|%203.11%20|%203.12-blue" alt="Python Version Support">
   </a>
   <a href="https://img.shields.io/github/v/release/knaidoo29/FIESTA">
   <img src="https://img.shields.io/github/v/release/knaidoo29/FIESTA" alt="Version">
@@ -333,6 +334,13 @@ on large data-sets by distributing jobs across multiple processes via <code clas
 library and the <code class="docutils literal notranslate"><span class="pre">MPI</span></code> object from the <code class="docutils literal notranslate"><span class="pre">shift-fft</span></code> package (see <a class="reference external" href="https://shift.readthedocs.io/en/latest/mpiutils.html">here</a>)
 which is passed as an additional object into <code class="docutils literal notranslate"><span class="pre">MPI</span></code> related functions.</p>
 </section>
+<section id="showcase">
+<h2>Showcase<a class="headerlink" href="#showcase" title="Link to this heading">¶</a></h2>
+<p>The 2D density field computed with <code class="docutils literal notranslate"><span class="pre">FIESTA</span></code> (from the outputs of a cosmological simulation):</p>
+<div style="background-color:#f5f5f5; padding:12px; border-radius:8px; display:inline-block;"><img alt="_images/methods_logdens.png" class="align-center" src="_images/methods_logdens.png" />
+</div><p>The velocity-field along the z-axis computed with <code class="docutils literal notranslate"><span class="pre">FIESTA</span></code> (from the outputs of a cosmological simulation):</p>
+<div style="background-color:#f5f5f5; padding:12px; border-radius:8px; display:inline-block;"><img alt="_images/methods_vz.png" class="align-center" src="_images/methods_vz.png" />
+</div></section>
 <section id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -432,6 +440,7 @@ or (if you don’t have a github account) email <a class="reference external" hr
             <ul>
 <li><a class="reference internal" href="#">FIESTA: Field Interpolation and Estimation using Spatial Techniques and Algorithms</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#showcase">Showcase</a></li>
 <li><a class="reference internal" href="#contents">Contents</a></li>
 <li><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>

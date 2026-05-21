@@ -39,15 +39,10 @@ Example
     # Assuming correct initialisation of MPI object, see tutorial.
     import fiesta
 
-    rho = fiesta.gridsph.mpi_gridSPH2D(
-        boxsize=100,
-        ngrid=512,
-        x=x,
-        y=y,
-        MPI=MPI,
-        minpart=8,
-        buffer_size=4
-    )
+    boxsize=100
+    ngrid=512
+    
+    rho = fiesta.gridsph.mpi_gridSPH2D(x, y, boxsize, ngrid, MPI, minpart=8, buffer_size=4)
 
 Field Estimation Example
 ------------------------
@@ -57,15 +52,7 @@ Field Estimation Example
     # Assuming correct initialisation of MPI object, see tutorial.
     import fiesta
 
-    temp = fiesta.gridsph.mpi_gridSPH2D(
-        boxsize=[100, 100],
-        ngrid=256,
-        x=x,
-        y=y,
-        f=temperature,
-        MPI=MPI,
-        minpart=16
-    )
+    temp = fiesta.gridsph.mpi_gridSPH2D(x, y, [100, 100], 256, MPI, f=temperature, minpart=16)
 
 mpi_gridSPH3D
 =============
@@ -99,16 +86,10 @@ Example
     # Assuming correct initialisation of MPI object, see tutorial.
     import fiesta
 
-    rho = fiesta.gridsph.mpi_gridSPH3D(
-        boxsize=200,
-        ngrid=256,
-        x=x,
-        y=y,
-        z=z,
-        MPI=MPI,
-        minpart=32,
-        buffer_size=6
-    )
+    boxsize=200
+    ngrid=256
+
+    rho = fiesta.gridsph.mpi_gridSPH3D(x, y, z, boxsize, ngrid, MPI, minpart=32, buffer_size=6)
 
 3D Field Example
 ----------------
@@ -118,16 +99,7 @@ Example
     # Assuming correct initialisation of MPI object, see tutorial.
     import fiesta
 
-    temp = fiesta.gridsph.mpi_gridSPH3D(
-        boxsize=[200, 200, 200],
-        ngrid=128,
-        x=x,
-        y=y,
-        z=z,
-        f=temperature,
-        MPI=MPI,
-        minpart=20
-    )
+    temp = fiesta.gridsph.mpi_gridSPH3D(x, y, z, [200, 200, 200], 128, MPI, f=temperature, minpart=20)
 
 Performance Notes
 =================

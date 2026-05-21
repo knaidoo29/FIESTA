@@ -8,6 +8,11 @@ computes particle statistics on a grid and uses integral images to efficiently
 approximate SPH-like smoothing. This approach is significantly faster for large 
 datasets while maintaining reasonable accuracy.
 
+The density and velocity field of a cosmological simulation computed with GridSPH.
+
+.. image:: _static/gridsph_example.png
+   :align: center
+
 gridSPH2D
 =========
 
@@ -30,22 +35,11 @@ Example
 
     import fiesta
 
-    rho = fiesta.gridsph.gridSPH2D(
-        boxsize=100,
-        ngrid=256,
-        x=x,
-        y=y,
-        minpart=5
-    )
+    boxsize = 100
+    ngrid = 256
+    rho = fiesta.gridsph.gridSPH2D(x, y, boxsize, ngrid, minpart=5)
 
-    temp = fiesta.gridsph.gridSPH2D(
-        boxsize=[100, 100],
-        ngrid=128,
-        x=x,
-        y=y,
-        f=temperature,
-        minpart=10
-    )
+    temp = fiesta.gridsph.gridSPH2D(x, y, [100, 100], 128, f=temperature, minpart=10)
 
 gridSPH3D
 =========
@@ -65,24 +59,11 @@ Example
 
     import fiesta
 
-    rho = fiesta.gridsph.gridSPH3D(
-        boxsize=200,
-        ngrid=128,
-        x=x,
-        y=y,
-        z=z,
-        minpart=10
-    )
+    boxsize = 100
+    ngrid = 256
+    rho = fiesta.gridsph.gridSPH3D(x, y, z, boxsize, ngrid, minpart=10)
 
-    temp = fiesta.gridsph.gridSPH3D(
-        boxsize=[200, 200, 200],
-        ngrid=64,
-        x=x,
-        y=y,
-        z=z,
-        f=temperature,
-        minpart=20
-    )
+    temp = fiesta.gridsph.gridSPH3D(x, y, z, [200, 200, 200], 64, f=temperature, minpart=20)
 
 API Reference
 =============

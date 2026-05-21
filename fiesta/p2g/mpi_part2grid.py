@@ -14,7 +14,7 @@ def mpi_part2grid2D(
     ngrid: Union[int, List[int]],
     MPI: object,
     method: str = "TSC",
-    periodic: bool = True,
+    periodic: Union[bool, List[bool]] = True,
     origin: Union[float, List[float]] = 0.0,
 ) -> np.ndarray:
     """
@@ -36,7 +36,7 @@ def mpi_part2grid2D(
         MPIutils MPI class object.
     method : str, optional
         Grid assignment scheme, either 'NGP', 'CIC', 'TSC', 'PCS'.
-    periodic : bool, optional
+    periodic : bool or list, optional
         Assign particles with periodic boundaries.
     origin : float, optional
         Origin.
@@ -117,7 +117,7 @@ def mpi_part2grid3D(
     ngrid: Union[int, List[int]],
     MPI: object,
     method: str = "TSC",
-    periodic: bool = True,
+    periodic: Union[bool, List[bool]] = True,
     origin: Union[float, List[float]] = 0.0,
 ) -> np.ndarray:
     """
@@ -141,7 +141,7 @@ def mpi_part2grid3D(
         MPIutils MPI class object.
     method : str, optional
         Grid assignment scheme, either 'NGP', 'CIC' or 'TSC'.
-    periodic : bool, optional
+    periodic : bool or list, optional
         Assign particles with periodic boundaries.
     origin : float, optional
         Origin.

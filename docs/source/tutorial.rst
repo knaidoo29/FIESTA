@@ -2,6 +2,8 @@
 Tutorials
 =========
 
+In-depth tutorials on different interpolation and particle assignment methods are provided below:
+
 .. toctree::
   :maxdepth: 1
   

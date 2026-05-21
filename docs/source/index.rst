@@ -60,6 +60,35 @@ on large data-sets by distributing jobs across multiple processes via ``MPI``. T
 library and the ``MPI`` object from the ``shift-fft`` package (see `here <https://shift.readthedocs.io/en/latest/mpiutils.html>`_) 
 which is passed as an additional object into ``MPI`` related functions.
 
+Showcase
+========
+
+The 2D density field computed with ``FIESTA`` (from the outputs of a cosmological simulation):
+
+.. raw:: html
+
+  <div style="background-color:#f5f5f5; padding:12px; border-radius:8px; display:inline-block;">
+
+.. image:: _static/methods_logdens.png
+  :align: center
+
+.. raw:: html
+
+  </div>
+
+The velocity-field along the z-axis computed with ``FIESTA`` (from the outputs of a cosmological simulation):
+
+.. raw:: html
+
+  <div style="background-color:#f5f5f5; padding:12px; border-radius:8px; display:inline-block;">
+
+.. image:: _static/methods_vz.png
+  :align: center
+
+.. raw:: html
+
+  </div>
+
 Contents
 ========
 

@@ -2,6 +2,11 @@
 Delaunay Tesselation Field Estimation
 =====================================
 
+The density and velocity field of a cosmological simulation computed with DTFE.
+
+.. image:: _static/dtfe_example.png
+   :align: center
+
 .. toctree::
   :maxdepth: 1
 

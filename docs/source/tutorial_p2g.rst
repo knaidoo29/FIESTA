@@ -15,6 +15,33 @@ Supported assignment methods:
 - ``TSC`` : Triangular Shaped Cloud
 - ``PCS`` : Piecewise Cubic Spline
 
+The density field of a cosmological simulation computed with particle-to-grid
+methods.
+
+.. raw:: html
+
+  <div style="background-color:#f5f5f5; padding:12px; border-radius:8px; display:inline-block;">
+
+.. image:: _static/p2g_dens.png
+   :align: center
+
+.. raw:: html
+
+  </div>
+
+The log-density of the same density field.
+
+.. raw:: html
+
+  <div style="background-color:#f5f5f5; padding:12px; border-radius:8px; display:inline-block;">
+
+.. image:: _static/p2g_logdens.png
+   :align: center
+
+.. raw:: html
+
+  </div>
+
 Example: 2D Grid Assignment Densities
 =====================================
 

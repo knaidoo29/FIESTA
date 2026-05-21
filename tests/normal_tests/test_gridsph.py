@@ -7,6 +7,8 @@ from fiesta.gridsph import (
     gridSPH3D,
 )
 
+from fiesta import p2g
+
 from fiesta.src import (
     sum_from_integral_image_2D,
     get_volume_enclosing_box_2D,
@@ -271,5 +273,184 @@ class TestVEFE:
         x3d, y3d, z3d = np.meshgrid(x, y, z, indexing="ij")
         f = np.sin(2 * np.pi * x3d.ravel())
         fgrid = gridSPH3D(x3d.ravel(), y3d.ravel(), z3d.ravel(), 1.0, 2, minpart=1, f=f)
+        assert fgrid.shape == (2, 2, 2)
+        assert np.all(np.isfinite(fgrid))
+
+    def test_gridSPH2D_predgrid(self):
+        x = np.linspace(0.1, 0.9, 9)
+        y = np.linspace(0.1, 0.9, 9)
+        x2d, y2d = np.meshgrid(x, y)
+
+        weights = np.ones(len(x2d.ravel()))
+        pre_dgrid = p2g.part2grid2D(
+            x2d.ravel(),
+            y2d.ravel(),
+            weights,
+            1.0,
+            3,
+            method="NGP",
+            periodic=True,
+            origin=0.0,
+        )
+
+        dgrid = gridSPH2D(
+            x2d.ravel(),
+            y2d.ravel(),
+            1.0,
+            3,
+            minpart=1,
+            dgrid=pre_dgrid,
+        )
+        assert dgrid.shape == (3, 3)
+
+        dgrid = gridSPH2D(
+            x2d.ravel(),
+            y2d.ravel(),
+            [1.0, 1.0],
+            3,
+            minpart=1,
+            periodic=[True, True],
+            dgrid=pre_dgrid,
+        )
+        assert dgrid.shape == (3, 3)
+
+    def test_gridSPH2D_predgrid_prefgrid_field(self):
+        x = np.linspace(0.1, 0.9, 9)
+        y = np.linspace(0.1, 0.9, 9)
+        x2d, y2d = np.meshgrid(x, y)
+
+        f = np.cos(2 * np.pi * x2d.ravel())
+
+        weights = np.ones(len(x2d.ravel()))
+
+        pre_dgrid = p2g.part2grid2D(
+            x2d.ravel(),
+            y2d.ravel(),
+            weights,
+            1.0,
+            3,
+            method="NGP",
+            periodic=True,
+            origin=0.0,
+        )
+
+        pre_fgrid = p2g.part2grid2D(
+            x2d.ravel(),
+            y2d.ravel(),
+            f,
+            1.0,
+            3,
+            method="NGP",
+            periodic=True,
+            origin=0.0,
+        )
+
+        fgrid = gridSPH2D(
+            x2d.ravel(),
+            y2d.ravel(),
+            1.0,
+            3,
+            minpart=1,
+            f=f,
+            dgrid=pre_dgrid,
+            fgrid=pre_fgrid,
+        )
+
+        assert fgrid.shape == (3, 3)
+        assert np.all(np.isfinite(fgrid))
+
+    def test_gridSPH3D_predgrid(self):
+        x = np.linspace(0.2, 0.8, 8)
+        y = np.linspace(0.2, 0.8, 8)
+        z = np.linspace(0.2, 0.8, 8)
+
+        x3d, y3d, z3d = np.meshgrid(x, y, z, indexing="ij")
+
+        weights = np.ones(len(x3d.ravel()))
+
+        pre_dgrid = p2g.part2grid3D(
+            x3d.ravel(),
+            y3d.ravel(),
+            z3d.ravel(),
+            weights,
+            1.0,
+            2,
+            method="NGP",
+            periodic=True,
+            origin=0.0,
+        )
+
+        dgrid = gridSPH3D(
+            x3d.ravel(),
+            y3d.ravel(),
+            z3d.ravel(),
+            1.0,
+            2,
+            minpart=1,
+            dgrid=pre_dgrid,
+        )
+
+        assert dgrid.shape == (2, 2, 2)
+
+        dgrid = gridSPH3D(
+            x3d.ravel(),
+            y3d.ravel(),
+            z3d.ravel(),
+            [1.0, 1.0, 1.0],
+            2,
+            minpart=1,
+            periodic=[True, True, True],
+            dgrid=pre_dgrid,
+        )
+
+        assert dgrid.shape == (2, 2, 2)
+
+    def test_gridSPH3D_predgrid_prefgrid_field(self):
+        x = np.linspace(0.2, 0.8, 8)
+        y = np.linspace(0.2, 0.8, 8)
+        z = np.linspace(0.2, 0.8, 8)
+
+        x3d, y3d, z3d = np.meshgrid(x, y, z, indexing="ij")
+
+        f = np.sin(2 * np.pi * x3d.ravel())
+
+        weights = np.ones(len(x3d.ravel()))
+
+        pre_dgrid = p2g.part2grid3D(
+            x3d.ravel(),
+            y3d.ravel(),
+            z3d.ravel(),
+            weights,
+            1.0,
+            2,
+            method="NGP",
+            periodic=True,
+            origin=0.0,
+        )
+
+        pre_fgrid = p2g.part2grid3D(
+            x3d.ravel(),
+            y3d.ravel(),
+            z3d.ravel(),
+            f,
+            1.0,
+            2,
+            method="NGP",
+            periodic=True,
+            origin=0.0,
+        )
+
+        fgrid = gridSPH3D(
+            x3d.ravel(),
+            y3d.ravel(),
+            z3d.ravel(),
+            1.0,
+            2,
+            minpart=1,
+            f=f,
+            dgrid=pre_dgrid,
+            fgrid=pre_fgrid,
+        )
+
         assert fgrid.shape == (2, 2, 2)
         assert np.all(np.isfinite(fgrid))

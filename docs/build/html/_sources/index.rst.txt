@@ -42,9 +42,9 @@
     <a href="https://github.com/psf/black">
     <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black">
     </a>
-    <!-- <a href="https://doi.org/10.5281/zenodo.17093446">
-    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.17093446.svg" alt="zenodo: DOI">
-    </a> -->
+    <a href="https://doi.org/10.5281/zenodo.20328944">
+    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.20328944.svg" alt="zenodo: DOI">
+    </a>
   </p>
 
 ==================================================================================
@@ -140,19 +140,20 @@ Citation
 
 If you use FIESTA in your work, please cite:
 
-.. .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.17093446.svg
-..    :target: https://doi.org/10.5281/zenodo.17093446
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.20328944.svg
+   :target: https://doi.org/10.5281/zenodo.20328944
 
-.. .. code-block:: bibtex
+.. code-block:: bibtex
 
-..    @software{naidoo_shift_2025,
-..      author       = {Naidoo, Krishna},
-..      title        = {SHIFT: a scalable MPI library for computing fast Fourier transforms in python},
-..      year         = 2025,
-..      publisher    = {Zenodo},
-..      doi          = {10.5281/zenodo.17093446},
-..      url          = {https://doi.org/10.5281/zenodo.17093446}
-..    }
+    @software{naidoo_fiesta_2026,
+      author       = {Krishna Naidoo},
+      title        = {FIESTA: Field Interpolation and Estimation using Spatial Techniques and Algorithms},
+      month        = may,
+      year         = 2026,
+      publisher    = {Zenodo},
+      doi          = {10.5281/zenodo.20328944},
+      url          = {https://doi.org/10.5281/zenodo.20328944},
+    }
 
 Support
 =======

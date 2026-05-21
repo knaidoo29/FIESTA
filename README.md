@@ -46,7 +46,6 @@ https://raw.githubusercontent.com/knaidoo29/FIESTA/main/docs/source/_static/FiEs
 
 ``FIESTA`` is a python library for general interpolation from uniform and non-uniform input points. The library is written in python with numba acceleration for speed. The library has the *optional* capability to be used on large data-sets by distributing jobs across multiple processes via ``MPI``. This relies on the ``mpi4py`` library and the ``MPI`` object from the ``shift-fft`` package (see [here](https://shift.readthedocs.io/en/latest/mpiutils.html)) which is passed as an additional object into ``MPI`` related functions.
 
-
 ## Dependencies
 
 * [numba](https://numba.pydata.org/)
@@ -60,7 +59,7 @@ https://raw.githubusercontent.com/knaidoo29/FIESTA/main/docs/source/_static/FiEs
 FIESTA can be installed via ``pip``:
 
 ```
-  pip install fiesta-pkg
+    pip install fiesta-pkg
 ```
 
 or by cloning the repository:
@@ -78,6 +77,18 @@ Once this is done you should be able to call `fiesta` from python:
 ```
 
 To use the ``MPI`` functionality please take a look at the documentation in FIESTA which instructs users how to use the ``shift-fft`` ``MPI`` object and how to run these distributed jobs successfully without errors or MPI related hanging.
+
+## Showcase
+
+The 2D density field computed with ``FIESTA`` (from the outputs of a cosmological simulation):
+
+![exampledens](
+https://raw.githubusercontent.com/knaidoo29/FIESTA/main/docs/source/_static/methods_logdens.png)
+
+The velocity-field along the z-axis computed with ``FIESTA`` (from the outputs of a cosmological simulation):
+
+![examplevz](
+https://raw.githubusercontent.com/knaidoo29/FIESTA/main/docs/source/_static/methods_vz.png)
 
 ## Documentation
 

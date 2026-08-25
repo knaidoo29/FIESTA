@@ -150,7 +150,7 @@ def part2grid_cic_3d(
                         and (ypix[j2] >= 0)
                         and (ypix[j2] < nygrid)
                         and (zpix[j3] >= 0)
-                        and (zpix[j3] < nygrid)
+                        and (zpix[j3] < nzgrid)
                     ):
                         pix = part2grid_pix.pix1dto3d_scalar(
                             xpix[j1], ypix[j2], zpix[j3], nygrid, nzgrid
@@ -242,7 +242,7 @@ def part2grid_tsc_3d(
                         and (ypix[j2] >= 0)
                         and (ypix[j2] < nygrid)
                         and (zpix[j3] >= 0)
-                        and (zpix[j3] < nygrid)
+                        and (zpix[j3] < nzgrid)
                     ):
                         pix = part2grid_pix.pix1dto3d_scalar(
                             xpix[j1], ypix[j2], zpix[j3], nygrid, nzgrid
@@ -334,7 +334,7 @@ def part2grid_pcs_3d(
                         and (ypix[j2] >= 0)
                         and (ypix[j2] < nygrid)
                         and (zpix[j3] >= 0)
-                        and (zpix[j3] < nygrid)
+                        and (zpix[j3] < nzgrid)
                     ):
                         pix = part2grid_pix.pix1dto3d_scalar(
                             xpix[j1], ypix[j2], zpix[j3], nygrid, nzgrid

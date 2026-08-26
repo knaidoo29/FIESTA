@@ -1,4 +1,4 @@
 version=1
 release=0
-patch=5
-vstr="1.0.5"
+patch=6
+vstr="1.0.6"

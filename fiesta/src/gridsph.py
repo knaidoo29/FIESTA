@@ -38,6 +38,8 @@ def sum_from_integral_image_2D(
     """
     lenx = len(igrid[:, 0])
     leny = len(igrid[0])
+    nx = lenx - 1
+    ny = leny - 1
     if ixmin >= 0 and ixmax < lenx and iymin >= 0 and iymax < leny:
         return (
             igrid[ixmax, iymax]
@@ -64,15 +66,16 @@ def sum_from_integral_image_2D(
         else:
             if xperiodic == True:
                 if ixmin < 0:
-                    ixmin1 = ixmin + lenx
-                    ixmax1 = lenx - 1
+                    ixmin1 = ixmin + nx
+                    ixmax1 = nx
                     ixmin2 = 0
                     ixmax2 = ixmax
-                elif ixmax > lenx - 1:
+
+                elif ixmax > nx:
                     ixmin1 = ixmin
-                    ixmax1 = lenx - 1
+                    ixmax1 = nx
                     ixmin2 = 0
-                    ixmax2 = ixmax - lenx
+                    ixmax2 = ixmax - nx
                 else:
                     ixmin1 = -2 * lenx
                     ixmax1 = -2 * lenx
@@ -94,18 +97,17 @@ def sum_from_integral_image_2D(
                     ixmax1 = -2 * lenx
                     ixmin2 = -2 * lenx
                     ixmax2 = -2 * lenx
-
             if yperiodic == True:
                 if iymin < 0:
-                    iymin1 = iymin + leny
-                    iymax1 = leny - 1
+                    iymin1 = iymin + ny
+                    iymax1 = ny
                     iymin2 = 0
                     iymax2 = iymax
-                elif iymax > leny - 1:
+                elif iymax > ny:
                     iymin1 = iymin
-                    iymax1 = leny - 1
+                    iymax1 = ny
                     iymin2 = 0
-                    iymax2 = iymax - leny
+                    iymax2 = iymax - ny
                 else:
                     iymin1 = -2 * leny
                     iymax1 = -2 * leny
@@ -207,61 +209,101 @@ def get_volume_enclosing_box_2D(
     ifgrid: Optional[np.ndarray] = None,
 ) -> np.ndarray:  # pragma: no cover
     """
-    Get the volume for an enclosing box containing minpart number of particles.
+    Get the volume for an enclosing box containing minpart particles.
 
     Parameters
     ----------
-    boxsize : float
-        Size of the 2D grid.
-    ngrid : int
-       Grid size.
-    dgrid : array
-        The 2D density field grid.
-    idgrid : array
-        The 2D density field integral image.
+    xboxsize, yboxsize : float
+        Physical box size along x and y.
+    dgrid : ndarray
+        2D density grid.
+    idgrid : ndarray
+        Integral image of the density grid.
     minpart : int
-        Minimum number of particles.
-    periodic : bool, optional
-        Periodic boundary condition.
-    ifgrid : array
-        Field integral image. If not None, then the field will be estimate via
-        the volume enclosing box method.
+        Minimum number of particles to enclose.
+    xperiodic, yperiodic : bool, optional
+        Periodic boundary conditions along x and y.
+    ifgrid : ndarray, optional
+        Integral image of an auxiliary field. If supplied, return the
+        volume-enclosing-box estimate of that field instead of the volume.
 
     Returns
     -------
-    vgrid : array
-        The 2D volume enclosing box for density estimation.
+    ndarray
+        Enclosing volume grid, or auxiliary field estimate if ``ifgrid``
+        is supplied.
     """
-    ngridx, ngridy = np.shape(dgrid)[0], np.shape(dgrid)[1]
+
+    tol = 1e-12 * max(1.0, float(minpart))
+
+    ngridx, ngridy = dgrid.shape
+
     dx = xboxsize / ngridx
     dy = yboxsize / ngridy
-    vgrid = np.zeros(np.shape(dgrid), dtype=np.float64)
+
+    cellvol = dx * dy
+
+    vgrid = np.zeros(
+        dgrid.shape,
+        dtype=np.float64,
+    )
+
     if ifgrid is not None:
-        fgridVEB = np.zeros(np.shape(dgrid), dtype=np.float64)
-    for i in range(0, np.shape(dgrid)[0]):
-        for j in range(0, np.shape(dgrid)[1]):
-            counts = dgrid[i, j] * dx * dy
-            if counts >= minpart:
-                vol = minpart / (counts / (dx * dy))
+        fgridVEB = np.zeros(
+            dgrid.shape,
+            dtype=np.float64,
+        )
+
+    for i in range(ngridx):
+
+        for j in range(ngridy):
+
+            # Number of particles represented by the central cell.
+            counts = dgrid[i, j] * cellvol
+
+            # --------------------------------------------------------
+            # Central cell already contains minpart particles.
+            # --------------------------------------------------------
+
+            if counts >= minpart - tol:
+
+                # If counts is infinitesimally below minpart because of
+                # roundoff, regard the complete cell as the enclosing
+                # volume rather than allowing a volume > one cell.
+                if counts < minpart:
+                    vol = cellvol
+                else:
+                    vol = minpart / (counts / cellvol)
+
                 if ifgrid is not None:
-                    iadd = 1
-                    isub = 0
-                    fgridVEB[i, j] = (
-                        sum_from_integral_image_2D(
-                            ifgrid,
-                            i + isub,
-                            i + iadd,
-                            j + isub,
-                            j + iadd,
-                            xperiodic=xperiodic,
-                            yperiodic=yperiodic,
-                        )
-                        / dgrid[i, j]
+
+                    fsum = sum_from_integral_image_2D(
+                        ifgrid,
+                        i,
+                        i + 1,
+                        j,
+                        j + 1,
+                        xperiodic=xperiodic,
+                        yperiodic=yperiodic,
                     )
+
+                    fgridVEB[i, j] = (
+                        fsum / dgrid[i, j]
+                    )
+
+            # --------------------------------------------------------
+            # Need to expand the enclosing box.
+            # --------------------------------------------------------
+
             else:
+
                 iadd = 1
                 isub = 0
-                # smaller enclosing volume
+
+                # ----------------------------------------------------
+                # Smaller enclosing box.
+                # ----------------------------------------------------
+
                 IcountS = sum_from_integral_image_2D(
                     idgrid,
                     i + isub,
@@ -271,8 +313,11 @@ def get_volume_enclosing_box_2D(
                     xperiodic=xperiodic,
                     yperiodic=yperiodic,
                 )
-                IcountS *= dx * dy
+
+                IcountS *= cellvol
+
                 if ifgrid is not None:
+
                     fsumS = sum_from_integral_image_2D(
                         ifgrid,
                         i + isub,
@@ -282,10 +327,16 @@ def get_volume_enclosing_box_2D(
                         xperiodic=xperiodic,
                         yperiodic=yperiodic,
                     )
-                    fsumS *= dx * dy
-                # larger enclosing volume
+
+                    fsumS *= cellvol
+
+                # ----------------------------------------------------
+                # Larger enclosing box.
+                # ----------------------------------------------------
+
                 iadd += 1
                 isub -= 1
+
                 IcountL = sum_from_integral_image_2D(
                     idgrid,
                     i + isub,
@@ -295,8 +346,11 @@ def get_volume_enclosing_box_2D(
                     xperiodic=xperiodic,
                     yperiodic=yperiodic,
                 )
-                IcountL *= dx * dy
+
+                IcountL *= cellvol
+
                 if ifgrid is not None:
+
                     fsumL = sum_from_integral_image_2D(
                         ifgrid,
                         i + isub,
@@ -306,13 +360,24 @@ def get_volume_enclosing_box_2D(
                         xperiodic=xperiodic,
                         yperiodic=yperiodic,
                     )
-                    fsumL *= dx * dy
-                while IcountL < minpart:
+
+                    fsumL *= cellvol
+
+                # ----------------------------------------------------
+                # Grow the box until it contains minpart particles,
+                # allowing for floating-point roundoff.
+                # ----------------------------------------------------
+
+                while IcountL < minpart - tol:
+
                     IcountS = IcountL
+
                     if ifgrid is not None:
                         fsumS = fsumL
+
                     iadd += 1
                     isub -= 1
+
                     IcountL = sum_from_integral_image_2D(
                         idgrid,
                         i + isub,
@@ -322,8 +387,11 @@ def get_volume_enclosing_box_2D(
                         xperiodic=xperiodic,
                         yperiodic=yperiodic,
                     )
-                    IcountL *= dx * dy
+
+                    IcountL *= cellvol
+
                     if ifgrid is not None:
+
                         fsumL = sum_from_integral_image_2D(
                             ifgrid,
                             i + isub,
@@ -333,28 +401,157 @@ def get_volume_enclosing_box_2D(
                             xperiodic=xperiodic,
                             yperiodic=yperiodic,
                         )
-                        fsumL *= dx * dy
-                voxelvolS = (iadd - isub - 2) ** 2
-                voxelvolL = (iadd - isub) ** 2 - voxelvolS
-                volS = voxelvolS * (dx * dy)
-                volL = voxelvolL * (dx * dy)
-                densL = (IcountL - IcountS) / volL
+
+                        fsumL *= cellvol
+
+                # ----------------------------------------------------
+                # Volume of the smaller box and newly added shell.
+                # ----------------------------------------------------
+
+                voxelvolS = (
+                    iadd - isub - 2
+                ) ** 2
+
+                voxelvolL = (
+                    iadd - isub
+                ) ** 2 - voxelvolS
+
+                volS = voxelvolS * cellvol
+                volL = voxelvolL * cellvol
+
+                # ----------------------------------------------------
+                # Determine how much of the outer shell is required.
+                # ----------------------------------------------------
+
                 inS = IcountS
-                inL = minpart - inS
-                vol = volS + inL / densL
-                if ifgrid is not None:
-                    weiS = inS / minpart
-                    weiL = inL / minpart
-                    if inS == 0.0:
-                        fgridVEB[i, j] = (fsumL - fsumS) / (IcountL - IcountS)
-                    else:
-                        fgridVEB[i, j] = weiS * fsumS / IcountS
-                        fgridVEB[i, j] += weiL * (fsumL - fsumS) / (IcountL - IcountS)
+                inL = minpart - IcountS
+
+                shell_count = (
+                    IcountL - IcountS
+                )
+
+                remaining_L = (
+                    minpart - IcountL
+                )
+
+                # ----------------------------------------------------
+                # Case 1:
+                # The smaller box itself already contains minpart
+                # to numerical precision.
+                # ----------------------------------------------------
+
+                if abs(inL) <= tol:
+
+                    vol = volS
+
+                    if ifgrid is not None:
+
+                        if IcountS > tol:
+                            fgridVEB[i, j] = (
+                                fsumS / IcountS
+                            )
+                        else:
+                            fgridVEB[i, j] = 0.0
+
+                # ----------------------------------------------------
+                # Case 2:
+                # The larger box contains minpart to numerical
+                # precision. Use the complete newly added shell.
+                #
+                # This avoids trying to interpolate through a shell
+                # whose measured count may be comparable to numerical
+                # roundoff.
+                # ----------------------------------------------------
+
+                elif abs(remaining_L) <= tol:
+
+                    vol = volS + volL
+
+                    if ifgrid is not None:
+
+                        if IcountL > tol:
+                            fgridVEB[i, j] = (
+                                fsumL / IcountL
+                            )
+                        else:
+                            fgridVEB[i, j] = 0.0
+
+                # ----------------------------------------------------
+                # Case 3:
+                # Genuine threshold crossing. Interpolate through
+                # the newly added shell.
+                # ----------------------------------------------------
+
+                else:
+
+                    if shell_count <= 0.0:
+
+                        print(
+                            "GRIDSPH SHELL ERROR:",
+                            "i =", i,
+                            "j =", j,
+                            "isub =", isub,
+                            "iadd =", iadd,
+                            "IcountS =", IcountS,
+                            "IcountL =", IcountL,
+                            "inL =", inL,
+                            "remaining_L =", remaining_L,
+                            "shell_count =", shell_count,
+                            "tol =", tol,
+                            "minpart =", minpart,
+                        )
+
+                        raise ValueError(
+                            "GridSPH encountered a non-positive "
+                            "shell particle count."
+                        )
+
+                    densL = (
+                        shell_count / volL
+                    )
+
+                    vol = (
+                        volS
+                        + inL / densL
+                    )
+
+                    if ifgrid is not None:
+
+                        weiS = (
+                            inS / minpart
+                        )
+
+                        weiL = (
+                            inL / minpart
+                        )
+
+                        if inS <= tol:
+
+                            fgridVEB[i, j] = (
+                                (fsumL - fsumS)
+                                / shell_count
+                            )
+
+                        else:
+
+                            fgridVEB[i, j] = (
+                                weiS
+                                * fsumS
+                                / IcountS
+                            )
+
+                            fgridVEB[i, j] += (
+                                weiL
+                                * (fsumL - fsumS)
+                                / shell_count
+                            )
+
             vgrid[i, j] = vol
+
     if ifgrid is None:
         return vgrid
-    else:
-        return fgridVEB
+
+    return fgridVEB
 
 
 @njit
@@ -401,6 +598,9 @@ def sum_from_integral_image_3D(
     The sum of the integral image within a rectangle.
     """
     lenx, leny, lenz = np.shape(igrid)
+    nx = lenx - 1
+    ny = leny - 1
+    nz = lenz - 1
     if (
         ixmin >= 0
         and ixmax < lenx
@@ -444,15 +644,16 @@ def sum_from_integral_image_3D(
         else:
             if xperiodic == True:
                 if ixmin < 0:
-                    ixmin1 = ixmin + lenx
-                    ixmax1 = lenx - 1
+                    ixmin1 = ixmin + nx
+                    ixmax1 = nx
                     ixmin2 = 0
                     ixmax2 = ixmax
-                elif ixmax > lenx - 1:
+
+                elif ixmax > nx:
                     ixmin1 = ixmin
-                    ixmax1 = lenx - 1
+                    ixmax1 = nx
                     ixmin2 = 0
-                    ixmax2 = ixmax - lenx
+                    ixmax2 = ixmax - nx
                 else:
                     ixmin1 = -2 * lenx
                     ixmax1 = -2 * lenx
@@ -477,15 +678,15 @@ def sum_from_integral_image_3D(
 
             if yperiodic == True:
                 if iymin < 0:
-                    iymin1 = iymin + leny
-                    iymax1 = leny - 1
+                    iymin1 = iymin + ny
+                    iymax1 = ny
                     iymin2 = 0
                     iymax2 = iymax
-                elif iymax > leny - 1:
+                elif iymax > ny:
                     iymin1 = iymin
-                    iymax1 = leny - 1
+                    iymax1 = ny
                     iymin2 = 0
-                    iymax2 = iymax - leny
+                    iymax2 = iymax - ny
                 else:
                     iymin1 = -2 * leny
                     iymax1 = -2 * leny
@@ -510,15 +711,15 @@ def sum_from_integral_image_3D(
 
             if zperiodic == True:
                 if izmin < 0:
-                    izmin1 = izmin + lenz
-                    izmax1 = lenz - 1
+                    izmin1 = izmin + nz
+                    izmax1 = nz
                     izmin2 = 0
                     izmax2 = izmax
-                elif izmax > lenz - 1:
+                elif izmax > nz:
                     izmin1 = izmin
-                    izmax1 = lenz - 1
+                    izmax1 = nz
                     izmin2 = 0
-                    izmax2 = izmax - lenz
+                    izmax2 = izmax - nz
                 else:
                     izmin1 = -2 * lenz
                     izmax1 = -2 * lenz
@@ -658,64 +859,111 @@ def get_volume_enclosing_box_3D(
     ifgrid: Optional[np.ndarray] = None,
 ) -> np.ndarray:  # pragma: no cover
     """
-    Get the volume for an enclosing box containing minpart number of particles.
+    Get the volume for an enclosing box containing minpart particles.
 
     Parameters
     ----------
-    boxsize : float
-        Size of the 3D grid.
-    dgrid : array
-        The 3D density field grid.
-    idgrid : array
-        The 3D density field integral image.
+    xboxsize, yboxsize, zboxsize : float
+        Physical box size along x, y and z.
+    dgrid : ndarray
+        3D density grid.
+    idgrid : ndarray
+        Integral image of the density grid.
     minpart : int
-        Minimum number of particles.
-    periodic : bool, optional
-        Periodic boundary condition.
-    ifgrid : array
-        Field integral image. If not None, then the field will be estimate via
-        the volume enclosing box method.
+        Minimum number of particles to enclose.
+    xperiodic, yperiodic, zperiodic : bool, optional
+        Periodic boundary conditions along x, y and z.
+    ifgrid : ndarray, optional
+        Integral image of an auxiliary field. If supplied, return the
+        volume-enclosing-box estimate of that field instead of the volume.
 
     Returns
     -------
-    vgrid : array
-        The 3D volume enclosing box for density estimation.
+    ndarray
+        Enclosing volume grid, or auxiliary field estimate if ``ifgrid``
+        is supplied.
     """
-    ngridx, ngridy, ngridz = np.shape(dgrid)[0], np.shape(dgrid)[1], np.shape(dgrid)[2]
+
+    tol = 1e-12 * max(1.0, float(minpart))
+
+    ngridx, ngridy, ngridz = dgrid.shape
+
     dx = xboxsize / ngridx
     dy = yboxsize / ngridy
     dz = zboxsize / ngridz
-    vgrid = np.zeros(np.shape(dgrid), dtype=np.float64)
+
+    cellvol = dx * dy * dz
+
+    vgrid = np.zeros(
+        dgrid.shape,
+        dtype=np.float64,
+    )
+
     if ifgrid is not None:
-        fgridVEB = np.zeros(np.shape(dgrid), dtype=np.float64)
-    for i in range(0, np.shape(dgrid)[0]):
-        for j in range(0, np.shape(dgrid)[1]):
-            for k in range(0, np.shape(dgrid)[2]):
-                counts = dgrid[i, j, k] * dx * dy * dz
-                if counts >= minpart:
-                    vol = minpart / (counts / (dx * dy * dz))
+        fgridVEB = np.zeros(
+            dgrid.shape,
+            dtype=np.float64,
+        )
+
+    for i in range(ngridx):
+
+        for j in range(ngridy):
+
+            for k in range(ngridz):
+
+                # Number of particles represented by the central cell.
+                counts = dgrid[i, j, k] * cellvol
+
+                # ----------------------------------------------------
+                # Central cell already contains minpart particles.
+                # ----------------------------------------------------
+
+                if counts >= minpart - tol:
+
+                    # If counts is infinitesimally below minpart because
+                    # of roundoff, use the complete cell rather than
+                    # allowing a volume slightly larger than one cell.
+                    if counts < minpart:
+                        vol = cellvol
+                    else:
+                        vol = (
+                            minpart
+                            / (counts / cellvol)
+                        )
+
                     if ifgrid is not None:
-                        iadd = 1
-                        isub = 0
+
+                        fsum = sum_from_integral_image_3D(
+                            ifgrid,
+                            i,
+                            i + 1,
+                            j,
+                            j + 1,
+                            k,
+                            k + 1,
+                            xperiodic=xperiodic,
+                            yperiodic=yperiodic,
+                            zperiodic=zperiodic,
+                        )
+
                         fgridVEB[i, j, k] = (
-                            sum_from_integral_image_3D(
-                                ifgrid,
-                                i + isub,
-                                i + iadd,
-                                j + isub,
-                                j + iadd,
-                                k + isub,
-                                k + iadd,
-                                xperiodic=xperiodic,
-                                yperiodic=yperiodic,
-                                zperiodic=zperiodic,
-                            )
+                            fsum
                             / dgrid[i, j, k]
                         )
+
+                # ----------------------------------------------------
+                # Need to expand the enclosing box.
+                # ----------------------------------------------------
+
                 else:
+
                     iadd = 1
                     isub = 0
-                    # smaller enclosing volume
+
+                    # ------------------------------------------------
+                    # Smaller enclosing box.
+                    # ------------------------------------------------
+
                     IcountS = sum_from_integral_image_3D(
                         idgrid,
                         i + isub,
@@ -728,8 +976,11 @@ def get_volume_enclosing_box_3D(
                         yperiodic=yperiodic,
                         zperiodic=zperiodic,
                     )
-                    IcountS *= dx * dy * dz
+
+                    IcountS *= cellvol
+
                     if ifgrid is not None:
+
                         fsumS = sum_from_integral_image_3D(
                             ifgrid,
                             i + isub,
@@ -742,10 +993,16 @@ def get_volume_enclosing_box_3D(
                             yperiodic=yperiodic,
                             zperiodic=zperiodic,
                         )
-                        fsumS *= dx * dy * dz
-                    # larger enclosing volume
+
+                        fsumS *= cellvol
+
+                    # ------------------------------------------------
+                    # Larger enclosing box.
+                    # ------------------------------------------------
+
                     iadd += 1
                     isub -= 1
+
                     IcountL = sum_from_integral_image_3D(
                         idgrid,
                         i + isub,
@@ -758,8 +1015,11 @@ def get_volume_enclosing_box_3D(
                         yperiodic=yperiodic,
                         zperiodic=zperiodic,
                     )
-                    IcountL *= dx * dy * dz
+
+                    IcountL *= cellvol
+
                     if ifgrid is not None:
+
                         fsumL = sum_from_integral_image_3D(
                             ifgrid,
                             i + isub,
@@ -772,13 +1032,24 @@ def get_volume_enclosing_box_3D(
                             yperiodic=yperiodic,
                             zperiodic=zperiodic,
                         )
-                        fsumL *= dx * dy * dz
-                    while IcountL < minpart:
+
+                        fsumL *= cellvol
+
+                    # ------------------------------------------------
+                    # Grow the box until it contains minpart particles,
+                    # allowing for floating-point roundoff.
+                    # ------------------------------------------------
+
+                    while IcountL < minpart - tol:
+
                         IcountS = IcountL
+
                         if ifgrid is not None:
                             fsumS = fsumL
+
                         iadd += 1
                         isub -= 1
+
                         IcountL = sum_from_integral_image_3D(
                             idgrid,
                             i + isub,
@@ -791,8 +1062,11 @@ def get_volume_enclosing_box_3D(
                             yperiodic=yperiodic,
                             zperiodic=zperiodic,
                         )
-                        IcountL *= dx * dy * dz
+
+                        IcountL *= cellvol
+
                         if ifgrid is not None:
+
                             fsumL = sum_from_integral_image_3D(
                                 ifgrid,
                                 i + isub,
@@ -805,27 +1079,173 @@ def get_volume_enclosing_box_3D(
                                 yperiodic=yperiodic,
                                 zperiodic=zperiodic,
                             )
-                            fsumL *= dx * dy * dz
-                    voxelvolS = (iadd - isub - 2) ** 3
-                    voxelvolL = (iadd - isub) ** 3 - voxelvolS
-                    volS = voxelvolS * (dx * dy * dz)
-                    volL = voxelvolL * (dx * dy * dz)
-                    densL = (IcountL - IcountS) / volL
+
+                            fsumL *= cellvol
+
+                    # ------------------------------------------------
+                    # Volume of the smaller box and newly added shell.
+                    # ------------------------------------------------
+
+                    voxelvolS = (
+                        iadd - isub - 2
+                    ) ** 3
+
+                    voxelvolL = (
+                        iadd - isub
+                    ) ** 3 - voxelvolS
+
+                    volS = (
+                        voxelvolS
+                        * cellvol
+                    )
+
+                    volL = (
+                        voxelvolL
+                        * cellvol
+                    )
+
+                    # ------------------------------------------------
+                    # Determine how much of the newly added shell is
+                    # required to reach minpart.
+                    # ------------------------------------------------
+
                     inS = IcountS
-                    inL = minpart - inS
-                    vol = volS + inL / densL
-                    if ifgrid is not None:
-                        weiS = inS / minpart
-                        weiL = inL / minpart
-                        if inS == 0.0:
-                            fgridVEB[i, j, k] = (fsumL - fsumS) / (IcountL - IcountS)
-                        else:
-                            fgridVEB[i, j, k] = weiS * fsumS / IcountS
-                            fgridVEB[i, j, k] += (
-                                weiL * (fsumL - fsumS) / (IcountL - IcountS)
+                    inL = minpart - IcountS
+
+                    shell_count = (
+                        IcountL - IcountS
+                    )
+
+                    remaining_L = (
+                        minpart - IcountL
+                    )
+
+                    # ------------------------------------------------
+                    # Case 1:
+                    # Smaller box already contains minpart to
+                    # numerical precision.
+                    # ------------------------------------------------
+
+                    if abs(inL) <= tol:
+
+                        vol = volS
+
+                        if ifgrid is not None:
+
+                            if IcountS > tol:
+
+                                fgridVEB[i, j, k] = (
+                                    fsumS
+                                    / IcountS
+                                )
+
+                            else:
+
+                                fgridVEB[i, j, k] = 0.0
+
+                    # ------------------------------------------------
+                    # Case 2:
+                    # Larger box contains minpart to numerical
+                    # precision. Use the complete outer shell.
+                    # ------------------------------------------------
+
+                    elif abs(remaining_L) <= tol:
+
+                        vol = (
+                            volS
+                            + volL
+                        )
+
+                        if ifgrid is not None:
+
+                            if IcountL > tol:
+
+                                fgridVEB[i, j, k] = (
+                                    fsumL
+                                    / IcountL
+                                )
+
+                            else:
+
+                                fgridVEB[i, j, k] = 0.0
+
+                    # ------------------------------------------------
+                    # Case 3:
+                    # Genuine threshold crossing. Interpolate through
+                    # the newly added shell.
+                    # ------------------------------------------------
+
+                    else:
+
+                        if shell_count <= 0.0:
+
+                            print(
+                                "GRIDSPH SHELL ERROR:",
+                                "i =", i,
+                                "j =", j,
+                                "k =", k,
+                                "isub =", isub,
+                                "iadd =", iadd,
+                                "IcountS =", IcountS,
+                                "IcountL =", IcountL,
+                                "inL =", inL,
+                                "remaining_L =", remaining_L,
+                                "shell_count =", shell_count,
+                                "tol =", tol,
+                                "minpart =", minpart,
                             )
+
+                            raise ValueError(
+                                "GridSPH encountered a non-positive "
+                                "shell particle count."
+                            )
+
+                        densL = (
+                            shell_count
+                            / volL
+                        )
+
+                        vol = (
+                            volS
+                            + inL / densL
+                        )
+
+                        if ifgrid is not None:
+
+                            weiS = (
+                                inS
+                                / minpart
+                            )
+
+                            weiL = (
+                                inL
+                                / minpart
+                            )
+
+                            if inS <= tol:
+
+                                fgridVEB[i, j, k] = (
+                                    (fsumL - fsumS)
+                                    / shell_count
+                                )
+
+                            else:
+
+                                fgridVEB[i, j, k] = (
+                                    weiS
+                                    * fsumS
+                                    / IcountS
+                                )
+
+                                fgridVEB[i, j, k] += (
+                                    weiL
+                                    * (fsumL - fsumS)
+                                    / shell_count
+                                )
+
                 vgrid[i, j, k] = vol
+
     if ifgrid is None:
         return vgrid
-    else:
-        return fgridVEB
+
+    return fgridVEB

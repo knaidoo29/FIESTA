@@ -15,7 +15,8 @@ class TestP2G:
         x = np.random.rand(10)
         y = np.random.rand(10)
         f = np.random.rand(10)
-        grid = part2grid2D(x, y, f, boxsize=1.0, ngrid=10, method="NGP")
+        grid = part2grid2D(x, y, boxsize=1.0, ngrid=10, method="NGP")
+        grid = part2grid2D(x, y, f=f, boxsize=1.0, ngrid=10, method="NGP")
         assert grid.shape == (10, 10)
 
     def test_part2grid2D_ngp_list(self):
@@ -25,7 +26,16 @@ class TestP2G:
         grid = part2grid2D(
             x,
             y,
-            f,
+            boxsize=[1.0, 1.0],
+            ngrid=[10, 10],
+            origin=[0.0, 0.0],
+            periodic=[True, False],
+            method="NGP",
+        )
+        grid = part2grid2D(
+            x,
+            y,
+            f=f,
             boxsize=[1.0, 1.0],
             ngrid=[10, 10],
             origin=[0.0, 0.0],
@@ -38,21 +48,24 @@ class TestP2G:
         x = np.random.rand(10)
         y = np.random.rand(10)
         f = np.random.rand(10)
-        grid = part2grid2D(x, y, f, boxsize=1.0, ngrid=10, method="CIC")
+        grid = part2grid2D(x, y, boxsize=1.0, ngrid=10, method="CIC")
+        grid = part2grid2D(x, y, f=f, boxsize=1.0, ngrid=10, method="CIC")
         assert grid.shape == (10, 10)
 
     def test_part2grid2D_tsc(self):
         x = np.random.rand(10)
         y = np.random.rand(10)
         f = np.random.rand(10)
-        grid = part2grid2D(x, y, f, boxsize=1.0, ngrid=10, method="TSC")
+        grid = part2grid2D(x, y, boxsize=1.0, ngrid=10, method="TSC")
+        grid = part2grid2D(x, y, f=f, boxsize=1.0, ngrid=10, method="TSC")
         assert grid.shape == (10, 10)
 
     def test_part2grid2D_pcs(self):
         x = np.random.rand(10)
         y = np.random.rand(10)
         f = np.random.rand(10)
-        grid = part2grid2D(x, y, f, boxsize=1.0, ngrid=10, method="PCS")
+        grid = part2grid2D(x, y, boxsize=1.0, ngrid=10, method="PCS")
+        grid = part2grid2D(x, y, f=f, boxsize=1.0, ngrid=10, method="PCS")
         assert grid.shape == (10, 10)
 
     def test_part2grid3D_ngp(self):
@@ -60,7 +73,8 @@ class TestP2G:
         y = np.random.rand(10)
         z = np.random.rand(10)
         f = np.random.rand(10)
-        grid = part2grid3D(x, y, z, f, boxsize=1.0, ngrid=5, method="NGP")
+        grid = part2grid3D(x, y, z, boxsize=1.0, ngrid=5, method="NGP")
+        grid = part2grid3D(x, y, z, f=f, boxsize=1.0, ngrid=5, method="NGP")
         assert grid.shape == (5, 5, 5)
 
     def test_part2grid3D_ngp_list(self):
@@ -72,7 +86,17 @@ class TestP2G:
             x,
             y,
             z,
-            f,
+            boxsize=[1.0, 1.0, 1.0],
+            ngrid=[5, 5, 5],
+            origin=[0.0, 0.0, 0.0],
+            periodic=[True, False, True],
+            method="NGP",
+        )
+        grid = part2grid3D(
+            x,
+            y,
+            z,
+            f=f,
             boxsize=[1.0, 1.0, 1.0],
             ngrid=[5, 5, 5],
             origin=[0.0, 0.0, 0.0],
@@ -86,7 +110,8 @@ class TestP2G:
         y = np.random.rand(10)
         z = np.random.rand(10)
         f = np.random.rand(10)
-        grid = part2grid3D(x, y, z, f, boxsize=1.0, ngrid=5, method="CIC")
+        grid = part2grid3D(x, y, z, boxsize=1.0, ngrid=5, method="CIC")
+        grid = part2grid3D(x, y, z, f=f, boxsize=1.0, ngrid=5, method="CIC")
         assert grid.shape == (5, 5, 5)
 
     def test_part2grid3D_tsc(self):
@@ -94,7 +119,8 @@ class TestP2G:
         y = np.random.rand(10)
         z = np.random.rand(10)
         f = np.random.rand(10)
-        grid = part2grid3D(x, y, z, f, boxsize=1.0, ngrid=5, method="TSC")
+        grid = part2grid3D(x, y, z, boxsize=1.0, ngrid=5, method="TSC")
+        grid = part2grid3D(x, y, z, f=f, boxsize=1.0, ngrid=5, method="TSC")
         assert grid.shape == (5, 5, 5)
 
     def test_part2grid3D_pcs(self):
@@ -102,7 +128,8 @@ class TestP2G:
         y = np.random.rand(10)
         z = np.random.rand(10)
         f = np.random.rand(10)
-        grid = part2grid3D(x, y, z, f, boxsize=1.0, ngrid=5, method="PCS")
+        grid = part2grid3D(x, y, z, boxsize=1.0, ngrid=5, method="PCS")
+        grid = part2grid3D(x, y, z, f=f, boxsize=1.0, ngrid=5, method="PCS")
         assert grid.shape == (5, 5, 5)
 
     def test_get_deconvol_p(self):

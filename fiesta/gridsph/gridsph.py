@@ -52,18 +52,16 @@ def gridSPH2D(
     fgridSPH : array
         If f is not None then the field is estimated via SPH.
     """
-    if w is None:
-        w = np.ones(len(x))
     if dgrid is None:
         dgrid = p2g.part2grid2D(
-            x, y, w, boxsize, ngrid, method="NGP", periodic=True, origin=0.0
+            x, y, boxsize, ngrid, f=w, method="NGP", periodic=True, origin=0.0
         )
     else:
         assert dgrid.shape == (ngrid, ngrid), "dgrid shape does not match ngrid"
     if f is not None:
         if fgrid is None:
             fgrid = p2g.part2grid2D(
-                x, y, f, boxsize, ngrid, method="NGP", periodic=True, origin=0.0
+                x, y, boxsize, ngrid, f=f, method="NGP", periodic=True, origin=0.0
             )
         else:
             assert fgrid.shape == (ngrid, ngrid), "fgrid shape does not match ngrid"
@@ -155,18 +153,16 @@ def gridSPH3D(
     fgridSPH : array
         If f is not None then the field is estimated via SPH.
     """
-    if w is None:
-        w = np.ones(len(x))
     if dgrid is None:
         dgrid = p2g.part2grid3D(
-            x, y, z, w, boxsize, ngrid, method="NGP", periodic=True, origin=0.0
+            x, y, z, boxsize, ngrid, f=w, method="NGP", periodic=True, origin=0.0
         )
     else:
         assert dgrid.shape == (ngrid, ngrid, ngrid), "dgrid shape does not match ngrid"
     if f is not None:
         if fgrid is None:
             fgrid = p2g.part2grid3D(
-                x, y, z, f, boxsize, ngrid, method="NGP", periodic=True, origin=0.0
+                x, y, z, boxsize, ngrid, f=f, method="NGP", periodic=True, origin=0.0
             )
         else:
             assert fgrid.shape == (ngrid, ngrid, ngrid), "fgrid shape does not match ngrid"

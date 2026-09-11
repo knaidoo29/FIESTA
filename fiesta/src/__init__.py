@@ -1,38 +1,6 @@
 from .grid import xgrid
 from .grid import xgrids
 
-from .part2grid_pix import which_pix
-from .part2grid_pix import which_pixs
-from .part2grid_pix import pix1dto2d
-from .part2grid_pix import pix1dto3d
-from .part2grid_pix import periodic_pix
-from .part2grid_pix import ngp_pix
-from .part2grid_pix import cic_pix
-from .part2grid_pix import tsc_pix
-from .part2grid_pix import pcs_pix
-
-from .part2grid_wei import weight_cic
-from .part2grid_wei import weight_tsc
-from .part2grid_wei import weight_pcs
-
-from .part2grid_2d import part2grid_ngp_2d
-from .part2grid_2d import part2grid_cic_2d
-from .part2grid_2d import part2grid_tsc_2d
-from .part2grid_2d import part2grid_pcs_2d
-
-from .part2grid_3d import part2grid_ngp_3d
-from .part2grid_3d import part2grid_cic_3d
-from .part2grid_3d import part2grid_tsc_3d
-from .part2grid_3d import part2grid_pcs_3d
-
-from .bilinear import bilinear_periodic
-from .bilinear import bilinear_nonperiodic
-from .bilinear import bilinear_axisperiodic
-
-from .trilinear import trilinear_periodic
-from .trilinear import trilinear_nonperiodic
-from .trilinear import trilinear_axisperiodic
-
 from .polygon import triangle_area
 from .polygon import sum_triangle_area
 

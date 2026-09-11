@@ -4,7 +4,6 @@ from numba import njit
 import shift
 
 from .. import coords
-from .. import src
 
 from typing import Union, List
 
@@ -367,7 +366,7 @@ def bilinear(
             if periodic == True:
                 f = bilinear_periodic(fgrid, x, y, xbox, ybox, originx, originy, dtype=dtype)
             else:
-                f = src.bilinear_nonperiodic(fgrid, x, y, xbox, ybox, originx, originy, dtype=dtype)
+                f = bilinear_nonperiodic(fgrid, x, y, xbox, ybox, originx, originy, dtype=dtype)
         else:
             if periodic[0] is True:
                 perix = 1
@@ -377,15 +376,15 @@ def bilinear(
                 periy = 1
             else:
                 periy = 0
-            f = src.bilinear_axisperiodic(fgrid, x, y, xbox, ybox, perix, periy, originx, originy, dtype=dtype)
+            f = bilinear_axisperiodic(fgrid, x, y, xbox, ybox, perix, periy, originx, originy, dtype=dtype)
     else:
         # Some particles are outside the boundary.
         f = np.full(len(x), fill_value, dtype=dtype)
         if np.isscalar(periodic):
             if periodic == True:
-                f[inside] = src.bilinear_periodic(fgrid, x[inside], y[inside], xbox, ybox, originx, originy, dtype=dtype)
+                f[inside] = bilinear_periodic(fgrid, x[inside], y[inside], xbox, ybox, originx, originy, dtype=dtype)
             else:
-                f[inside] = src.bilinear_nonperiodic(fgrid, x[inside], y[inside], xbox, ybox, originx, originy, dtype=dtype)
+                f[inside] = bilinear_nonperiodic(fgrid, x[inside], y[inside], xbox, ybox, originx, originy, dtype=dtype)
         else:
             if periodic[0] is True:
                 perix = 1
@@ -395,7 +394,7 @@ def bilinear(
                 periy = 1
             else:
                 periy = 0
-            f[inside] = src.bilinear_axisperiodic(fgrid, x[inside], y[inside], xbox, ybox, perix, periy, originx, originy, dtype=dtype)
+            f[inside] = bilinear_axisperiodic(fgrid, x[inside], y[inside], xbox, ybox, perix, periy, originx, originy, dtype=dtype)
     return f
 
 

@@ -1299,9 +1299,9 @@ def part2grid2D(
     else:
         xmin, ymin = origin[0], origin[1]
     if np.isscalar(ngrid):
-        nxgrid, nygrid = ngrid, ngrid
+        nxgrid, nygrid = int(ngrid), int(ngrid)
     else:
-        nxgrid, nygrid = ngrid[0], ngrid[1]
+        nxgrid, nygrid = int(ngrid[0]), int(ngrid[1])
     if np.isscalar(periodic):
         periodx = periodic
         periody = periodic
@@ -2892,9 +2892,9 @@ def part2grid3D(
     else:
         xmin, ymin, zmin = origin[0], origin[1], origin[2]
     if np.isscalar(ngrid):
-        nxgrid, nygrid, nzgrid = ngrid, ngrid, ngrid
+        nxgrid, nygrid, nzgrid = int(ngrid), int(ngrid), int(ngrid)
     else:
-        nxgrid, nygrid, nzgrid = ngrid[0], ngrid[1], ngrid[2]
+        nxgrid, nygrid, nzgrid = int(ngrid[0]), int(ngrid[1]), int(ngrid[2])
     if np.isscalar(periodic):
         periodx = periodic
         periody = periodic

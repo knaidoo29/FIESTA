@@ -46,7 +46,7 @@ def test_mpi_part2grid2D_ngp():
     f_local = f[local_mask]
 
     grid = mpi_part2grid2D(
-        x_local, y_local, f_local, boxsize, ngrid, mpi, method="NGP", periodic=True
+        x_local, y_local, boxsize, ngrid, mpi, f=f_local, method="NGP", periodic=True
     )
 
     assert_mpi_local_shape(grid, ngrid, mpi)
@@ -79,10 +79,10 @@ def test_mpi_part2grid3D_ngp():
         x_local,
         y_local,
         z_local,
-        f_local,
         boxsize,
         ngrid,
         mpi,
+        f=f_local,
         method="NGP",
         periodic=True,
     )

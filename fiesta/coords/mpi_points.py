@@ -3,7 +3,6 @@ import numpy as np
 import shift
 
 from . import points
-from .. import src
 
 from typing import List, Optional, Union
 
@@ -493,7 +492,7 @@ class MPI_SortByX:
         x2d : ndarray
             X-coordinates for the 2D grid.
         y2d : ndarray
-            y-coordinates for the 2D grid.
+            Y-coordinates for the 2D grid.
         f2d : ndarray
             Field values for the 2D grid.
 
@@ -503,40 +502,55 @@ class MPI_SortByX:
             Distributed 2D field grid.
         """
         if x2d is not None:
-            data = np.column_stack([x2d.flatten(), y2d.flatten(), f2d.flatten()])
+            data = np.column_stack(
+                [x2d.flatten(), y2d.flatten(), f2d.flatten()]
+            )
         else:
             data = None
+
         self.input(data)
         data = self.distribute()
+
         if np.isscalar(self.boxsize):
-            # xbox = self.boxsize
             ybox = self.boxsize
         else:
-            # xbox = self.boxsize[0]
             ybox = self.boxsize[1]
+
         nygrid = self.ngrid
-        # if np.isscalar(self.ngrid):
-        #     # nxgrid = self.ngrid
-        #     nygrid = self.ngrid
-        # else:
-        #     # nxgrid = self.ngrid[0]
-        #     nygrid = self.ngrid[1]
+
         if np.isscalar(self.origin):
-            # xorigin = self.origin
             yorigin = self.origin
         else:
-            # xorigin = self.origin[0]
             yorigin = self.origin[1]
-        dx = (self.limits[1] - self.limits[0]) / float(self.ngrid_rank)
+
+        dx = (
+            self.limits[1] - self.limits[0]
+        ) / float(self.ngrid_rank)
+
         dy = ybox / float(nygrid)
-        xpixs = src.which_pixs(data[:, 0], dx, self.limits[0])
-        ypixs = src.which_pixs(data[:, 1], dy, yorigin)
-        f = np.zeros((self.ngrid_rank, nygrid))
+
+        xpixs = np.floor(
+            (data[:, 0] - self.limits[0]) / dx
+        ).astype(np.int32)
+
+        ypixs = np.floor(
+            (data[:, 1] - yorigin) / dy
+        ).astype(np.int32)
+
+        f = np.zeros(
+            (self.ngrid_rank, nygrid)
+        )
+
         f[xpixs, ypixs] = data[:, 2]
+
         return f
 
     def distribute_grid3D(
-        self, x3d: np.ndarray, y3d: np.ndarray, z3d: np.ndarray, f3d: np.ndarray
+        self,
+        x3d: np.ndarray,
+        y3d: np.ndarray,
+        z3d: np.ndarray,
+        f3d: np.ndarray,
     ) -> np.ndarray:
         """
         Distributes a 3D grid data set via slab decomposition.
@@ -546,10 +560,10 @@ class MPI_SortByX:
         x3d : ndarray
             X-coordinates for the 3D grid.
         y3d : ndarray
-            y-coordinates for the 3D grid.
+            Y-coordinates for the 3D grid.
         z3d : ndarray
-            y-coordinates for the 3D grid.
-        f23 : ndarray
+            Z-coordinates for the 3D grid.
+        f3d : ndarray
             Field values for the 3D grid.
 
         Returns
@@ -559,46 +573,61 @@ class MPI_SortByX:
         """
         if x3d is not None:
             data = np.column_stack(
-                [x3d.flatten(), y3d.flatten(), z3d.flatten(), f3d.flatten()]
+                [
+                    x3d.flatten(),
+                    y3d.flatten(),
+                    z3d.flatten(),
+                    f3d.flatten(),
+                ]
             )
         else:
             data = None
+
         self.input(data)
         data = self.distribute()
+
         if np.isscalar(self.boxsize):
-            # xbox = self.boxsize
             ybox = self.boxsize
             zbox = self.boxsize
         else:
-            # xbox = self.boxsize[0]
             ybox = self.boxsize[1]
             zbox = self.boxsize[2]
+
         nygrid = self.ngrid
         nzgrid = self.ngrid
-        # if np.isscalar(self.ngrid):
-        #     # nxgrid = self.ngrid
-        #     nygrid = self.ngrid
-        #     nzgrid = self.ngrid
-        # else:
-        #     # nxgrid = self.ngrid[0]
-        #     nygrid = self.ngrid[1]
-        #     nzgrid = self.ngrid[2]
+
         if np.isscalar(self.origin):
-            # xorigin = self.origin
             yorigin = self.origin
             zorigin = self.origin
         else:
-            # xorigin = self.origin[0]
             yorigin = self.origin[1]
             zorigin = self.origin[2]
-        dx = (self.limits[1] - self.limits[0]) / float(self.ngrid_rank)
+
+        dx = (
+            self.limits[1] - self.limits[0]
+        ) / float(self.ngrid_rank)
+
         dy = ybox / float(nygrid)
         dz = zbox / float(nzgrid)
-        xpixs = src.which_pixs(data[:, 0], dx, self.limits[0])
-        ypixs = src.which_pixs(data[:, 1], dy, yorigin)
-        zpixs = src.which_pixs(data[:, 2], dz, zorigin)
-        f = np.zeros((self.ngrid_rank, nygrid, nzgrid))
+
+        xpixs = np.floor(
+            (data[:, 0] - self.limits[0]) / dx
+        ).astype(np.int32)
+
+        ypixs = np.floor(
+            (data[:, 1] - yorigin) / dy
+        ).astype(np.int32)
+
+        zpixs = np.floor(
+            (data[:, 2] - zorigin) / dz
+        ).astype(np.int32)
+
+        f = np.zeros(
+            (self.ngrid_rank, nygrid, nzgrid)
+        )
+
         f[xpixs, ypixs, zpixs] = data[:, 3]
+
         return f
 
     def clean(self) -> None:

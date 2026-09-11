@@ -16,6 +16,9 @@ def trilinear_periodic(
     ngridx: int,
     ngridy: int,
     ngridz: int,
+    originx: float = 0.0,
+    originy: float = 0.0,
+    originz: float = 0.0,
 ) -> np.ndarray:  # pragma: no cover
     """
     Trilinear interpolation of field defined on a grid.
@@ -36,6 +39,8 @@ def trilinear_periodic(
         Size of the grid along each axis.
     npart : int
         Number of particles.
+    originx, originy, originz : float
+        Origin of the grid along each axis.
 
     Returns
     -------
@@ -49,7 +54,9 @@ def trilinear_periodic(
     dy = ybox / float(ngridy)
     dz = zbox / float(ngridz)
     for i in range(0, npart):
-        xp, yp, zp = x[i], y[i], z[i]
+        xp = x[i] - originx
+        yp = y[i] - originy
+        zp = z[i] - originz
 
         if xp - dx / 2.0 < 0.0:
             xp = xp + xbox
@@ -134,6 +141,9 @@ def trilinear_nonperiodic(
     ngridx: int,
     ngridy: int,
     ngridz: int,
+    originx: float = 0.0,
+    originy: float = 0.0,
+    originz: float = 0.0
 ) -> np.ndarray:  # pragma: no cover
     """
     Trilinear interpolation of field defined on a grid.
@@ -152,6 +162,8 @@ def trilinear_nonperiodic(
         Size of the box.
     ngridx, ngridy, ngridz : int
         Size of the grid along each axis.
+    originx, originy, originz : float
+        Origin of the grid along each axis.
 
     Returns
     -------
@@ -165,8 +177,9 @@ def trilinear_nonperiodic(
     dy = ybox / float(ngridy)
     dz = zbox / float(ngridz)
     for i in range(0, npart):
-        xp, yp, zp = x[i], y[i], z[i]
-
+        xp = x[i] - originx
+        yp = y[i] - originy
+        zp = z[i] - originz
         if xp - dx / 2.0 < 0.0:
             ix1 = -1
             ix2 = 0
@@ -273,6 +286,9 @@ def trilinear_axisperiodic(
     ngridx: int,
     ngridy: int,
     ngridz: int,
+    originx: float = 0.0,
+    originy: float = 0.0,
+    originz: float = 0.0
 ) -> np.ndarray:  # pragma: no cover
     """
     Trilinear interpolation of field defined on a grid.
@@ -293,6 +309,8 @@ def trilinear_axisperiodic(
         0 = non-periodic, 1 = periodic
     ngridx, ngridy, ngridz : int
         Size of the grid along each axis.
+    originx, originy, originz : float
+        Origin of the grid along each axis.
 
     Returns
     -------
@@ -306,8 +324,9 @@ def trilinear_axisperiodic(
     dy = ybox / float(ngridy)
     dz = zbox / float(ngridz)
     for i in range(0, npart):
-        xp, yp, zp = x[i], y[i], z[i]
-
+        xp = x[i] - originx
+        yp = y[i] - originy
+        zp = z[i] - originz
         if perix == 1:
             if xp - dx / 2.0 < 0.0:
                 xp = xp + xbox

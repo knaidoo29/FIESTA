@@ -13,6 +13,8 @@ def bilinear_periodic(
     ybox: float,
     ngridx: int,
     ngridy: int,
+    originx: float = 0.0,
+    originy: float = 0.0
 ) -> np.ndarray:  # pragma: no cover
     """
     Bilinear interpolation of field defined on a grid.
@@ -29,6 +31,8 @@ def bilinear_periodic(
         Size of the box.
     ngridx, ngridy : int
         Size of the grid alone each axes.
+    originx, originy : float
+        Origin of the grid along each axis.
 
     Returns
     -------
@@ -43,8 +47,8 @@ def bilinear_periodic(
     minx = 0.0
 
     for i in range(0, npart):
-        xp = x[i]
-        yp = y[i]
+        xp = x[i] - originx
+        yp = y[i] - originy
 
         if xp - (dx / 2.0) < 0.0:
             xp += xbox
@@ -94,6 +98,8 @@ def bilinear_nonperiodic(
     ybox: float,
     ngridx: int,
     ngridy: int,
+    originx: float = 0.0,
+    originy: float = 0.0
 ) -> np.ndarray:  # pragma: no cover
     """
     Bilinear interpolation of field defined on a grid.
@@ -124,8 +130,8 @@ def bilinear_nonperiodic(
     minx = 0.0
 
     for i in range(0, npart):
-        xp = x[i]
-        yp = y[i]
+        xp = x[i] - originx
+        yp = y[i] - originy
 
         if xp - dx / 2.0 < 0.0:
             ix1 = -1
@@ -192,6 +198,8 @@ def bilinear_axisperiodic(
     periy: int,
     ngridx: int,
     ngridy: int,
+    originx: float = 0.0,
+    originy: float = 0.0
 ) -> np.ndarray:  # pragma: no cover
     """
     Bilinear interpolation of a field defined on a grid with axis-periodic conditions.
@@ -208,6 +216,8 @@ def bilinear_axisperiodic(
         Flags indicating periodicity along each axis (1 = periodic, 0 = non-periodic).
     ngridx, ngridy : int
         Grid resolution along each axis.
+    originx, originy : float
+        Origin of the grid along each axis.
 
     Returns
     -------
@@ -222,8 +232,8 @@ def bilinear_axisperiodic(
     minx = 0.0
 
     for i in range(0, npart):
-        xp = x[i]
-        yp = y[i]
+        xp = x[i] - originx
+        yp = y[i] - originy
 
         # Handle periodicity along x-axis
         if perix == 1:

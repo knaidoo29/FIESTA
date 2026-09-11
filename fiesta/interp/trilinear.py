@@ -1,11 +1,371 @@
 import numpy as np
+from numba import njit
 
 import shift
 
 from .. import coords
-from .. import src
 
 from typing import Union, List
+
+
+@njit
+def trilinear_periodic(
+    fgrid: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    xbox: float,
+    ybox: float,
+    zbox: float,
+    originx: float = 0.0,
+    originy: float = 0.0,
+    originz: float = 0.0,
+    dtype: np.dtype = np.float64
+) -> np.ndarray:
+    """
+    Trilinear interpolation on a periodic 3D cell-centred grid.
+
+    Parameters
+    ----------
+    fgrid : ndarray
+        Three-dimensional array containing the field values on the grid.
+    x, y, z : ndarray
+        Coordinates of the points at which the field is interpolated.
+    xbox, ybox, zbox : float
+        Physical size of the grid domain along each axis.
+    originx, originy, originz : float, optional
+        Physical coordinates of the lower boundary of the grid domain.
+    dtype : np.dtype, optional
+        Data type of the returned interpolation array.
+
+    Returns
+    -------
+    f : ndarray
+        Interpolated field values at the coordinates ``(x, y, z)``.
+
+    Notes
+    -----
+    The field is assumed to be defined at cell centres. Periodic boundary
+    conditions are applied independently along all three axes.
+    """
+
+    ngridx, ngridy, ngridz = fgrid.shape
+    npart = len(x)
+
+    f = np.empty(npart, dtype=dtype)
+
+    idx = ngridx / xbox
+    idy = ngridy / ybox
+    idz = ngridz / zbox
+
+    for i in range(npart):
+
+        gx = (x[i] - originx) * idx - 0.5
+        gy = (y[i] - originy) * idy - 0.5
+        gz = (z[i] - originz) * idz - 0.5
+
+        ix1_raw = int(np.floor(gx))
+        iy1_raw = int(np.floor(gy))
+        iz1_raw = int(np.floor(gz))
+
+        tx = gx - ix1_raw
+        ty = gy - iy1_raw
+        tz = gz - iz1_raw
+
+        ix1 = ix1_raw % ngridx
+        iy1 = iy1_raw % ngridy
+        iz1 = iz1_raw % ngridz
+
+        ix2 = (ix1 + 1) % ngridx
+        iy2 = (iy1 + 1) % ngridy
+        iz2 = (iz1 + 1) % ngridz
+
+        f000 = fgrid[ix1, iy1, iz1]
+        f100 = fgrid[ix2, iy1, iz1]
+        f010 = fgrid[ix1, iy2, iz1]
+        f110 = fgrid[ix2, iy2, iz1]
+
+        f001 = fgrid[ix1, iy1, iz2]
+        f101 = fgrid[ix2, iy1, iz2]
+        f011 = fgrid[ix1, iy2, iz2]
+        f111 = fgrid[ix2, iy2, iz2]
+
+        f00 = (1.0 - tx)*f000 + tx*f100
+        f10 = (1.0 - tx)*f010 + tx*f110
+
+        f01 = (1.0 - tx)*f001 + tx*f101
+        f11 = (1.0 - tx)*f011 + tx*f111
+
+        f0 = (1.0 - ty)*f00 + ty*f10
+        f1 = (1.0 - ty)*f01 + ty*f11
+
+        f[i] = (1.0 - tz)*f0 + tz*f1
+
+    return f
+
+
+@njit
+def trilinear_nonperiodic(
+    fgrid: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    xbox: float,
+    ybox: float,
+    zbox: float,
+    originx: float = 0.0,
+    originy: float = 0.0,
+    originz: float = 0.0,
+    dtype: np.dtype = np.float64
+) -> np.ndarray:
+    """
+    Trilinear interpolation on a non-periodic 3D cell-centred grid.
+
+    Parameters
+    ----------
+    fgrid : ndarray
+        Three-dimensional array containing the field values on the grid.
+    x, y, z : ndarray
+        Coordinates of the points at which the field is interpolated.
+    xbox, ybox, zbox : float
+        Physical size of the grid domain along each axis.
+    originx, originy, originz : float, optional
+        Physical coordinates of the lower boundary of the grid domain.
+    dtype : np.dtype, optional
+        Data type of the returned interpolation array.
+
+    Returns
+    -------
+    f : ndarray
+        Interpolated field values at the coordinates ``(x, y, z)``.
+
+    Notes
+    -----
+    The field is assumed to be defined at cell centres. At non-periodic
+    boundaries, interpolation is clamped to the nearest grid value whenever
+    the interpolation stencil would extend outside the domain.
+    """
+
+    ngridx, ngridy, ngridz = fgrid.shape
+    npart = len(x)
+
+    f = np.empty(npart, dtype=dtype)
+
+    idx = ngridx / xbox
+    idy = ngridy / ybox
+    idz = ngridz / zbox
+
+    for i in range(npart):
+
+        gx = (x[i] - originx) * idx - 0.5
+        gy = (y[i] - originy) * idy - 0.5
+        gz = (z[i] - originz) * idz - 0.5
+
+        ix1_raw = int(np.floor(gx))
+        iy1_raw = int(np.floor(gy))
+        iz1_raw = int(np.floor(gz))
+
+        tx = gx - ix1_raw
+        ty = gy - iy1_raw
+        tz = gz - iz1_raw
+
+        # x-axis
+        if ix1_raw < 0:
+            ix1 = 0
+            ix2 = 0
+        elif ix1_raw >= ngridx - 1:
+            ix1 = ngridx - 1
+            ix2 = ngridx - 1
+        else:
+            ix1 = ix1_raw
+            ix2 = ix1 + 1
+
+        # y-axis
+        if iy1_raw < 0:
+            iy1 = 0
+            iy2 = 0
+        elif iy1_raw >= ngridy - 1:
+            iy1 = ngridy - 1
+            iy2 = ngridy - 1
+        else:
+            iy1 = iy1_raw
+            iy2 = iy1 + 1
+
+        # z-axis
+        if iz1_raw < 0:
+            iz1 = 0
+            iz2 = 0
+        elif iz1_raw >= ngridz - 1:
+            iz1 = ngridz - 1
+            iz2 = ngridz - 1
+        else:
+            iz1 = iz1_raw
+            iz2 = iz1 + 1
+
+        f000 = fgrid[ix1, iy1, iz1]
+        f100 = fgrid[ix2, iy1, iz1]
+        f010 = fgrid[ix1, iy2, iz1]
+        f110 = fgrid[ix2, iy2, iz1]
+
+        f001 = fgrid[ix1, iy1, iz2]
+        f101 = fgrid[ix2, iy1, iz2]
+        f011 = fgrid[ix1, iy2, iz2]
+        f111 = fgrid[ix2, iy2, iz2]
+
+        f00 = (1.0 - tx)*f000 + tx*f100
+        f10 = (1.0 - tx)*f010 + tx*f110
+
+        f01 = (1.0 - tx)*f001 + tx*f101
+        f11 = (1.0 - tx)*f011 + tx*f111
+
+        f0 = (1.0 - ty)*f00 + ty*f10
+        f1 = (1.0 - ty)*f01 + ty*f11
+
+        f[i] = (1.0 - tz)*f0 + tz*f1
+
+    return f
+
+
+@njit
+def trilinear_axisperiodic(
+    fgrid: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    z: np.ndarray,
+    xbox: float,
+    ybox: float,
+    zbox: float,
+    perix: int,
+    periy: int,
+    periz: int,
+    originx: float = 0.0,
+    originy: float = 0.0,
+    originz: float = 0.0,
+    dtype: np.dtype = np.float64
+) -> np.ndarray:
+    """
+    Trilinear interpolation on a 3D cell-centred grid with configurable
+    periodicity along each axis.
+
+    Parameters
+    ----------
+    fgrid : ndarray
+        Three-dimensional array containing the field values on the grid.
+    x, y, z : ndarray
+        Coordinates of the points at which the field is interpolated.
+    xbox, ybox, zbox : float
+        Physical size of the grid domain along each axis.
+    perix, periy, periz : int
+        Periodicity flags for the x-, y-, and z-directions respectively.
+        A value of 1 applies periodic boundary conditions, while 0 applies
+        non-periodic boundary conditions.
+    originx, originy, originz : float, optional
+        Physical coordinates of the lower boundary of the grid domain.
+    dtype : np.dtype, optional
+        Data type of the returned interpolation array.
+
+    Returns
+    -------
+    f : ndarray
+        Interpolated field values at the coordinates ``(x, y, z)``.
+
+    Notes
+    -----
+    Periodic axes wrap across the corresponding domain boundary, while
+    non-periodic axes are clamped to the nearest grid value whenever the
+    interpolation stencil would extend outside the domain.
+    """
+
+    ngridx, ngridy, ngridz = fgrid.shape
+    npart = len(x)
+
+    f = np.empty(npart, dtype=dtype)
+
+    idx = ngridx / xbox
+    idy = ngridy / ybox
+    idz = ngridz / zbox
+
+    for i in range(npart):
+
+        gx = (x[i] - originx) * idx - 0.5
+        gy = (y[i] - originy) * idy - 0.5
+        gz = (z[i] - originz) * idz - 0.5
+
+        ix1_raw = int(np.floor(gx))
+        iy1_raw = int(np.floor(gy))
+        iz1_raw = int(np.floor(gz))
+
+        tx = gx - ix1_raw
+        ty = gy - iy1_raw
+        tz = gz - iz1_raw
+
+        # x-axis
+        if perix == 1:
+            ix1 = ix1_raw % ngridx
+            ix2 = (ix1 + 1) % ngridx
+        else:
+            if ix1_raw < 0:
+                ix1 = 0
+                ix2 = 0
+            elif ix1_raw >= ngridx - 1:
+                ix1 = ngridx - 1
+                ix2 = ngridx - 1
+            else:
+                ix1 = ix1_raw
+                ix2 = ix1 + 1
+
+        # y-axis
+        if periy == 1:
+            iy1 = iy1_raw % ngridy
+            iy2 = (iy1 + 1) % ngridy
+        else:
+            if iy1_raw < 0:
+                iy1 = 0
+                iy2 = 0
+            elif iy1_raw >= ngridy - 1:
+                iy1 = ngridy - 1
+                iy2 = ngridy - 1
+            else:
+                iy1 = iy1_raw
+                iy2 = iy1 + 1
+
+        # z-axis
+        if periz == 1:
+            iz1 = iz1_raw % ngridz
+            iz2 = (iz1 + 1) % ngridz
+        else:
+            if iz1_raw < 0:
+                iz1 = 0
+                iz2 = 0
+            elif iz1_raw >= ngridz - 1:
+                iz1 = ngridz - 1
+                iz2 = ngridz - 1
+            else:
+                iz1 = iz1_raw
+                iz2 = iz1 + 1
+
+        f000 = fgrid[ix1, iy1, iz1]
+        f100 = fgrid[ix2, iy1, iz1]
+        f010 = fgrid[ix1, iy2, iz1]
+        f110 = fgrid[ix2, iy2, iz1]
+
+        f001 = fgrid[ix1, iy1, iz2]
+        f101 = fgrid[ix2, iy1, iz2]
+        f011 = fgrid[ix1, iy2, iz2]
+        f111 = fgrid[ix2, iy2, iz2]
+
+        f00 = (1.0 - tx)*f000 + tx*f100
+        f10 = (1.0 - tx)*f010 + tx*f110
+
+        f01 = (1.0 - tx)*f001 + tx*f101
+        f11 = (1.0 - tx)*f011 + tx*f111
+
+        f0 = (1.0 - ty)*f00 + ty*f10
+        f1 = (1.0 - ty)*f01 + ty*f11
+
+        f[i] = (1.0 - tz)*f0 + tz*f1
+
+    return f
 
 
 def trilinear(
@@ -17,6 +377,7 @@ def trilinear(
     origin: Union[float, List[float]] = 0.0,
     fill_value: float = np.nan,
     periodic: bool = True,
+    dtype: np.dtype = np.float64
 ) -> np.ndarray:
     """Trilinear interpolation from a 3D grid defined in box of [0., boxsize].
 
@@ -38,14 +399,14 @@ def trilinear(
         Fill outside boundary values.
     periodic : bool, optional
         Determines whether to interpolate on a periodic grid.
+    dtype : np.dtype, optional
+        Data type of the returned interpolation array.
 
     Returns
     -------
     f : array
         Field interpolation values.
     """
-    # determine ngrid from fgrid
-    ngrids = np.shape(fgrid)
     if np.isscalar(boxsize):
         xbox = boxsize
         ybox = boxsize
@@ -53,52 +414,29 @@ def trilinear(
     else:
         xbox, ybox, zbox = boxsize[0], boxsize[1], boxsize[2]
     if np.isscalar(origin):
-        _x = np.copy(x) - origin
-        _y = np.copy(y) - origin
-        _z = np.copy(z) - origin
+        originx = origin
+        originy = origin
+        originz = origin
     else:
-        _x = np.copy(x) - origin[0]
-        _y = np.copy(y) - origin[1]
-        _z = np.copy(z) - origin[2]
+        originx = origin[0]
+        originy = origin[1]
+        originz = origin[2]
     # check if particles are inside the box
-    cond = np.where(
-        (_x >= 0.0)
-        & (_x < xbox)
-        & (_y >= 0.0)
-        & (_y < ybox)
-        & (_z >= 0.0)
-        & (_z < zbox)
-    )[0]
-    if len(cond) == len(_x):
+    inside = (
+        (x >= originx)
+        & (x < originx + xbox)
+        & (y >= originy)
+        & (y < originy + ybox)
+        & (z >= originz)
+        & (z < originz + zbox)
+    )
+    if np.all(inside):
         # All particles are within the boundaries so no boundary management is necessary.
-        npart = len(_x)
         if np.isscalar(periodic):
             if periodic == True:
-                f = src.trilinear_periodic(
-                    fgrid.flatten(),
-                    _x,
-                    _y,
-                    _z,
-                    xbox,
-                    ybox,
-                    zbox,
-                    ngrids[0],
-                    ngrids[1],
-                    ngrids[2],
-                )
+                f = trilinear_periodic(fgrid, x, y, z, xbox, ybox, zbox, originx, originy, originz, dtype=dtype)
             else:
-                f = src.trilinear_nonperiodic(
-                    fgrid.flatten(),
-                    _x,
-                    _y,
-                    _z,
-                    xbox,
-                    ybox,
-                    zbox,
-                    ngrids[0],
-                    ngrids[1],
-                    ngrids[2],
-                )
+                f = trilinear_nonperiodic(fgrid, x, y, z, xbox, ybox, zbox, originx, originy, originz, dtype=dtype)
         else:
             if periodic[0] is True:
                 perix = 1
@@ -112,57 +450,14 @@ def trilinear(
                 periz = 1
             else:
                 periz = 0
-            f = src.trilinear_axisperiodic(
-                fgrid.flatten(),
-                _x,
-                _y,
-                _z,
-                xbox,
-                ybox,
-                zbox,
-                perix,
-                periy,
-                periz,
-                ngrids[0],
-                ngrids[1],
-                ngrids[2],
-            )
+            f = trilinear_axisperiodic(fgrid, x, y, z, xbox, ybox, zbox, perix, periy, periz, originx, originy, originz, dtype=dtype)
     else:
-        # Some particles are outside the boundary.
-        # create a mask for in and outside the box
-        mask = np.zeros(len(_x))
-        # assign particles in the boundary a binary mask of 1.
-        mask[cond] = 1.0
-        # find trilinear interpolation for points inside the boundary.
-        npart = len(x[cond])
-        f = np.zeros(len(_x))
+        f = np.full(len(x), fill_value, dtype=dtype)
         if np.isscalar(periodic):
             if periodic == True:
-                f[cond] = src.trilinear_periodic(
-                    fgrid.flatten(),
-                    _x[cond],
-                    _y[cond],
-                    _z[cond],
-                    xbox,
-                    ybox,
-                    zbox,
-                    ngrids[0],
-                    ngrids[1],
-                    ngrids[2],
-                )
+                f[inside] = trilinear_periodic(fgrid, x[inside], y[inside], z[inside], xbox, ybox, zbox, originx, originy, originz, dtype=dtype)
             else:
-                f[cond] = src.trilinear_nonperiodic(
-                    fgrid.flatten(),
-                    _x[cond],
-                    _y[cond],
-                    _z[cond],
-                    xbox,
-                    ybox,
-                    zbox,
-                    ngrids[0],
-                    ngrids[1],
-                    ngrids[2],
-                )
+                f[inside] = trilinear_nonperiodic(fgrid, x[inside], y[inside], z[inside], xbox, ybox, zbox, originx, originy, originz, dtype=dtype)
         else:
             if periodic[0] is True:
                 perix = 1
@@ -176,26 +471,8 @@ def trilinear(
                 periz = 1
             else:
                 periz = 0
-            f[cond] = src.trilinear_axisperiodic(
-                fgrid.flatten(),
-                _x[cond],
-                _y[cond],
-                _z[cond],
-                xbox,
-                ybox,
-                zbox,
-                perix,
-                periy,
-                periz,
-                ngrids[0],
-                ngrids[1],
-                ngrids[2],
-            )
-        # fill outside boundary with fill values.
-        cond = np.where(mask == 0.0)[0]
-        f[cond] = fill_value
+            f[inside] = trilinear_axisperiodic(fgrid, x[inside], y[inside], z[inside], xbox, ybox, zbox, perix, periy, periz, originx, originy, originz, dtype=dtype)
     return f
-
 
 
 def mpi_trilinear(
@@ -209,14 +486,16 @@ def mpi_trilinear(
     origin: Union[float, List[float]] = 0.0,
     fill_value: float = np.nan,
     periodic: bool = True,
+    check_distributed: bool = True,
+    dtype: np.dtype = np.float64
 ) -> np.ndarray:
     """
-    Bilinear interpolation from a 2D grid defined in box of [0., boxsize].
+    Trilinear interpolation from a 3D grid defined in box of [0., boxsize].
 
     Parameter
     ---------
     fgrid : array
-        Field values on a 2D grid
+        Field values on a 3D grid
     ngrid : int or int list
         Grid dimensions.
     boxsize : float or list
@@ -235,6 +514,10 @@ def mpi_trilinear(
         Fill outside boundary values.
     periodic : bool, optional
         Determines whether to interpolate on a periodic grid.
+    check_distributed : bool, optional
+        If True, checks if the coordinates are distributed correctly across MPI ranks.
+    dtype : np.dtype
+        Data type for the output array.
 
     Returns
     -------
@@ -321,13 +604,17 @@ def mpi_trilinear(
             _xorigin -= dx
             _xboxsize += 2*dx
         
-        if x is not None:
-            data = coords.xyz2points(x, y, z)
-        else: 
-            data = None
-        data = coords.distribute_points_by_x(data, boxsize, ngrid, origin, MPI)
-        x, y, z = coords.points2xyz(data)
-        f = trilinear(fgrid, [_xboxsize, yboxsize, zboxsize], x, y, z, [_xorigin, yorigin, zorigin], fill_value=fill_value, periodic=[False, yperiodic, zperiodic])
+        if check_distributed:
+            if x is not None:
+                data = coords.xyz2points(x, y, z)
+            else: 
+                data = None
+            data = coords.distribute_points_by_x(data, boxsize, ngrid, origin, MPI)
+            x, y, z = coords.points2xyz(data)
+        f = trilinear(
+            fgrid, [_xboxsize, yboxsize, zboxsize], x, y, z, [_xorigin, yorigin, zorigin], 
+            fill_value=fill_value, periodic=[False, yperiodic, zperiodic], dtype=dtype
+        )
         return x, y, z, f
     else:
         MPI.mpi_print_zero("ERROR: Shape of fgrid does not match expectation for distributed array")

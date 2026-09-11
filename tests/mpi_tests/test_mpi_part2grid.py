@@ -45,10 +45,21 @@ def test_mpi_part2grid2d_returns_valid_local_grid(method, periodic):
     grid = mpi_part2grid2D(
         x_local,
         y_local,
-        f_local,
         boxsize,
         ngrid,
         mpi,
+        method=method,
+        periodic=periodic,
+        origin=origin,
+    )
+
+    grid = mpi_part2grid2D(
+        x_local,
+        y_local,
+        boxsize,
+        ngrid,
+        mpi,
+        f=f_local,
         method=method,
         periodic=periodic,
         origin=origin,
@@ -97,10 +108,21 @@ def test_mpi_part2grid2d_returns_valid_local_grid_list(method, periodic):
     grid = mpi_part2grid2D(
         x_local,
         y_local,
-        f_local,
         boxsize,
         ngrid,
         mpi,
+        method=method,
+        periodic=periodic,
+        origin=origin,
+    )
+
+    grid = mpi_part2grid2D(
+        x_local,
+        y_local,
+        boxsize,
+        ngrid,
+        mpi,
+        f=f_local,
         method=method,
         periodic=periodic,
         origin=origin,
@@ -157,10 +179,22 @@ def test_mpi_part2grid3d_returns_valid_local_grid(method, periodic):
         x_local,
         y_local,
         z_local,
-        f_local,
         boxsize,
         ngrid,
         mpi,
+        method=method,
+        periodic=periodic,
+        origin=origin,
+    )
+
+    grid = mpi_part2grid3D(
+        x_local,
+        y_local,
+        z_local,
+        boxsize,
+        ngrid,
+        mpi,
+        f=f_local,
         method=method,
         periodic=periodic,
         origin=origin,
@@ -205,10 +239,22 @@ def test_mpi_part2grid3d_returns_valid_local_grid_list(method, periodic):
         x_local,
         y_local,
         z_local,
-        f_local,
         boxsize,
         ngrid,
         mpi,
+        method=method,
+        periodic=periodic,
+        origin=origin,
+    )
+
+    grid = mpi_part2grid3D(
+        x_local,
+        y_local,
+        z_local,
+        boxsize,
+        ngrid,
+        mpi,
+        f=f_local,
         method=method,
         periodic=periodic,
         origin=origin,

@@ -82,19 +82,16 @@ def mpi_gridSPH2D(
     dx = xedges[1] - xedges[0]
     nxgrid = len(xgrid)
 
-    if w is None:
-        w = np.ones(len(x))
-
     if dgrid is None:
         dgrid = p2g.mpi_part2grid2D(
-            x, y, w, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.0
+            x, y, boxsize, ngrid, MPI, f=w, method="NGP", periodic=True, origin=0.0
         )
     else:
         assert dgrid.shape == (nxgrid, ngrid), "dgrid shape does not match ngrid"
     if f is not None:
         if fgrid is None:
             fgrid = p2g.mpi_part2grid2D(
-                x, y, f, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.0
+                x, y, boxsize, ngrid, MPI, f=f, method="NGP", periodic=True, origin=0.0
             )
         else:
             assert fgrid.shape == (nxgrid, ngrid), "fgrid shape does not match ngrid"
@@ -285,14 +282,14 @@ def mpi_gridSPH3D(
 
     if dgrid is None:
         dgrid = p2g.mpi_part2grid3D(
-            x, y, z, w, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.0
+            x, y, z, boxsize, ngrid, MPI, f=w, method="NGP", periodic=True, origin=0.0
         )
     else:
         assert dgrid.shape == (nxgrid, ngrid, ngrid), "dgrid shape does not match ngrid"
     if f is not None:
         if fgrid is None:
             fgrid = p2g.mpi_part2grid3D(
-                x, y, z, f, boxsize, ngrid, MPI, method="NGP", periodic=True, origin=0.0
+                x, y, z, boxsize, ngrid, MPI, f=f, method="NGP", periodic=True, origin=0.0
             )
         else:
             assert fgrid.shape == (nxgrid, ngrid, ngrid), "fgrid shape does not match ngrid"

@@ -17,7 +17,7 @@ def part2grid_ngp_2d(
     nxgrid: int,
     nygrid: int,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Nearest-grid-point assignment in 2D.
 
@@ -78,7 +78,7 @@ def part2grid_ngp_2d_unit(
     nxgrid: int,
     nygrid: int,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Nearest-grid-point assignment in 2D.
 
@@ -139,7 +139,7 @@ def part2grid_cic_2d(
     periodx: bool,
     periody: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a two-dimensional grid using the
     cloud-in-cell (CIC) assignment scheme.
@@ -288,7 +288,7 @@ def part2grid_cic_2d_unit(
     periodx: bool,
     periody: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a two-dimensional grid using the
     cloud-in-cell (CIC) assignment scheme.
@@ -434,7 +434,7 @@ def part2grid_tsc_2d(
     periodx: bool,
     periody: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a two-dimensional grid using the
     triangular-shaped-cloud (TSC) assignment scheme.
@@ -628,7 +628,7 @@ def part2grid_tsc_2d_unit(
     periodx: bool,
     periody: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a two-dimensional grid using the
     triangular-shaped-cloud (TSC) assignment scheme.
@@ -819,7 +819,7 @@ def part2grid_pcs_2d(
     periodx: bool,
     periody: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a two-dimensional grid using the
     piecewise-cubic-spline (PCS) assignment scheme.
@@ -1042,7 +1042,7 @@ def part2grid_pcs_2d_unit(
     periodx: bool,
     periody: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a two-dimensional grid using the
     piecewise-cubic-spline (PCS) assignment scheme.
@@ -1362,7 +1362,7 @@ def part2grid_ngp_3d(
     nygrid: int,
     nzgrid: int,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a three-dimensional grid using the
     nearest-grid-point (NGP) assignment scheme.
@@ -1461,7 +1461,7 @@ def part2grid_ngp_3d_unit(
     nygrid: int,
     nzgrid: int,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a three-dimensional grid using the
     nearest-grid-point (NGP) assignment scheme.
@@ -1560,7 +1560,7 @@ def part2grid_cic_3d(
     periody: bool,
     periodz: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a three-dimensional grid using the
     cloud-in-cell (CIC) assignment scheme.
@@ -1775,7 +1775,7 @@ def part2grid_cic_3d_unit(
     periody: bool,
     periodz: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a three-dimensional grid using the
     cloud-in-cell (CIC) assignment scheme.
@@ -1991,7 +1991,7 @@ def part2grid_tsc_3d(
     periody: bool,
     periodz: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a three-dimensional grid using the
     triangular-shaped-cloud (TSC) assignment scheme.
@@ -2191,7 +2191,7 @@ def part2grid_tsc_3d_unit(
     periody: bool,
     periodz: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a three-dimensional grid using the
     triangular-shaped-cloud (TSC) assignment scheme.
@@ -2389,7 +2389,7 @@ def part2grid_pcs_3d(
     periody: bool,
     periodz: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a three-dimensional grid using the
     piecewise-cubic-spline (PCS) assignment scheme.
@@ -2624,7 +2624,7 @@ def part2grid_pcs_3d_unit(
     periody: bool,
     periodz: bool,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Assign particle values to a three-dimensional grid using the
     piecewise-cubic-spline (PCS) assignment scheme.

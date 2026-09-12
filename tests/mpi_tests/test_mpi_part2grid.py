@@ -271,3 +271,43 @@ def test_mpi_part2grid3d_returns_valid_local_grid_list(method, periodic):
         )
     else:
         assert grid.sum() > 0
+
+
+def test_mpi_part2grid2d_invalid_method():
+    mpi = MPI()
+
+    x = np.array([0.25, 0.75])
+    y = np.array([0.25, 0.75])
+
+    with pytest.raises(ValueError, match="NGP|CIC|TSC|PCS"):
+        mpi_part2grid2D(
+            x,
+            y,
+            1.0,
+            8,
+            mpi,
+            method="INVALID",
+            periodic=True,
+            origin=0.0,
+        )
+
+
+def test_mpi_part2grid3d_invalid_method():
+    mpi = MPI()
+
+    x = np.array([0.25, 0.75])
+    y = np.array([0.25, 0.75])
+    z = np.array([0.25, 0.75])
+
+    with pytest.raises(ValueError, match="NGP|CIC|TSC|PCS"):
+        mpi_part2grid3D(
+            x,
+            y,
+            z,
+            1.0,
+            8,
+            mpi,
+            method="INVALID",
+            periodic=True,
+            origin=0.0,
+        )

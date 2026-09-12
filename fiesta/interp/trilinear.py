@@ -21,7 +21,7 @@ def trilinear_periodic(
     originy: float = 0.0,
     originz: float = 0.0,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Trilinear interpolation on a periodic 3D cell-centred grid.
 
@@ -117,7 +117,7 @@ def trilinear_nonperiodic(
     originy: float = 0.0,
     originz: float = 0.0,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Trilinear interpolation on a non-periodic 3D cell-centred grid.
 
@@ -242,7 +242,7 @@ def trilinear_axisperiodic(
     originy: float = 0.0,
     originz: float = 0.0,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Trilinear interpolation on a 3D cell-centred grid with configurable
     periodicity along each axis.

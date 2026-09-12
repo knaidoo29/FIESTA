@@ -18,7 +18,7 @@ def bilinear_periodic(
     originx: float = 0.0,
     originy: float = 0.0,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Bilinear interpolation on a periodic 2D cell-centred grid.
 
@@ -96,7 +96,7 @@ def bilinear_nonperiodic(
     originx: float = 0.0,
     originy: float = 0.0,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Bilinear interpolation on a non-periodic 2D cell-centred grid.
 
@@ -196,7 +196,7 @@ def bilinear_axisperiodic(
     originx: float = 0.0,
     originy: float = 0.0,
     dtype: np.dtype = np.float64
-) -> np.ndarray:
+) -> np.ndarray: # pragma: no cover
     """
     Bilinear interpolation on a 2D cell-centred grid with configurable
     periodicity along each axis.

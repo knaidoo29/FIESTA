@@ -90,8 +90,8 @@ def mpi_part2grid2D(
 
         _fexist = int(fexist)
 
-        ftotal = MPI.sum(_fexist)
-        ftotal = MPI.broadcast(ftotal)
+        ftotal = MPI.Sum(_fexist)
+        ftotal = MPI.Bcast(ftotal)
 
         # Only distribute f if it exists on every rank.
         fexist = ftotal == MPI.size
@@ -283,11 +283,11 @@ def mpi_part2grid2D(
 
     if nhalo > 0:
 
-        fgrid_send_up = MPI.send_up(
+        fgrid_send_up = MPI.Send_up(
             np.ascontiguousarray(fgrid[-nhalo:])
         )
 
-        fgrid_send_down = MPI.send_down(
+        fgrid_send_down = MPI.Send_down(
             np.ascontiguousarray(fgrid[:nhalo])
         )
 
@@ -387,8 +387,8 @@ def mpi_part2grid3D(
 
         _fexist = int(fexist)
 
-        ftotal = MPI.sum(_fexist)
-        ftotal = MPI.broadcast(ftotal)
+        ftotal = MPI.Sum(_fexist)
+        ftotal = MPI.Bcast(ftotal)
 
         # Only distribute f if it exists on every rank.
         fexist = ftotal == MPI.size
@@ -668,8 +668,8 @@ def mpi_part2grid3D(
 
     if nhalo > 0:
 
-        fgrid_send_up = MPI.send_up(fgrid[-nhalo:])
-        fgrid_send_down = MPI.send_down(fgrid[:nhalo])
+        fgrid_send_up = MPI.Send_up(fgrid[-nhalo:])
+        fgrid_send_down = MPI.Send_down(fgrid[:nhalo])
 
         fgrid = fgrid[nhalo:-nhalo]
 

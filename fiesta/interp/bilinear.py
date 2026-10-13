@@ -485,7 +485,7 @@ def mpi_bilinear(
     else:
         correct_shape = False
     
-    correct_shapes = MPI.collect([correct_shape])
+    correct_shapes = MPI.gather([correct_shape])
 
     if MPI.rank == 0:
         if all(correct_shapes):
@@ -493,12 +493,12 @@ def mpi_bilinear(
         else:
             correct_shape = False
     
-    correct_shape = MPI.broadcast(correct_shape)
+    correct_shape = MPI.Bcast(correct_shape)
 
     if correct_shape:
 
-        fgrid_sendup = np.array([MPI.send_up(fgrid[-1])])
-        fgrid_senddown = np.array([MPI.send_down(fgrid[0])])
+        fgrid_sendup = MPI.Send_up(fgrid[-1])
+        fgrid_senddown = MPI.Send_down(fgrid[0])
 
         if MPI.rank == 0:
             if xperiodic:

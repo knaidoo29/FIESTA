@@ -65,7 +65,7 @@ def mpi_find_range_2D(fnames: str, freader: object, MPI: object) -> np.ndarray:
     xmins, xmaxs = np.array(xmins), np.array(xmaxs)
     ymins, ymaxs = np.array(ymins), np.array(ymaxs)
     ranges = points.coord2points([xmins, xmaxs, ymins, ymaxs])
-    ranges = MPI.collect(ranges, outlist=True)
+    ranges = MPI.gather(ranges)
     if MPI.rank == 0:
         ranges = np.vstack(ranges)
     return ranges
@@ -104,7 +104,7 @@ def mpi_find_range_3D(fnames: str, freader: object, MPI: object) -> np.ndarray:
     ymins, ymaxs = np.array(ymins), np.array(ymaxs)
     zmins, zmaxs = np.array(zmins), np.array(zmaxs)
     ranges = points.coord2points([xmins, xmaxs, ymins, ymaxs, zmins, zmaxs])
-    ranges = MPI.collect(ranges, outlist=True)
+    ranges = MPI.gather(ranges)
     if MPI.rank == 0:
         ranges = np.vstack(ranges)
     return ranges
@@ -248,16 +248,16 @@ def check_coords_at_MPI_0(x: np.ndarray, MPI: object) -> bool:
         nocoord = True
     else:
         nocoord = False
-    nocoords = MPI.collect(nocoord, outlist=True)
+    nocoords = MPI.gather(nocoord)
     if MPI.rank == 0:
         if nocoords[0] == True:
             checkatzero = True
         for i in range(1, len(nocoords)):
             if nocoords[i] == True:
                 checkatzero = False
-        MPI.send(checkatzero, tag=11)
     else:
-        checkatzero = MPI.recv(0, tag=11)
+        checkatzero = False
+    MPI.Bcast(checkatzero, tag=11)
     return checkatzero
 
 
@@ -341,12 +341,10 @@ class MPI_SortByX:
         )
         self.limits = [xedges[0], xedges[-1]]
         self.ngrid_rank = len(xgrid)
-        all_limits = self.MPI.collect(self.limits, outlist=True)
+        all_limits = self.MPI.gather(self.limits)
         if self.MPI.rank == 0:
             all_limits = np.vstack(all_limits)
-            self.MPI.send(all_limits, tag=11)
-        else:
-            all_limits = self.MPI.recv(0, tag=11)
+        all_limits = self.MPI.Bcast(all_limits)
         self.all_limits = all_limits
 
     def _checkifdist(self) -> bool:
@@ -369,17 +367,16 @@ class MPI_SortByX:
                 check = True
             else:
                 check = False
-        checks = self.MPI.collect(check)
+        checks = self.MPI.Gather(check)
         if self.MPI.rank == 0:
             cond = np.where(checks == False)[0]
             if len(cond) != 0:
                 ifdist = False
             else:
                 ifdist = True
-            self.MPI.send(ifdist, tag=11)
         else:
-            ifdist = self.MPI.recv(0, tag=11)
-        self.MPI.wait()
+            ifdist = False
+        self.MPI.Bcast(ifdist)
         return ifdist
 
     def distribute(self, include_internalbuffer: bool = False) -> np.ndarray:
@@ -460,8 +457,8 @@ class MPI_SortByX:
                 else:
                     _data = None
                     _hasdata = False
-                _data = self.MPI.collect(_data, outlist=True)
-                _hasdata = self.MPI.collect(_hasdata, outlist=True)
+                _data = self.MPI.gather(_data)
+                _hasdata = self.MPI.gather(_hasdata)
                 if self.MPI.rank == 0:
                     _hasdata = np.array(_hasdata).flatten()
                     cond = np.where(_hasdata == True)[0]

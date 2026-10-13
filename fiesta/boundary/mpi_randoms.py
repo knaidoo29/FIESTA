@@ -203,9 +203,9 @@ def mpi_buffer_random_utils(
         Periodic data values.
     """
     cond = np.where(data[:, 0] <= limits[0] + buffer_length)[0]
-    data_send_down = MPI.send_down(data[cond])
+    data_send_down = MPI.Send_down_variable(data[cond])
     cond = np.where(data[:, 0] >= limits[1] - buffer_length)[0]
-    data_send_up = MPI.send_up(data[cond])
+    data_send_up = MPI.Send_up_variable(data[cond])
     if MPI.rank == 0:
         datap = np.vstack([data, data_send_down])
     elif MPI.rank == MPI.size - 1:

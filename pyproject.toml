@@ -26,7 +26,7 @@ dependencies = [
     "numba",
     "numpy",
     "scipy",
-    "shift-fft"
+    "shift-fft>=1.1.0"
 ]
 dynamic = ["version"]
 

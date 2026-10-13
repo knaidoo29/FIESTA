@@ -42,9 +42,9 @@ def mpi_buffer_internal_2D(
     else:
         xboxsize = boxsize[0]
     cond = np.where(data[:, 0] <= xorigin + buffer_length)[0]
-    data_send_down = MPI.send_down(data[cond])
+    data_send_down = MPI.Send_down_variable(data[cond])
     cond = np.where(data[:, 0] >= xorigin + xboxsize - buffer_length)[0]
-    data_send_up = MPI.send_up(data[cond])
+    data_send_up = MPI.Send_up_variable(data[cond])
     if MPI.rank == 0:
         # data_send_up[:,0] -= xboxsize
         datap = np.vstack([data, data_send_down])
@@ -97,9 +97,9 @@ def mpi_buffer_periodic_2D(
         xboxsize, yboxsize = boxsize[0], boxsize[1]
     datap = periodic.buffer_periodic(data, 1, yboxsize, buffer_length, origin=yorigin)
     cond = np.where(datap[:, 0] <= xorigin + buffer_length)[0]
-    data_send_down = MPI.send_down(datap[cond])
+    data_send_down = MPI.Send_down_variable(datap[cond])
     cond = np.where(datap[:, 0] >= xorigin + xboxsize - buffer_length)[0]
-    data_send_up = MPI.send_up(datap[cond])
+    data_send_up = MPI.Send_up_variable(datap[cond])
     if MPI.rank == 0:
         data_send_up[:, 0] -= xboxsize
     elif MPI.rank == MPI.size - 1:
@@ -147,9 +147,9 @@ def mpi_buffer_internal_3D(
     else:
         xboxsize = boxsize[0]
     cond = np.where(data[:, 0] <= xorigin + buffer_length)[0]
-    data_send_down = MPI.send_down(data[cond])
+    data_send_down = MPI.Send_down_variable(data[cond])
     cond = np.where(data[:, 0] >= xorigin + xboxsize - buffer_length)[0]
-    data_send_up = MPI.send_up(data[cond])
+    data_send_up = MPI.Send_up_variable(data[cond])
     if MPI.rank == 0:
         # data_send_up[:,0] -= xboxsize
         datap = np.vstack([data, data_send_down])
@@ -203,9 +203,9 @@ def mpi_buffer_periodic_3D(
     datap = periodic.buffer_periodic(data, 1, yboxsize, buffer_length, origin=yorigin)
     datap = periodic.buffer_periodic(datap, 2, zboxsize, buffer_length, origin=zorigin)
     cond = np.where(datap[:, 0] <= xorigin + buffer_length)[0]
-    data_send_down = MPI.send_down(datap[cond])
+    data_send_down = MPI.Send_down_variable(datap[cond])
     cond = np.where(datap[:, 0] >= xorigin + xboxsize - buffer_length)[0]
-    data_send_up = MPI.send_up(datap[cond])
+    data_send_up = MPI.Send_up_variable(datap[cond])
     if MPI.rank == 0:
         data_send_up[:, 0] -= xboxsize
     elif MPI.rank == MPI.size - 1:

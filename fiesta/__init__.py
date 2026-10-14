@@ -7,6 +7,5 @@ from . import interp
 from . import kdtree
 from . import randoms
 from . import sph
-from . import src
 from . import utils
 from . import gridsph

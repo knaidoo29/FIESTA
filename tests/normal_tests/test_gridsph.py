@@ -5,16 +5,13 @@ from fiesta.gridsph import (
     get_integral_image3D,
     gridSPH2D,
     gridSPH3D,
-)
-
-from fiesta import p2g
-
-from fiesta.src import (
     sum_from_integral_image_2D,
     get_volume_enclosing_box_2D,
     sum_from_integral_image_3D,
     get_volume_enclosing_box_3D,
 )
+
+from fiesta import p2g
 
 
 class TestVEFE:

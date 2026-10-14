@@ -57,8 +57,8 @@ Introduction
 ``FIESTA`` is a python library for general interpolation from uniform and non-uniform input points. The library
 is written in python with numba acceleration for speed. The library has the *optional* capability to be used 
 on large data-sets by distributing jobs across multiple processes via ``MPI``. This relies on the ``mpi4py`` 
-library and the ``MPI`` object from the ``shift-fft`` package (see `here <https://shift.readthedocs.io/en/latest/mpiutils.html>`_) 
-which is passed as an additional object into ``MPI`` related functions.
+library and the ``MPI`` object from the ``shift-fft`` package which is passed as an additional object into 
+``MPI`` related functions.
 
 Showcase
 ========

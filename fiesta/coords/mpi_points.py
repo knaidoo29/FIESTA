@@ -4,7 +4,7 @@ import shift
 
 from . import points
 
-from typing import List, Optional, Union
+from typing import List, Union
 
 
 def split_limits_by_grid(
@@ -65,7 +65,7 @@ def mpi_find_range_2D(fnames: str, freader: object, MPI: object) -> np.ndarray:
     xmins, xmaxs = np.array(xmins), np.array(xmaxs)
     ymins, ymaxs = np.array(ymins), np.array(ymaxs)
     ranges = points.coord2points([xmins, xmaxs, ymins, ymaxs])
-    ranges = MPI.collect(ranges, outlist=True)
+    ranges = MPI.gather(ranges)
     if MPI.rank == 0:
         ranges = np.vstack(ranges)
     return ranges
@@ -104,7 +104,7 @@ def mpi_find_range_3D(fnames: str, freader: object, MPI: object) -> np.ndarray:
     ymins, ymaxs = np.array(ymins), np.array(ymaxs)
     zmins, zmaxs = np.array(zmins), np.array(zmaxs)
     ranges = points.coord2points([xmins, xmaxs, ymins, ymaxs, zmins, zmaxs])
-    ranges = MPI.collect(ranges, outlist=True)
+    ranges = MPI.gather(ranges)
     if MPI.rank == 0:
         ranges = np.vstack(ranges)
     return ranges
@@ -248,20 +248,21 @@ def check_coords_at_MPI_0(x: np.ndarray, MPI: object) -> bool:
         nocoord = True
     else:
         nocoord = False
-    nocoords = MPI.collect(nocoord, outlist=True)
+    nocoords = MPI.gather(nocoord)
     if MPI.rank == 0:
         if nocoords[0] == True:
             checkatzero = True
         for i in range(1, len(nocoords)):
             if nocoords[i] == True:
                 checkatzero = False
-        MPI.send(checkatzero, tag=11)
     else:
-        checkatzero = MPI.recv(0, tag=11)
+        checkatzero = False
+    checkatzero = MPI.bcast(checkatzero)
     return checkatzero
 
 
 class MPI_SortByX:
+
 
     def __init__(self, MPI: object) -> None:
         """
@@ -281,6 +282,7 @@ class MPI_SortByX:
         self.limits = None
         self.all_limits = None
         self.buffer_length = 0.0
+
 
     def settings(
         self,
@@ -309,6 +311,7 @@ class MPI_SortByX:
         assert buffer_length >= 0.0, "buffer_length cannot be < 0."
         self.buffer_length = buffer_length
 
+
     def input(self, data: np.ndarray) -> None:
         """
         Input coordinates.
@@ -319,6 +322,7 @@ class MPI_SortByX:
             A 2 dimensional array where the first column is the x-axis coordinate.
         """
         self.data = data
+
 
     def limits4grid(self) -> None:
         """
@@ -341,13 +345,12 @@ class MPI_SortByX:
         )
         self.limits = [xedges[0], xedges[-1]]
         self.ngrid_rank = len(xgrid)
-        all_limits = self.MPI.collect(self.limits, outlist=True)
+        all_limits = self.MPI.gather(self.limits)
         if self.MPI.rank == 0:
             all_limits = np.vstack(all_limits)
-            self.MPI.send(all_limits, tag=11)
-        else:
-            all_limits = self.MPI.recv(0, tag=11)
+        all_limits = self.MPI.bcast(all_limits)
         self.all_limits = all_limits
+
 
     def _checkifdist(self) -> bool:
         """
@@ -369,118 +372,126 @@ class MPI_SortByX:
                 check = True
             else:
                 check = False
-        checks = self.MPI.collect(check)
-        if self.MPI.rank == 0:
-            cond = np.where(checks == False)[0]
-            if len(cond) != 0:
-                ifdist = False
-            else:
-                ifdist = True
-            self.MPI.send(ifdist, tag=11)
-        else:
-            ifdist = self.MPI.recv(0, tag=11)
-        self.MPI.wait()
-        return ifdist
+        return bool(self.MPI.comm.allreduce(check, op=self.MPI.mpi.LAND))
+    
 
     def distribute(self, include_internalbuffer: bool = False) -> np.ndarray:
         """
-        Distributes points along the x-axis based grid-based slab decomposition.
+        Distribute points along the x-axis using an MPI slab decomposition.
+
+        Optionally include particles within the internal buffer regions.
+        Periodic boundary conditions are not applied.
 
         Parameters
         ----------
         include_internalbuffer : bool, optional
-            Whether to include internal buffer region. Note, this does not support, periodic boundary conditions.
+            Whether to include internal buffer particles.
 
-        Yields
-        ------
-        Distributed data.
+        Returns
+        -------
+        np.ndarray
+            Distributed particle data.
         """
-        # TODO: add periodic buffer particles?
-        if self._checkifdist() is False:
-            for i in range(0, self.MPI.size):
-                if self.data is not None:
-                    if include_internalbuffer:
-                        if i == 0:
-                            cond = np.where(
-                                (
-                                    self.data[:, 0]
-                                    >= self.all_limits[i, 0] - self.buffer_length
-                                )
-                                & (
-                                    self.data[:, 0]
-                                    < self.all_limits[i, 1] + self.buffer_length
-                                )
-                            )[0]
-                        elif i == self.MPI.size - 1:
-                            cond = np.where(
-                                (
-                                    self.data[:, 0]
-                                    >= self.all_limits[i, 0] - self.buffer_length
-                                )
-                                & (
-                                    self.data[:, 0]
-                                    <= self.all_limits[i, 1] + self.buffer_length
-                                )
-                            )[0]
-                        else:
-                            cond = np.where(
-                                (
-                                    self.data[:, 0]
-                                    >= self.all_limits[i, 0] - self.buffer_length
-                                )
-                                & (
-                                    self.data[:, 0]
-                                    < self.all_limits[i, 1] + self.buffer_length
-                                )
-                            )[0]
-                    else:
-                        if i == 0:
-                            cond = np.where(
-                                (
-                                    self.data[:, 0]
-                                    >= self.all_limits[i, 0] - self.buffer_length
-                                )
-                                & (self.data[:, 0] < self.all_limits[i, 1])
-                            )[0]
-                        elif i == self.MPI.size - 1:
-                            cond = np.where(
-                                (self.data[:, 0] >= self.all_limits[i, 0])
-                                & (
-                                    self.data[:, 0]
-                                    <= self.all_limits[i, 1] + self.buffer_length
-                                )
-                            )[0]
-                        else:
-                            cond = np.where(
-                                (self.data[:, 0] >= self.all_limits[i, 0])
-                                & (self.data[:, 0] < self.all_limits[i, 1])
-                            )[0]
-                    _data = self.data[cond]
-                    _hasdata = True
-                else:
-                    _data = None
-                    _hasdata = False
-                _data = self.MPI.collect(_data, outlist=True)
-                _hasdata = self.MPI.collect(_hasdata, outlist=True)
-                if self.MPI.rank == 0:
-                    _hasdata = np.array(_hasdata).flatten()
-                    cond = np.where(_hasdata == True)[0]
-                    if len(cond) != 0:
-                        _data = np.vstack([_data[c] for c in cond])
-                    else:
-                        _data = None
-                    if i == 0:
-                        _data4limit = np.copy(_data)
-                    else:
-                        self.MPI.send(_data, to_rank=i, tag=10 + i)
-                else:
-                    if i != 0 and i == self.MPI.rank:
-                        _data4limit = self.MPI.recv(0, tag=10 + i)
-                self.MPI.wait()
-            return _data4limit
-        else:
+        if self._checkifdist():
             return self.data
 
+        MPI = self.MPI
+
+        # Determine the array dtype and shape across ranks.
+        # Some ranks may initially have self.data = None.
+        metadata = MPI.comm.allgather(
+            None if self.data is None
+            else (self.data.dtype, self.data.shape[1:])
+        )
+
+        metadata = [m for m in metadata if m is not None]
+
+        if not metadata:
+            return None
+
+        dtype, trailing_shape = metadata[0]
+
+        if any(m != metadata[0] for m in metadata):
+            raise ValueError(
+                "All ranks must have the same data dtype and trailing shape."
+            )
+
+        if self.data is None:
+            data = np.empty((0, *trailing_shape), dtype=dtype)
+        else:
+            data = self.data
+
+        # Identify particles destined for each rank.
+        x = data[:, 0]
+
+        sendcounts = np.zeros(MPI.size, dtype=np.int64)
+        indices = []
+
+        for i in range(MPI.size):
+
+            xmin, xmax = self.all_limits[i]
+
+            if include_internalbuffer:
+                xmin -= self.buffer_length
+                xmax += self.buffer_length
+            else:
+                if i == 0:
+                    xmin -= self.buffer_length
+                if i == MPI.size - 1:
+                    xmax += self.buffer_length
+
+            # The final slab includes its upper boundary.
+            if i == MPI.size - 1:
+                cond = (x >= xmin) & (x <= xmax)
+            else:
+                cond = (x >= xmin) & (x < xmax)
+
+            idx = np.flatnonzero(cond)
+
+            indices.append(idx)
+            sendcounts[i] = idx.size
+
+        # Group outgoing particles by destination rank.
+        indices = np.concatenate(indices)
+        senddata = np.ascontiguousarray(data[indices])
+
+        # Exchange the number of particles.
+        recvcounts = np.empty(MPI.size, dtype=np.int64)
+
+        MPI.Alltoall(sendcounts, recvcounts)
+
+        # Convert particle counts into array-element counts.
+        row_size = int(np.prod(data.shape[1:], dtype=np.int64))
+
+        sendcounts *= row_size
+        recvcounts *= row_size
+
+        # Compute displacements.
+        senddispls = np.zeros(MPI.size, dtype=np.int64)
+        recvdispls = np.zeros(MPI.size, dtype=np.int64)
+
+        senddispls[1:] = np.cumsum(sendcounts[:-1])
+        recvdispls[1:] = np.cumsum(recvcounts[:-1])
+
+        # Allocate the receiving array.
+        recvdata = np.empty(
+            (int(recvcounts.sum() // row_size), *data.shape[1:]),
+            dtype=dtype,
+        )
+
+        # Redistribute particles.
+        MPI.Alltoallv(
+            senddata.reshape(-1),
+            sendcounts,
+            senddispls,
+            recvdata.reshape(-1),
+            recvcounts,
+            recvdispls,
+        )
+
+        return recvdata
+
+    
     def distribute_grid2D(
         self, x2d: np.ndarray, y2d: np.ndarray, f2d: np.ndarray
     ) -> np.ndarray:
@@ -544,6 +555,7 @@ class MPI_SortByX:
         f[xpixs, ypixs] = data[:, 2]
 
         return f
+
 
     def distribute_grid3D(
         self,
@@ -630,6 +642,7 @@ class MPI_SortByX:
 
         return f
 
+    
     def clean(self) -> None:
         """
         Reinitialises the class.

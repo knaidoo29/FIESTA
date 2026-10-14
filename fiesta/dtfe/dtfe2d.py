@@ -1,11 +1,198 @@
 import numpy as np
+from numba import njit
 from scipy.spatial import Delaunay as scDelaunay
 
+from . import polygon
+
 from .. import coords
-from .. import src
 from .. import maths
 
 from typing import List, Optional, Union
+
+
+@njit
+def delaunay_area_2d(
+    x: np.ndarray,
+    y: np.ndarray,
+    del_vert0: np.ndarray,
+    del_vert1: np.ndarray,
+    del_vert2: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
+    """
+    Determines area for each simplex.
+
+    Parameters
+    ----------
+    x : array
+        X-coordinates.
+    y : array
+        Y-coordinates.
+    del_vert0 : array
+        Index for vertex 0 of each simplices.
+    del_vert1 : array
+        Index for vertex 1 of each simplices.
+    del_vert2 : array
+        Index for vertex 2 of each simplices.
+
+    Returns
+    -------
+    areas : array
+        The areas of each simplex.
+    """
+    nvert = len(del_vert0)
+    areas = np.zeros(nvert)
+    for i in range(0, nvert):
+        i0 = del_vert0[i]
+        i1 = del_vert1[i]
+        i2 = del_vert2[i]
+        areas[i] = polygon.triangle_area(x[i0], y[i0], x[i1], y[i1], x[i2], y[i2])
+    return areas
+
+
+@njit
+def sum_delaunay_area_4_points_2d(
+    delaunay_area: np.ndarray,
+    del_vert0: np.ndarray,
+    del_vert1: np.ndarray,
+    del_vert2: np.ndarray,
+    npart: int,
+) -> np.ndarray:  # pragma: no cover
+    """
+    Finds the Delaunay area for each point.
+
+    Parameters
+    ----------
+    delaunay_area : array
+        Delaunay area.
+    del_vert0 : array
+        Index for vertex 0 of each simplices.
+    del_vert1 : array
+        Index for vertex 1 of each simplices.
+    del_vert2 : array
+        Index for vertex 2 of each simplices.
+    npart : int
+        Number of points.
+
+    Returns
+    -------
+    point_area : array
+        Delaunay area for each point.
+    """
+    point_area = np.zeros(npart)
+    nvert = len(del_vert0)
+    for i in range(0, nvert):
+        i0 = del_vert0[i]
+        i1 = del_vert1[i]
+        i2 = del_vert2[i]
+        point_area[i0] += delaunay_area[i] / 3.0
+        point_area[i1] += delaunay_area[i] / 3.0
+        point_area[i2] += delaunay_area[i] / 3.0
+    return point_area
+
+
+@njit
+def get_delf0_2d(
+    x: np.ndarray,
+    y: np.ndarray,
+    f: np.ndarray,
+    del_vert0: np.ndarray,
+    del_vert1: np.ndarray,
+    del_vert2: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
+    """
+    Determines delf0 for each simplices.
+
+    Parameters
+    ----------
+    x : array
+        X-coordinates.
+    y : array
+        Y-coordinates.
+    f : array
+        Field values at these points.
+    del_vert0 : array
+        Index for vertex 0 of each simplices.
+    del_vert1 : array
+        Index for vertex 1 of each simplices.
+    del_vert2 : array
+        Index for vertex 2 of each simplices.
+
+    Returns
+    -------
+    delf0 : array
+        The 2D difference in each simplices.
+    """
+    nvert = len(del_vert0)
+    delf0 = np.zeros(2 * nvert)
+    m = np.zeros(4)
+    for i in range(0, nvert):
+        i0 = del_vert0[i]
+        i1 = del_vert1[i]
+        i2 = del_vert2[i]
+
+        dx1 = x[i1] - x[i0]
+        dx2 = x[i2] - x[i0]
+
+        dy1 = y[i1] - y[i0]
+        dy2 = y[i2] - y[i0]
+
+        df1 = f[i1] - f[i0]
+        df2 = f[i2] - f[i0]
+
+        m[0] = dx1
+        m[1] = dy1
+        m[2] = dx2
+        m[3] = dy2
+
+        invm = maths.inv2by2(m)
+
+        delf0[2 * i] = invm[0] * df1 + invm[1] * df2
+        delf0[2 * i + 1] = invm[2] * df1 + invm[3] * df2
+    return delf0
+
+
+@njit
+def delaunay_estimate_2d(
+    simplices: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    x0: np.ndarray,
+    y0: np.ndarray,
+    f0: np.ndarray,
+    delf0: np.ndarray,
+) -> np.ndarray:  # pragma: no cover
+    """
+    Estimates a field from Delaunay tesselation.
+
+    Parameters
+    ----------
+    simplices : array
+    x : array
+        X-coordinates for estimates.
+    y : array
+        Y-coordinates for estimates.
+    x0 : array
+        X-coordinate of vertex 0 of each simplices.
+    y0 : array
+        Y-coordinate of vertex 0 of each simplices.
+    f0 : array
+        Field values at vertex 0 of each simplices.
+    delf0 : array
+        The 2D difference in each simplices.
+
+    Returns
+    -------
+    f_est : array
+        Estimates of the field.
+    """
+    npart = len(x)
+    f_est = np.zeros(npart)
+    for i in range(0, npart):
+        j = simplices[i]
+        f_est[i] = (
+            f0[j] + delf0[2 * j] * (x[i] - x0[j]) + delf0[2 * j + 1] * (y[i] - y0[j])
+        )
+    return f_est
 
 
 class Delaunay2D:
@@ -278,7 +465,7 @@ class Delaunay2D:
         del_vert0 = self.simplices[:, 0]
         del_vert1 = self.simplices[:, 1]
         del_vert2 = self.simplices[:, 2]
-        self.delaunay_area = src.delaunay_area_2d(x, y, del_vert0, del_vert1, del_vert2)
+        self.delaunay_area = delaunay_area_2d(x, y, del_vert0, del_vert1, del_vert2)
 
     def get_dens(self) -> None:
         """
@@ -289,7 +476,7 @@ class Delaunay2D:
         del_vert0 = self.simplices[:, 0]
         del_vert1 = self.simplices[:, 1]
         del_vert2 = self.simplices[:, 2]
-        point_area = src.sum_delaunay_area_4_points_2d(
+        point_area = sum_delaunay_area_4_points_2d(
             self.delaunay_area, del_vert0, del_vert1, del_vert2, len(self.points)
         )
         self.point_dens = self.mass / point_area
@@ -313,7 +500,7 @@ class Delaunay2D:
         self.x0 = x[del_vert0]
         self.y0 = y[del_vert0]
         self.f0 = f[del_vert0]
-        self.delf0 = src.get_delf0_2d(x, y, f, del_vert0, del_vert1, del_vert2)
+        self.delf0 = get_delf0_2d(x, y, f, del_vert0, del_vert1, del_vert2)
         self.dtfe_mode = "field"
 
     def set_field2dens(self) -> None:
@@ -365,7 +552,7 @@ class Delaunay2D:
             cond = np.where(
                 (simplices_idx != -1) & (self.simptypes[simplices_idx] == 1.0)
             )[0]
-        f_est[cond] = src.delaunay_estimate_2d(
+        f_est[cond] = delaunay_estimate_2d(
             simplices_idx[cond], x[cond], y[cond], self.x0, self.y0, self.f0, self.delf0
         )
         return f_est

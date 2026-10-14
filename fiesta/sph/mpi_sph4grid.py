@@ -101,14 +101,14 @@ def mpi_sph4grid2D(
     else:
         fieldexist = False
 
-    fieldexists = MPI.collect(fieldexist)
+    fieldexists = MPI.gather(fieldexist)
 
     if MPI.rank == 0:
         fieldexist = any(fieldexists)
     else:
         fieldexist = None
 
-    fieldexist = MPI.broadcast(fieldexist)
+    fieldexist = MPI.bcast(fieldexist)
 
     # sort coordinates and distribute by coordinate system
     MPI_SBX = coords.MPI_SortByX(MPI)
@@ -253,14 +253,14 @@ def mpi_sph4grid3D(
     else:
         fieldexist = False
 
-    fieldexists = MPI.collect(fieldexist)
+    fieldexists = MPI.gather(fieldexist)
 
     if MPI.rank == 0:
         fieldexist = any(fieldexists)
     else:
         fieldexist = None
 
-    fieldexist = MPI.broadcast(fieldexist)
+    fieldexist = MPI.bcast(fieldexist)
 
     # sort coordinates and distribute by coordinate system
     MPI_SBX = coords.MPI_SortByX(MPI)

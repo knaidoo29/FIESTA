@@ -3,10 +3,10 @@ import shift
 
 from typing import List, Union, Optional, Tuple
 
+from . import gridsph
 from . import integral_image
 
 from .. import p2g
-from .. import src
 
 
 def mpi_gridSPH2D(
@@ -96,8 +96,8 @@ def mpi_gridSPH2D(
         else:
             assert fgrid.shape == (nxgrid, ngrid), "fgrid shape does not match ngrid"
 
-    dgrid_send_up = MPI.send_up(dgrid[-buffer_size:])
-    dgrid_send_down = MPI.send_down(dgrid[:buffer_size])
+    dgrid_send_up = MPI.Send_up(dgrid[-buffer_size:])
+    dgrid_send_down = MPI.Send_down(dgrid[:buffer_size])
 
     if MPI.rank == 0:
         if xperiodic:
@@ -126,8 +126,8 @@ def mpi_gridSPH2D(
         dgrid = np.concatenate([dgrid_send_up, dgrid, dgrid_send_down], axis=0)
 
     if f is not None:
-        fgrid_send_up = MPI.send_up(fgrid[-buffer_size:])
-        fgrid_send_down = MPI.send_down(fgrid[:buffer_size])
+        fgrid_send_up = MPI.Send_up(fgrid[-buffer_size:])
+        fgrid_send_down = MPI.Send_down(fgrid[:buffer_size])
         if MPI.rank == 0:
             if xperiodic:
                 fgrid = np.concatenate([fgrid_send_up, fgrid, fgrid_send_down], axis=0)
@@ -160,7 +160,7 @@ def mpi_gridSPH2D(
         yperiodic = periodic[1]
 
     if f is None:
-        vgrid = src.get_volume_enclosing_box_2D(
+        vgrid = gridsph.get_volume_enclosing_box_2D(
             xboxsize,
             yboxsize,
             dgrid,
@@ -181,7 +181,7 @@ def mpi_gridSPH2D(
                 dgridSPH = dgridSPH[buffer_size:-buffer_size]
         return dgridSPH
     else:
-        fgridSPH = src.get_volume_enclosing_box_2D(
+        fgridSPH = gridsph.get_volume_enclosing_box_2D(
             xboxsize,
             yboxsize,
             dgrid,
@@ -294,8 +294,8 @@ def mpi_gridSPH3D(
         else:
             assert fgrid.shape == (nxgrid, ngrid, ngrid), "fgrid shape does not match ngrid"
 
-    dgrid_send_up = MPI.send_up(dgrid[-buffer_size:])
-    dgrid_send_down = MPI.send_down(dgrid[:buffer_size])
+    dgrid_send_up = MPI.Send_up(dgrid[-buffer_size:])
+    dgrid_send_down = MPI.Send_down(dgrid[:buffer_size])
     
     if MPI.rank == 0:
         if xperiodic:
@@ -324,8 +324,8 @@ def mpi_gridSPH3D(
         dgrid = np.concatenate([dgrid_send_up, dgrid, dgrid_send_down], axis=0)
 
     if f is not None:
-        fgrid_send_up = MPI.send_up(fgrid[-buffer_size:])
-        fgrid_send_down = MPI.send_down(fgrid[:buffer_size])
+        fgrid_send_up = MPI.Send_up(fgrid[-buffer_size:])
+        fgrid_send_down = MPI.Send_down(fgrid[:buffer_size])
         if MPI.rank == 0:
             if xperiodic:
                 fgrid = np.concatenate([fgrid_send_up, fgrid, fgrid_send_down], axis=0)
@@ -362,7 +362,7 @@ def mpi_gridSPH3D(
         zperiodic = periodic[2]
 
     if f is None:
-        vgrid = src.get_volume_enclosing_box_3D(
+        vgrid = gridsph.get_volume_enclosing_box_3D(
             xboxsize,
             yboxsize,
             zboxsize,
@@ -385,7 +385,7 @@ def mpi_gridSPH3D(
                 dgridSPH = dgridSPH[buffer_size:-buffer_size]
         return dgridSPH
     else:
-        fgridSPH = src.get_volume_enclosing_box_3D(
+        fgridSPH = gridsph.get_volume_enclosing_box_3D(
             xboxsize,
             yboxsize,
             zboxsize,

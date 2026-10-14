@@ -35,10 +35,10 @@ def mpi_dfdx(
     shape[0] += 2
     _f = np.zeros(shape)
     _f[1:-1] = f
-    f_send_up = MPI.send_up(f[-1])
-    _f[0] = f_send_up
-    f_send_down = MPI.send_down(f[0])
-    _f[-1] = f_send_down
+    f_send_up = MPI.Send_up(f[-1])
+    _f[0] = f_send_up[0]
+    f_send_down = MPI.Send_down(f[0])
+    _f[-1] = f_send_down[0]
     if periodic is False:
         if MPI.rank == 0:
             _xgrid = _xgrid[1:]

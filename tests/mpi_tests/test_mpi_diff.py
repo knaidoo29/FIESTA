@@ -9,7 +9,7 @@ from fiesta.maths import dfdx, dfdy, dfdz, mpi_dfdx, mpi_dfdy, mpi_dfdz
 
 
 def collect_arrays(mpi, local_array):
-    collected = mpi.collect(local_array, outlist=True)
+    collected = mpi.gather(local_array)
     if mpi.rank == 0:
         return np.concatenate(collected)
     return None
@@ -55,7 +55,7 @@ def test_mpi_dfdy_matches_serial_derivative_nonperiodic():
     mpi = MPI()
     ygrid = np.linspace(0.0, 1.0, 10)
     xgrid = np.linspace(0.0, 1.0, 5)
-    _, Y = np.meshgrid(xgrid, ygrid, indexing="xy")
+    _, Y = np.meshgrid(xgrid, ygrid, indexing="ij")
     f = np.sin(Y)
 
     result = mpi_dfdy(ygrid, f, mpi, periodic=False)
@@ -70,7 +70,7 @@ def test_mpi_dfdy_matches_serial_derivative_periodic():
     mpi = MPI()
     ygrid = np.linspace(0.0, 2.0 * np.pi, 10, endpoint=False)
     xgrid = np.linspace(0.0, 1.0, 5)
-    _, Y = np.meshgrid(xgrid, ygrid, indexing="xy")
+    _, Y = np.meshgrid(xgrid, ygrid, indexing="ij")
     f = np.sin(Y)
 
     result = mpi_dfdy(ygrid, f, mpi, periodic=True)

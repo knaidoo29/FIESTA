@@ -116,13 +116,13 @@ def mpi_delaunay_density4grid2D(
         lendata = len(data)
     else:  # pragma: no cover
         lendata = 0
-    size = MPI.collect(lendata, outlist=True)
+    size = MPI.gather(lendata)
     if MPI.rank == 0:
         npart = np.sum(np.array(size))
-        MPI.send(npart, tag=11)
     else:
-        npart = MPI.recv(0, tag=11)
-    MPI.wait()
+        npart = 0.
+    npart = MPI.bcast(npart)
+    MPI.Barrier()
 
     # sort coordinates and distribute by coordinate system
     MPI_SBX = coords.MPI_SortByX(MPI)
@@ -168,33 +168,33 @@ def mpi_delaunay_density4grid2D(
         flatten=True,
     )
 
-    MPI.wait()
+    MPI.Barrier()
 
     # get border particles from adjacent slabs with the slab below
 
     exterior_border_below = {}
 
-    exterior_border_below["x"] = MPI.send_up(exterior_border["x"])
-    exterior_border_below["y"] = MPI.send_up(exterior_border["y"])
-    exterior_border_below["mass"] = MPI.send_up(exterior_border["mass"])
-    exterior_border_below["ptype"] = MPI.send_up(exterior_border["ptype"])
-    exterior_border_below["f"] = MPI.send_up(exterior_border["f"])
+    exterior_border_below["x"] = MPI.Send_up_variable(exterior_border["x"])
+    exterior_border_below["y"] = MPI.Send_up_variable(exterior_border["y"])
+    exterior_border_below["mass"] = MPI.Send_up_variable(exterior_border["mass"])
+    exterior_border_below["ptype"] = MPI.Send_up_variable(exterior_border["ptype"])
+    exterior_border_below["f"] = MPI.Send_up_variable(exterior_border["f"])
     exterior_border_below["dtfe_mode"] = exterior_border["dtfe_mode"]
-    exterior_border_below["simplices"] = MPI.send_up(exterior_border["simplices"])
-    exterior_border_below["simptypes"] = MPI.send_up(exterior_border["simptypes"])
+    exterior_border_below["simplices"] = MPI.Send_up_variable(exterior_border["simplices"])
+    exterior_border_below["simptypes"] = MPI.Send_up_variable(exterior_border["simptypes"])
 
     # get border particles from adjacent slabs with the slab above
 
     exterior_border_above = {}
 
-    exterior_border_above["x"] = MPI.send_down(exterior_border["x"])
-    exterior_border_above["y"] = MPI.send_down(exterior_border["y"])
-    exterior_border_above["mass"] = MPI.send_down(exterior_border["mass"])
-    exterior_border_above["ptype"] = MPI.send_down(exterior_border["ptype"])
-    exterior_border_above["f"] = MPI.send_down(exterior_border["f"])
+    exterior_border_above["x"] = MPI.Send_down_variable(exterior_border["x"])
+    exterior_border_above["y"] = MPI.Send_down_variable(exterior_border["y"])
+    exterior_border_above["mass"] = MPI.Send_down_variable(exterior_border["mass"])
+    exterior_border_above["ptype"] = MPI.Send_down_variable(exterior_border["ptype"])
+    exterior_border_above["f"] = MPI.Send_down_variable(exterior_border["f"])
     exterior_border_above["dtfe_mode"] = exterior_border["dtfe_mode"]
-    exterior_border_above["simplices"] = MPI.send_down(exterior_border["simplices"])
-    exterior_border_above["simptypes"] = MPI.send_down(exterior_border["simptypes"])
+    exterior_border_above["simplices"] = MPI.Send_down_variable(exterior_border["simplices"])
+    exterior_border_above["simptypes"] = MPI.Send_down_variable(exterior_border["simptypes"])
 
     # Construct merged Delaunay tesselation
 
@@ -387,13 +387,14 @@ def mpi_delaunay_field4grid2D(
         lendata = len(data)
     else:  # pragma: no cover
         lendata = 0
-    size = MPI.collect(lendata, outlist=True)
+    size = MPI.gather(lendata)
     if MPI.rank == 0:
         npart = np.sum(np.array(size))
-        MPI.send(npart, tag=11)
     else:
-        npart = MPI.recv(0, tag=11)
-    MPI.wait()
+        npart = 0.
+    npart = MPI.bcast(npart)
+
+    MPI.Barrier()
 
     # sort coordinates and distribute by coordinate system
     MPI_SBX = coords.MPI_SortByX(MPI)
@@ -440,33 +441,33 @@ def mpi_delaunay_field4grid2D(
         flatten=True,
     )
 
-    MPI.wait()
+    MPI.Barrier()
 
     # get border particles from adjacent slabs with the slab below
 
     exterior_border_below = {}
 
-    exterior_border_below["x"] = MPI.send_up(exterior_border["x"])
-    exterior_border_below["y"] = MPI.send_up(exterior_border["y"])
-    exterior_border_below["mass"] = MPI.send_up(exterior_border["mass"])
-    exterior_border_below["ptype"] = MPI.send_up(exterior_border["ptype"])
-    exterior_border_below["f"] = MPI.send_up(exterior_border["f"])
+    exterior_border_below["x"] = MPI.Send_up_variable(exterior_border["x"])
+    exterior_border_below["y"] = MPI.Send_up_variable(exterior_border["y"])
+    exterior_border_below["mass"] = MPI.Send_up_variable(exterior_border["mass"])
+    exterior_border_below["ptype"] = MPI.Send_up_variable(exterior_border["ptype"])
+    exterior_border_below["f"] = MPI.Send_up_variable(exterior_border["f"])
     exterior_border_below["dtfe_mode"] = exterior_border["dtfe_mode"]
-    exterior_border_below["simplices"] = MPI.send_up(exterior_border["simplices"])
-    exterior_border_below["simptypes"] = MPI.send_up(exterior_border["simptypes"])
+    exterior_border_below["simplices"] = MPI.Send_up_variable(exterior_border["simplices"])
+    exterior_border_below["simptypes"] = MPI.Send_up_variable(exterior_border["simptypes"])
 
     # get border particles from adjacent slabs with the slab above
 
     exterior_border_above = {}
 
-    exterior_border_above["x"] = MPI.send_down(exterior_border["x"])
-    exterior_border_above["y"] = MPI.send_down(exterior_border["y"])
-    exterior_border_above["mass"] = MPI.send_down(exterior_border["mass"])
-    exterior_border_above["ptype"] = MPI.send_down(exterior_border["ptype"])
-    exterior_border_above["f"] = MPI.send_down(exterior_border["f"])
+    exterior_border_above["x"] = MPI.Send_down_variable(exterior_border["x"])
+    exterior_border_above["y"] = MPI.Send_down_variable(exterior_border["y"])
+    exterior_border_above["mass"] = MPI.Send_down_variable(exterior_border["mass"])
+    exterior_border_above["ptype"] = MPI.Send_down_variable(exterior_border["ptype"])
+    exterior_border_above["f"] = MPI.Send_down_variable(exterior_border["f"])
     exterior_border_above["dtfe_mode"] = exterior_border["dtfe_mode"]
-    exterior_border_above["simplices"] = MPI.send_down(exterior_border["simplices"])
-    exterior_border_above["simptypes"] = MPI.send_down(exterior_border["simptypes"])
+    exterior_border_above["simplices"] = MPI.Send_down_variable(exterior_border["simplices"])
+    exterior_border_above["simptypes"] = MPI.Send_down_variable(exterior_border["simptypes"])
 
     # Construct merged Delaunay tesselation
 
@@ -660,13 +661,13 @@ def mpi_delaunay_density4grid3D(
         lendata = len(data)
     else:  # pragma: no cover
         lendata = 0
-    size = MPI.collect(lendata, outlist=True)
+    size = MPI.gather(lendata)
     if MPI.rank == 0:
         npart = np.sum(np.array(size))
-        MPI.send(npart, tag=11)
     else:
-        npart = MPI.recv(0, tag=11)
-    MPI.wait()
+        npart = 0.
+    npart = MPI.bcast(npart)
+    MPI.Barrier()
 
     # sort coordinates and distribute by coordinate system
     MPI_SBX = coords.MPI_SortByX(MPI)
@@ -720,35 +721,35 @@ def mpi_delaunay_density4grid3D(
         flatten=True,
     )
 
-    MPI.wait()
+    MPI.Barrier()
 
     # get border particles from adjacent slabs with the slab below
 
     exterior_border_below = {}
 
-    exterior_border_below["x"] = MPI.send_up(exterior_border["x"])
-    exterior_border_below["y"] = MPI.send_up(exterior_border["y"])
-    exterior_border_below["z"] = MPI.send_up(exterior_border["z"])
-    exterior_border_below["mass"] = MPI.send_up(exterior_border["mass"])
-    exterior_border_below["ptype"] = MPI.send_up(exterior_border["ptype"])
-    exterior_border_below["f"] = MPI.send_up(exterior_border["f"])
+    exterior_border_below["x"] = MPI.Send_up_variable(exterior_border["x"])
+    exterior_border_below["y"] = MPI.Send_up_variable(exterior_border["y"])
+    exterior_border_below["z"] = MPI.Send_up_variable(exterior_border["z"])
+    exterior_border_below["mass"] = MPI.Send_up_variable(exterior_border["mass"])
+    exterior_border_below["ptype"] = MPI.Send_up_variable(exterior_border["ptype"])
+    exterior_border_below["f"] = MPI.Send_up_variable(exterior_border["f"])
     exterior_border_below["dtfe_mode"] = exterior_border["dtfe_mode"]
-    exterior_border_below["simplices"] = MPI.send_up(exterior_border["simplices"])
-    exterior_border_below["simptypes"] = MPI.send_up(exterior_border["simptypes"])
+    exterior_border_below["simplices"] = MPI.Send_up_variable(exterior_border["simplices"])
+    exterior_border_below["simptypes"] = MPI.Send_up_variable(exterior_border["simptypes"])
 
     # get border particles from adjacent slabs with the slab above
 
     exterior_border_above = {}
 
-    exterior_border_above["x"] = MPI.send_down(exterior_border["x"])
-    exterior_border_above["y"] = MPI.send_down(exterior_border["y"])
-    exterior_border_above["z"] = MPI.send_down(exterior_border["z"])
-    exterior_border_above["mass"] = MPI.send_down(exterior_border["mass"])
-    exterior_border_above["ptype"] = MPI.send_down(exterior_border["ptype"])
-    exterior_border_above["f"] = MPI.send_down(exterior_border["f"])
+    exterior_border_above["x"] = MPI.Send_down_variable(exterior_border["x"])
+    exterior_border_above["y"] = MPI.Send_down_variable(exterior_border["y"])
+    exterior_border_above["z"] = MPI.Send_down_variable(exterior_border["z"])
+    exterior_border_above["mass"] = MPI.Send_down_variable(exterior_border["mass"])
+    exterior_border_above["ptype"] = MPI.Send_down_variable(exterior_border["ptype"])
+    exterior_border_above["f"] = MPI.Send_down_variable(exterior_border["f"])
     exterior_border_above["dtfe_mode"] = exterior_border["dtfe_mode"]
-    exterior_border_above["simplices"] = MPI.send_down(exterior_border["simplices"])
-    exterior_border_above["simptypes"] = MPI.send_down(exterior_border["simptypes"])
+    exterior_border_above["simplices"] = MPI.Send_down_variable(exterior_border["simplices"])
+    exterior_border_above["simptypes"] = MPI.Send_down_variable(exterior_border["simptypes"])
 
     # Construct merged Delaunay tesselation
 
@@ -959,13 +960,13 @@ def mpi_delaunay_field4grid3D(
         lendata = len(data)
     else:  # pragma: no cover
         lendata = 0
-    size = MPI.collect(lendata, outlist=True)
+    size = MPI.gather(lendata)
     if MPI.rank == 0:
         npart = np.sum(np.array(size))
-        MPI.send(npart, tag=11)
     else:
-        npart = MPI.recv(0, tag=11)
-    MPI.wait()
+        npart = 0.
+    npart = MPI.bcast(npart)
+    MPI.Barrier()
 
     # sort coordinates and distribute by coordinate system
     MPI_SBX = coords.MPI_SortByX(MPI)
@@ -1020,35 +1021,35 @@ def mpi_delaunay_field4grid3D(
         flatten=True,
     )
 
-    MPI.wait()
+    MPI.Barrier()
 
     # get border particles from adjacent slabs with the slab below
 
     exterior_border_below = {}
 
-    exterior_border_below["x"] = MPI.send_up(exterior_border["x"])
-    exterior_border_below["y"] = MPI.send_up(exterior_border["y"])
-    exterior_border_below["z"] = MPI.send_up(exterior_border["z"])
-    exterior_border_below["mass"] = MPI.send_up(exterior_border["mass"])
-    exterior_border_below["ptype"] = MPI.send_up(exterior_border["ptype"])
-    exterior_border_below["f"] = MPI.send_up(exterior_border["f"])
+    exterior_border_below["x"] = MPI.Send_up_variable(exterior_border["x"])
+    exterior_border_below["y"] = MPI.Send_up_variable(exterior_border["y"])
+    exterior_border_below["z"] = MPI.Send_up_variable(exterior_border["z"])
+    exterior_border_below["mass"] = MPI.Send_up_variable(exterior_border["mass"])
+    exterior_border_below["ptype"] = MPI.Send_up_variable(exterior_border["ptype"])
+    exterior_border_below["f"] = MPI.Send_up_variable(exterior_border["f"])
     exterior_border_below["dtfe_mode"] = exterior_border["dtfe_mode"]
-    exterior_border_below["simplices"] = MPI.send_up(exterior_border["simplices"])
-    exterior_border_below["simptypes"] = MPI.send_up(exterior_border["simptypes"])
+    exterior_border_below["simplices"] = MPI.Send_up_variable(exterior_border["simplices"])
+    exterior_border_below["simptypes"] = MPI.Send_up_variable(exterior_border["simptypes"])
 
     # get border particles from adjacent slabs with the slab above
 
     exterior_border_above = {}
 
-    exterior_border_above["x"] = MPI.send_down(exterior_border["x"])
-    exterior_border_above["y"] = MPI.send_down(exterior_border["y"])
-    exterior_border_above["z"] = MPI.send_down(exterior_border["z"])
-    exterior_border_above["mass"] = MPI.send_down(exterior_border["mass"])
-    exterior_border_above["ptype"] = MPI.send_down(exterior_border["ptype"])
-    exterior_border_above["f"] = MPI.send_down(exterior_border["f"])
+    exterior_border_above["x"] = MPI.Send_down_variable(exterior_border["x"])
+    exterior_border_above["y"] = MPI.Send_down_variable(exterior_border["y"])
+    exterior_border_above["z"] = MPI.Send_down_variable(exterior_border["z"])
+    exterior_border_above["mass"] = MPI.Send_down_variable(exterior_border["mass"])
+    exterior_border_above["ptype"] = MPI.Send_down_variable(exterior_border["ptype"])
+    exterior_border_above["f"] = MPI.Send_down_variable(exterior_border["f"])
     exterior_border_above["dtfe_mode"] = exterior_border["dtfe_mode"]
-    exterior_border_above["simplices"] = MPI.send_down(exterior_border["simplices"])
-    exterior_border_above["simptypes"] = MPI.send_down(exterior_border["simptypes"])
+    exterior_border_above["simplices"] = MPI.Send_down_variable(exterior_border["simplices"])
+    exterior_border_above["simptypes"] = MPI.Send_down_variable(exterior_border["simptypes"])
 
     # Construct merged Delaunay tesselation
 

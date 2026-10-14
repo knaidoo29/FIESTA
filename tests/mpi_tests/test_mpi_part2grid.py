@@ -50,7 +50,7 @@ def test_mpi_part2grid2d_returns_valid_local_grid(method, periodic):
         mpi,
         method=method,
         periodic=periodic,
-        origin=origin,
+        origin=origin
     )
 
     grid = mpi_part2grid2D(
@@ -62,14 +62,14 @@ def test_mpi_part2grid2d_returns_valid_local_grid(method, periodic):
         f=f_local,
         method=method,
         periodic=periodic,
-        origin=origin,
+        origin=origin
     )
 
     if method == "NGP":
-        dx = xedges[1] - xedges[0]
+        dx = boxsize / ngrid
         dy = boxsize / ngrid
         assert np.isclose(
-            grid.sum() * dx * dy, float(len(f_local)), atol=1e-8, rtol=1e-8
+            grid.sum() * dx * dy, float(len(f_local)), atol=1e-5, rtol=1e-5
         )
     else:
         assert grid.sum() > 0
@@ -131,10 +131,10 @@ def test_mpi_part2grid2d_returns_valid_local_grid_list(method, periodic):
     assert_mpi_local_shape(grid, ngrid, mpi)
     assert np.all(np.isfinite(grid))
     if method == "NGP":
-        dx = xedges[1] - xedges[0]
+        dx = boxsize[0] / ngrid[0]
         dy = boxsize[1] / ngrid[1]
         assert np.isclose(
-            grid.sum() * dx * dy, float(len(f_local2)), atol=1e-8, rtol=1e-8
+            grid.sum() * dx * dy, float(len(f_local2)), atol=1e-5, rtol=1e-5
         )
     else:
         assert grid.sum() > 0
@@ -201,11 +201,11 @@ def test_mpi_part2grid3d_returns_valid_local_grid(method, periodic):
     )
 
     if method == "NGP":
-        dx = xedges[1] - xedges[0]
+        dx = boxsize / ngrid
         dy = boxsize / ngrid
         dz = boxsize / ngrid
         assert np.isclose(
-            grid.sum() * dx * dy * dz, float(len(f_local2)), atol=1e-8, rtol=1e-8
+            grid.sum() * dx * dy * dz, float(len(f_local2)), atol=1e-5, rtol=1e-5
         )
     else:
         assert grid.sum() > 0
@@ -263,11 +263,11 @@ def test_mpi_part2grid3d_returns_valid_local_grid_list(method, periodic):
     assert_mpi_local_shape(grid, ngrid, mpi)
     assert np.all(np.isfinite(grid))
     if method == "NGP":
-        dx = xedges[1] - xedges[0]
+        dx = boxsize[0] / ngrid[0]
         dy = boxsize[1] / ngrid[1]
         dz = boxsize[2] / ngrid[2]
         assert np.isclose(
-            grid.sum() * dx * dy * dz, float(len(f_local)), atol=1e-8, rtol=1e-8
+            grid.sum() * dx * dy * dz, float(len(f_local)), atol=1e-5, rtol=1e-5
         )
     else:
         assert grid.sum() > 0

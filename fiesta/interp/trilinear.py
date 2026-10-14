@@ -562,25 +562,17 @@ def mpi_trilinear(
     _xorigin = xedges[0]
     _xboxsize = xedges[-1] - xedges[0]
 
-    if np.shape(fgrid)[0] == len(xgrid):
-        correct_shape = True
-    else:
-        correct_shape = False
+    # Check that the local grid has the expected shape on every rank.
+    correct_shape = fgrid.shape[0] == len(xgrid)
 
-    correct_shapes = MPI.gather([correct_shape])
-
-    if MPI.rank == 0:
-        if all(correct_shapes):
-            correct_shape = True
-        else:
-            correct_shape = False
-    
-    correct_shape = MPI.Bcast(correct_shape)
+    correct_shape = bool(
+        MPI.comm.allreduce(correct_shape, op=MPI.mpi.LAND)
+    )
     
     if correct_shape:
 
-        fgrid_sendup = MPI.Send_up(fgrid[-1])
-        fgrid_senddown = MPI.Send_down(fgrid[0])
+        fgrid_sendup = MPI.Send_up(np.ascontiguousarray(fgrid[-1:]))
+        fgrid_senddown = MPI.Send_down(np.ascontiguousarray(fgrid[:1]))
 
         if MPI.rank == 0:
             if xperiodic:
@@ -611,11 +603,14 @@ def mpi_trilinear(
                 data = None
             data = coords.distribute_points_by_x(data, boxsize, ngrid, origin, MPI)
             x, y, z = coords.points2xyz(data)
+        
         f = trilinear(
             fgrid, [_xboxsize, yboxsize, zboxsize], x, y, z, [_xorigin, yorigin, zorigin], 
             fill_value=fill_value, periodic=[False, yperiodic, zperiodic], dtype=dtype
         )
+    
         return x, y, z, f
+    
     else:
         MPI.mpi_print_zero("ERROR: Shape of fgrid does not match expectation for distributed array")
         return np.nan, np.nan, np.nan, np.nan

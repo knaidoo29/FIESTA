@@ -15,5 +15,4 @@ API
   api_p2g
   api_randoms
   api_sph
-  api_src
   api_utils

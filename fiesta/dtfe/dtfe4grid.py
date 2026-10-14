@@ -8,55 +8,6 @@ from . import dtfe3d
 from typing import Union, Tuple, Optional, List
 from copy import deepcopy
 
-# TODO: Get rid of this? Is this used for anything?
-
-# def mean_separation_2D(npart, boxsize):
-#     """
-#     Calculates the mean separation for particles inside a 2D box.
-
-#     Parameters
-#     ----------
-#     npart : int
-#         Number of particles.
-#     boxsize : float or list
-#         Dimensions of the box.
-
-#     Returns
-#     -------
-#     mean_sep : float
-#         Mean separation of particles.
-#     """
-#     if np.isscalar(boxsize):
-#         area = boxsize**2.
-#     else:
-#         area = boxsize[0]*boxsize[1]
-#     mean_sep = np.sqrt(area/npart)
-#     return mean_sep
-
-
-# def mean_separation_3D(npart, boxsize):
-#     """
-#     Calculates the mean separation for particles inside a 3D box.
-
-#     Parameters
-#     ----------
-#     npart : int
-#         Number of particles.
-#     boxsize : float or list
-#         Dimensions of the box.
-
-#     Returns
-#     -------
-#     mean_sep : float
-#         Mean separation of particles.
-#     """
-#     if np.isscalar(boxsize):
-#         vol = boxsize**3.
-#     else:
-#         vol = boxsize[0]*boxsize[1]*boxsize[2]
-#     mean_sep = (vol/npart)**(1./3.)
-#     return mean_sep
-
 
 def delaunay_density4grid2D(
     x: np.ndarray,

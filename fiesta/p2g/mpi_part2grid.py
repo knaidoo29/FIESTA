@@ -89,11 +89,9 @@ def mpi_part2grid2D(
     if check_distributed:
 
         _fexist = int(fexist)
-
         ftotal = MPI.Sum(_fexist)
-        ftotal = MPI.Bcast(ftotal)
 
-        # Only distribute f if it exists on every rank.
+        ftotal = MPI.bcast(ftotal)
         fexist = ftotal == MPI.size
 
         if x is None:
@@ -103,7 +101,7 @@ def mpi_part2grid2D(
                 data = coords.coord2points([x, y, f])
             else:
                 data = coords.coord2points([x, y])
-
+        
         data = coords.distribute_points_by_x(
             data,
             boxsize,
@@ -388,7 +386,7 @@ def mpi_part2grid3D(
         _fexist = int(fexist)
 
         ftotal = MPI.Sum(_fexist)
-        ftotal = MPI.Bcast(ftotal)
+        ftotal = MPI.bcast(ftotal)
 
         # Only distribute f if it exists on every rank.
         fexist = ftotal == MPI.size

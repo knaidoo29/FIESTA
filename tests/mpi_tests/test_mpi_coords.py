@@ -371,3 +371,36 @@ def test_distribute_points_by_x_shifted_origin():
     assert distributed.ndim == 2
     assert distributed.shape[1] == 2
     assert np.all(np.isfinite(distributed))
+
+
+def test_distribute_points_by_x_inconsistent_dtype():
+    mpi = MPI()
+
+    if mpi.size == 1:
+        pytest.skip("Requires multiple MPI ranks.")
+
+    dtype = np.float32 if mpi.rank == 0 else np.float64
+
+    data = np.array([[0.9, 0.5]], dtype=dtype)
+
+    with pytest.raises(ValueError, match="same data dtype"):
+        distribute_points_by_x(
+            data, 1.0, 8, 0.0, mpi
+        )
+
+
+def test_distribute_points_by_x_inconsistent_shape():
+    mpi = MPI()
+
+    if mpi.size == 1:
+        pytest.skip("Requires multiple MPI ranks.")
+
+    if mpi.rank == 0:
+        data = np.array([[0.9, 0.5]])
+    else:
+        data = np.array([[0.9, 0.5, 0.2]])
+
+    with pytest.raises(ValueError, match="same data dtype and trailing shape"):
+        distribute_points_by_x(
+            data, 1.0, 8, 0.0, mpi
+        )

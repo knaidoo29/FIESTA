@@ -2,7 +2,6 @@ import numpy as np
 import pytest
 
 pytest.importorskip("mpi4py")
-import shift
 from shift.mpiutils import MPI
 
 from fiesta.boundary.mpi_periodic import (

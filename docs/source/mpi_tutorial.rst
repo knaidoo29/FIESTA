@@ -79,7 +79,10 @@ Points loaded in at rank 0 can be distributed to the correct ranks using:
       data = fiesta.coords.coord2points([x, y, z, f1, f2, ...])
 
       # Now distribute the points across ranks based on their x coordinates
-      data = fiesta.coords.distribute_points_by_x(data, boxsize=1000.0, ngrid=256, origin=0.0, MPI=MPI)
+      boxsize=1000.0
+      ngrid=256
+      origin=0.0
+      data = fiesta.coords.distribute_points_by_x(data, boxsize, ngrid, origin, MPI)
    else:
       # create an empty data array on other ranks to receive the distributed points
       data = None
@@ -112,7 +115,10 @@ points for each slab. If you do load points in on all ranks, ensure they are not
    data = fiesta.coords.coord2points([x, y, z, f1, f2, ...])
 
    # Now distribute the points across ranks based on their x coordinates
-   data = fiesta.coords.distribute_points_by_x(data, boxsize=1000.0, ngrid=256, origin=0.0, MPI=MPI)
+   boxsize=1000.0
+   ngrid=256
+   origin=0.0
+   data = fiesta.coords.distribute_points_by_x(data, boxsize, ngrid, origin, MPI)
 
    x = data[:, 0]
    y = data[:, 1]

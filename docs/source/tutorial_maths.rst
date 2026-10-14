@@ -25,9 +25,13 @@ Differentiate a sine function.
 .. code-block:: python
 
     import numpy as np
+    import shift
     import fiesta
 
-    xgrid = np.linspace(0, 2*np.pi, 100)
+    boxsize = 2*np.pi
+    ngrid = 100
+
+    xgrid = shift.cart.grid1D(boxsize, ngrid)
 
     f = np.sin(xgrid)
 
@@ -90,30 +94,32 @@ Basic Example
 
     import numpy as np
 
-    ygrid = np.linspace(0, 2*np.pi, 128)
+    boxsize = 2*np.pi
+    ngrid = [64, 128]
 
-    Y = np.meshgrid(ygrid, indexing="ij")[0]
+    x2D, y2D = shift.cart.grid2D(boxsize, ngrid)
 
-    f = np.sin(Y)
+    f = np.sin(y2D)
 
-    gy = fiesta.maths.dfdy(ygrid, f)
+    y1D = shift.cart.grid1D(boxsize, ngrid[1])
+
+    gy = fiesta.maths.dfdy(y1D, f)
 
 2D Field Example
 ----------------
 
 .. code-block:: python
 
-    nx = 128
-    ny = 128
+    boxsize = 1
+    ngrid = 128
 
-    x = np.linspace(0, 1, nx)
-    y = np.linspace(0, 1, ny)
+    x2D, y2D = shift.cart.grid2D(boxsize, ngrid)
 
-    X, Y = np.meshgrid(x, y, indexing="ij")
+    f = np.sin(x2D) * np.cos(y2D)
 
-    f = np.sin(X) * np.cos(Y)
+    y1D = shift.cart.grid1D(boxsize, ngrid)
 
-    gy = fiesta.maths.dfdy(y, f)
+    gy = fiesta.maths.dfdy(y1D, f)
 
 Periodic Boundaries
 -------------------
@@ -121,7 +127,7 @@ Periodic Boundaries
 .. code-block:: python
 
     gy = fiesta.maths.dfdy(
-        ygrid,
+        y1D,
         f,
         periodic=True,
     )
@@ -140,31 +146,32 @@ Basic Example
 
     import numpy as np
 
-    zgrid = np.linspace(0, 2*np.pi, 64)
+    boxsize = 1
+    ngrid = 128
 
-    f = np.sin(zgrid)
+    x3D, y3D, z3D = shift.cart.grid3D(boxsize, ngrid)
 
-    gz = fiesta.maths.dfdz(zgrid, f)
+    f = np.sin(z3D)
+
+    z1D = shift.cart.grid1D(boxsize, ngrid)
+
+    gz = fiesta.maths.dfdz(z1D, f)
 
 3D Field Example
 ----------------
 
 .. code-block:: python
 
-    nx = ny = nz = 64
+    boxsize = 1
+    ngrid = 64
 
-    x = np.linspace(0, 1, nx)
-    y = np.linspace(0, 1, ny)
-    z = np.linspace(0, 1, nz)
+    x3D, y3D, z3D = shift.cart.grid3D(boxsize, ngrid)
 
-    X, Y, Z = np.meshgrid(
-        x, y, z,
-        indexing="ij"
-    )
+    f = x3D**2 + y3D**2 + z3D**2
 
-    f = X**2 + Y**2 + Z**2
+    z1D = shift.cart.grid1D(boxsize, ngrid)
 
-    gz = fiesta.maths.dfdz(z, f)
+    gz = fiesta.maths.dfdz(z1D, f)
 
 Periodic 3D Simulations
 -----------------------
@@ -172,7 +179,7 @@ Periodic 3D Simulations
 .. code-block:: python
 
     gz = fiesta.maths.dfdz(
-        zgrid,
+        z1D,
         f,
         periodic=True,
     )

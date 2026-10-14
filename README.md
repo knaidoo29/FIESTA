@@ -34,9 +34,6 @@ https://raw.githubusercontent.com/knaidoo29/FIESTA/main/docs/source/_static/FiEs
     <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
     </a>
-    <a href="https://github.com/psf/black">
-    <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black">
-    </a>
     <a href="https://doi.org/10.5281/zenodo.20328944">
     <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.20328944.svg" alt="zenodo: DOI">
     </a>
@@ -44,7 +41,9 @@ https://raw.githubusercontent.com/knaidoo29/FIESTA/main/docs/source/_static/FiEs
 
 ## Introduction
 
-``FIESTA`` is a python library for general interpolation from uniform and non-uniform input points. The library is written in python with numba acceleration for speed. The library has the *optional* capability to be used on large data-sets by distributing jobs across multiple processes via ``MPI``. This relies on the ``mpi4py`` library and the ``MPI`` object from the ``shift-fft`` package (see [here](https://shift.readthedocs.io/en/latest/mpiutils.html)) which is passed as an additional object into ``MPI`` related functions.
+**FIESTA** (Field Interpolation and Estimation using Spatial Techniques and Algorithms) is a Python library for interpolating and estimating fields from regularly and irregularly distributed data in two and three dimensions. It provides a range of numerical methods, including particle-to-grid assignment, Delaunay Tessellation Field Estimation (DTFE), Smoothed Particle Hydrodynamics (SPH) interpolation, and grid-based interpolation. Computationally intensive operations are accelerated using `numba` for improved performance.
+
+The library also provides **optional MPI parallelisation** for processing large datasets by distributing computations across multiple processes. This functionality relies on `mpi4py` and the `MPI` object provided by the `shift-fft` package (see [documentation](https://shift.readthedocs.io/en/latest/mpiutils.html)), which is passed as an additional argument to MPI-enabled functions.
 
 ## Dependencies
 
@@ -65,7 +64,7 @@ FIESTA can be installed via ``pip``:
 or by cloning the repository:
 
 ```
-    git clone https://github.com/knaidoo29/fiesta.git
+    git clone https://github.com/knaidoo29/FIESTA.git
     cd FIESTA
     pip install .
 ```
@@ -77,6 +76,10 @@ Once this is done you should be able to call `fiesta` from python:
 ```
 
 To use the ``MPI`` functionality please take a look at the documentation in FIESTA which instructs users how to use the ``shift-fft`` ``MPI`` object and how to run these distributed jobs successfully without errors or MPI related hanging.
+
+## Documentation
+
+In depth documentation and tutorials are provided [here](https://fiesta-docs.readthedocs.io/).
 
 ## Showcase
 
@@ -90,9 +93,9 @@ The velocity-field along the z-axis computed with ``FIESTA`` (from the outputs o
 ![examplevz](
 https://raw.githubusercontent.com/knaidoo29/FIESTA/main/docs/source/_static/methods_vz.png)
 
-## Documentation
+## License
 
-In depth documentation and tutorials are provided [here](https://fiesta-docs.readthedocs.io/).
+FIESTA is released under the MIT License. See [LICENSE](LICENSE) for details.
 
 ## Citation
 

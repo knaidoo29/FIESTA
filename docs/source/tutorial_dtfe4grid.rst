@@ -43,11 +43,14 @@ Generate a 2D density field from particle coordinates.
     x = np.random.uniform(0.0, 100.0, npts)
     y = np.random.uniform(0.0, 100.0, npts)
 
+    boxsize=100.0
+    ngrid=128
+    
     dens = fiesta.dtfe.delaunay_density4grid2D(
         x,
         y,
-        boxsize=100.0,
-        ngrid=128,
+        boxsize,
+        ngrid,
     )
 
 The returned array has shape:
@@ -72,8 +75,8 @@ Mass weights can be supplied for weighted density estimation.
     dens = fiesta.dtfe.delaunay_density4grid2D(
         x,
         y,
-        boxsize=100.0,
-        ngrid=128,
+        boxsize,
+        ngrid,
         mass=mass,
     )
 
@@ -84,11 +87,14 @@ Different box sizes and grid dimensions may be used.
 
 .. code-block:: python
 
+    boxsize=[200.0, 100.0]
+    ngrid=[256, 128]
+    
     dens = fiesta.dtfe.delaunay_density4grid2D(
         x,
         y,
-        boxsize=[200.0, 100.0],
-        ngrid=[256, 128],
+        boxsize,
+        ngrid
     )
 
 Periodic Boundaries
@@ -98,11 +104,14 @@ Enable periodic boundaries independently per axis.
 
 .. code-block:: python
 
+    boxsize=100.0
+    ngrid=128
+    
     dens = fiesta.dtfe.delaunay_density4grid2D(
         x,
         y,
-        boxsize=100.0,
-        ngrid=128,
+        boxsize,
+        ngrid,
         periodic=[True, False],
     )
 
@@ -117,8 +126,8 @@ points per pixel.
     dens = fiesta.dtfe.delaunay_density4grid2D(
         x,
         y,
-        boxsize=100.0,
-        ngrid=128,
+        boxsize,
+        ngrid,
         subsampling=4,
     )
 
@@ -132,8 +141,8 @@ Returning Grid Coordinates
     dens, xgrid, ygrid = fiesta.dtfe.delaunay_density4grid2D(
         x,
         y,
-        boxsize=100.0,
-        ngrid=128,
+        boxsize,
+        ngrid,
         outputgrid=True,
     )
 
@@ -145,8 +154,8 @@ Flattened Output
     dens = fiesta.dtfe.delaunay_density4grid2D(
         x,
         y,
-        boxsize=100.0,
-        ngrid=128,
+        boxsize,
+        ngrid,
         flatten=True,
     )
 
@@ -170,8 +179,8 @@ Partitioning reduces memory usage for large datasets.
     dens = fiesta.dtfe.delaunay_density4grid2D(
         x,
         y,
-        boxsize=100.0,
-        ngrid=256,
+        boxsize,
+        ngrid,
         partition=4,
     )
 
@@ -199,8 +208,8 @@ Interpolate scalar field values onto a grid.
         x,
         y,
         f,
-        boxsize=100.0,
-        ngrid=128,
+        boxsize,
+        ngrid,
     )
 
 Returning Grid Coordinates
@@ -212,8 +221,8 @@ Returning Grid Coordinates
         x,
         y,
         f,
-        boxsize=100.0,
-        ngrid=128,
+        boxsize,
+        ngrid,
         outputgrid=True,
     )
 
@@ -226,8 +235,8 @@ Using Partitions
         x,
         y,
         f,
-        boxsize=100.0,
-        ngrid=256,
+        boxsize,
+        ngrid,
         partition=[2, 2],
     )
 
@@ -249,8 +258,8 @@ Basic Example
         x,
         y,
         z,
-        boxsize=100.0,
-        ngrid=64,
+        boxsize,
+        ngrid,
     )
 
 Output shape:
@@ -268,12 +277,15 @@ Anisotropic Volumes
 
 .. code-block:: python
 
+    boxsize=[200.0, 100.0, 50.0]
+    ngrid=[128, 64, 32]
+    
     dens = fiesta.dtfe.delaunay_density4grid3D(
         x,
         y,
         z,
-        boxsize=[200.0, 100.0, 50.0],
-        ngrid=[128, 64, 32],
+        boxsize,
+        ngrid
     )
 
 Periodic Boundaries
@@ -281,12 +293,15 @@ Periodic Boundaries
 
 .. code-block:: python
 
+    boxsize=100.0
+    ngrid=64
+    
     dens = fiesta.dtfe.delaunay_density4grid3D(
         x,
         y,
         z,
-        boxsize=100.0,
-        ngrid=64,
+        boxsize,
+        ngrid,
         periodic=[True, True, False],
     )
 
@@ -299,12 +314,15 @@ Partitioning is strongly recommended.
 
 .. code-block:: python
 
+    boxsize=100.0
+    ngrid=128
+    
     dens = fiesta.dtfe.delaunay_density4grid3D(
         x,
         y,
         z,
-        boxsize=100.0,
-        ngrid=128,
+        boxsize,
+        ngrid,
         partition=[2, 2, 2],
     )
 
@@ -326,13 +344,16 @@ Basic Example
 
     f = np.sin(x / 10.0) + np.cos(y / 10.0) + z / 50.0
 
+    boxsize=100.0
+    ngrid=64
+    
     field = fiesta.dtfe.delaunay_field4grid3D(
         x,
         y,
         z,
         f,
-        boxsize=100.0,
-        ngrid=64,
+        boxsize,
+        ngrid
     )
 
 Returning Coordinates
@@ -345,8 +366,8 @@ Returning Coordinates
         y,
         z,
         f,
-        boxsize=100.0,
-        ngrid=64,
+        boxsize,
+        ngrid,
         outputgrid=True,
     )
 
@@ -363,8 +384,8 @@ Exterior information is useful for debugging tessellation coverage.
     dens, exterior_border, pixID, count = fiesta.dtfe.delaunay_density4grid2D(
         x,
         y,
-        boxsize=100.0,
-        ngrid=128,
+        boxsize,
+        ngrid,
         outputexterior=True,
     )
 
@@ -382,8 +403,8 @@ Disabling Normalisation
     dens = fiesta.dtfe.delaunay_density4grid2D(
         x,
         y,
-        boxsize=100.0,
-        ngrid=128,
+        boxsize,
+        ngrid,
         normalise=False,
     )
 
@@ -398,8 +419,8 @@ The ``fbuffer`` parameter controls periodic boundary buffer size.
         x,
         y,
         z,
-        boxsize=100.0,
-        ngrid=64,
+        boxsize,
+        ngrid,
         fbuffer=0.3,
     )
 
@@ -440,8 +461,8 @@ Complete 2D workflow example:
     dens = fiesta.dtfe.delaunay_density4grid2D(
         x,
         y,
-        boxsize=200.0,
-        ngrid=256,
+        boxsize,
+        ngrid,
         partition=4,
         periodic=True,
         subsampling=2,

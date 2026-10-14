@@ -42,18 +42,21 @@ Example
 -------
 
 .. code-block:: python
-
+    
+    boxsize=100
+    ngrid=256
+    
     # To compute the density field
-    dgrid = fiesta.sph.sph4grid2D(x, y, boxsize=100, ngrid=256)
+    dgrid = fiesta.sph.sph4grid2D(x, y, boxsize, ngrid)
 
     # To compute the field
-    fgrid = fiesta.sph.sph4grid2D(x, y, boxsize=100, ngrid=256, f=f)
+    fgrid = fiesta.sph.sph4grid2D(x, y, boxsize, ngrid, f=f)
 
     # Compute the field and output the x and y grid
     fgrid, xg, yg = fiesta.sph.sph4grid2D(
         x, y,
-        boxsize=100,
-        ngrid=256,
+        boxsize,
+        ngrid,
         outputgrid=True
     )
 
@@ -92,17 +95,20 @@ Example
 
 .. code-block:: python
 
+    boxsize=100
+    ngrid=256
+
     # To compute the density field
-    dgrid = fiesta.sph.sph4grid3D(x, y, z, boxsize=100, ngrid=128)
+    dgrid = fiesta.sph.sph4grid3D(x, y, z, boxsize, ngrid)
 
     # To compute the field
-    fgrid = fiesta.sph.sph4grid3D(x, y, z, boxsize=100, ngrid=128, f=f)
+    fgrid = fiesta.sph.sph4grid3D(x, y, z, boxsize, ngrid, f=f)
 
     # Compute the field and output the x and y grid
     fgrid, xg, yg, zg = fiesta.sph.sph4grid3D(
         x, y, z,
-        boxsize=100,
-        ngrid=128,
+        boxsize,
+        ngrid,
         outputgrid=True
     )
 

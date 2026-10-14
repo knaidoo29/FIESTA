@@ -69,7 +69,7 @@ Example: 2D Distributed Interpolation
         x, y = None, None
 
     # Perform distributed bilinear interpolation.
-    x, y, f = mpiinterp.mpi_bilinear(fgrid, NGRID, BOXSIZE, x, y, MPI, periodic=True)
+    x, y, f = fiesta.interp.mpi_bilinear(fgrid, NGRID, BOXSIZE, x, y, MPI, periodic=True)
 
     # x, y, f now contain the interpolated values for points in the local slab of each rank.
 
@@ -125,7 +125,7 @@ Example: 3D Distributed Interpolation
         x, y, z = None, None, None
 
     # Perform distributed trilinear interpolation.
-    x, y, z, f = mpiinterp.mpi_trilinear(fgrid, NGRID, BOXSIZE, x, y, z, MPI, periodic=True)
+    x, y, z, f = fiesta.interp.mpi_trilinear(fgrid, NGRID, BOXSIZE, x, y, z, MPI, periodic=True)
 
     # x, y, z, f now contain the interpolated values for points in the local slab of each rank
 

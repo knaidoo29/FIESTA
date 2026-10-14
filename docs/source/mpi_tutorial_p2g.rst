@@ -38,42 +38,45 @@ them onto a 2D grid using the ``CIC`` interpolation scheme.
 
 .. code-block:: python
 
-   # Assuming correct initialisation of MPI object, see tutorial.
-   import numpy as np
-   import fiesta
+    # Assuming correct initialisation of MPI object, see tutorial.
+    import numpy as np
+    import fiesta
 
-   # Generate particles on root rank
-   if MPI.rank == 0:
+    # Generate particles on root rank
+    if MPI.rank == 0:
 
-       np.random.seed(0)
+        np.random.seed(0)
 
-       npart = 100000
+        npart = 100000
 
-       x = np.random.uniform(0.0, 1.0, npart)
-       y = np.random.uniform(0.0, 1.0, npart)
+        x = np.random.uniform(0.0, 1.0, npart)
+        y = np.random.uniform(0.0, 1.0, npart)
 
-       # Particle weights
-       f = np.ones(npart)
+        # Particle weights [optional, if None, assumes equal weights]
+        f = np.ones(npart)
 
-   else:
+    else:
 
-       x = None
-       y = None
-       f = None
+        x = None
+        y = None
+        f = None
 
-   # Interpolate particles onto the grid
-   fgrid = fiesta.mpi_part2grid2D(
-       x,
-       y,
-       f,
-       boxsize=1.0,
-       ngrid=256,
-       MPI=MPI,
-       method='CIC',
-       periodic=True
-   )
+    boxsize=1.0
+    ngrid=256
+    
+    # Interpolate particles onto the grid
+    fgrid = fiesta.p2g.mpi_part2grid2D(
+        x,
+        y,
+        boxsize,
+        ngrid,
+        f,
+        MPI,
+        method='CIC',
+        periodic=True
+    )
 
-   print(MPI.rank, fgrid.shape)
+    print(MPI.rank, fgrid.shape)
 
 Run using:
 
@@ -95,48 +98,52 @@ The following example performs distributed 3D particle-to-grid interpolation.
 
 .. code-block:: python
 
-   # Assuming correct initialisation of MPI object, see tutorial.
-   import numpy as np
-   import fiesta
+    # Assuming correct initialisation of MPI object, see tutorial.
+    import numpy as np
+    import fiesta
 
-   if MPI.rank == 0:
+    if MPI.rank == 0:
 
-       np.random.seed(0)
+        np.random.seed(0)
 
-       npart = 500000
+        npart = 500000
 
-       x = np.random.uniform(0.0, 1.0, npart)
-       y = np.random.uniform(0.0, 1.0, npart)
-       z = np.random.uniform(0.0, 1.0, npart)
+        x = np.random.uniform(0.0, 1.0, npart)
+        y = np.random.uniform(0.0, 1.0, npart)
+        z = np.random.uniform(0.0, 1.0, npart)
 
-       f = np.ones(npart)
+        # Particle weights [optional, if None, assumes equal weights]
+        f = np.ones(npart)
 
-   else:
+    else:
 
-       x = None
-       y = None
-       z = None
-       f = None
+        x = None
+        y = None
+        z = None
+        f = None
 
-   fgrid = fiesta.mpi_part2grid3D(
-       x,
-       y,
-       z,
-       f,
-       boxsize=1.0,
-       ngrid=128,
-       MPI=MPI,
-       method='TSC',
-       periodic=True
-   )
+    boxsize=1.0
+    ngrid=128
+    
+    fgrid = fiesta.mpi_part2grid3D(
+        x,
+        y,
+        z,
+        boxsize,
+        ngrid,
+        MPI,
+        f=f,
+        method='TSC',
+        periodic=True
+    )
 
-   print(MPI.rank, fgrid.shape)
+    print(MPI.rank, fgrid.shape)
 
 Run using:
 
 .. code-block:: bash
 
-   mpirun -np 8 python example_3d.py
+    mpirun -np 8 python example_3d.py
 
 Assignment Schemes
 ==================
@@ -179,9 +186,9 @@ For example:
 
 .. code-block:: text
 
-   Rank 0 -> x = [0 : nx0]
-   Rank 1 -> x = [nx0 : nx1]
-   Rank 2 -> x = [nx1 : nx2]
+    Rank 0 -> x = [0 : nx0]
+    Rank 1 -> x = [nx0 : nx1]
+    Rank 2 -> x = [nx1 : nx2]
 
 Each rank stores only its local section of the full grid.
 
@@ -194,11 +201,11 @@ Example:
 
 .. code-block:: python
 
-   grids = MPI.collect(fgrid)
+    grids = MPI.gather(fgrid)
 
-   if MPI.rank == 0:
+    if MPI.rank == 0:
 
-       full_grid = np.concatenate(grids, axis=0)
+        full_grid = np.concatenate(grids, axis=0)
 
 Memory Considerations
 =====================

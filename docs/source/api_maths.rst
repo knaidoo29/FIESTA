@@ -15,5 +15,9 @@ Finite difference differentiation in 2D/3D
 Matrices
 --------
 
+.. autofunction:: fiesta.maths.inv2by2
+.. autofunction:: fiesta.maths.inv3by3
+.. autofunction:: fiesta.maths.eig2by2
+.. autofunction:: fiesta.maths.symeig3by3
 .. autofunction:: fiesta.maths.det3by3
 .. autofunction:: fiesta.maths.det4by4

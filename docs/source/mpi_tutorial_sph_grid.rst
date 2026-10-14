@@ -27,21 +27,25 @@ Example
     # Assuming correct initialisation of MPI object, see tutorial.
     import fiesta
 
+    boxsize=100
+    ngrid=256
+    
     # compute density field
     dgrid = fiesta.sph.mpi_sph4grid2D(
         x, y,
-        boxsize=100,
-        ngrid=256,
-        MPI=MPI,
+        boxsize,
+        ngrid,
+        MPI,
         k=20
     )
 
     # compute field
     fgrid = fiesta.sph.mpi_sph4grid2D(
-        x, y, f=f,
-        boxsize=100,
-        ngrid=256,
-        MPI=MPI,
+        x, y, 
+        boxsize,
+        ngrid,
+        MPI,
+        f=f,
         k=20
     )
 
@@ -73,20 +77,24 @@ Example
     # Assuming correct initialisation of MPI object, see tutorial.
     import fiesta
 
+    boxsize=[200, 200, 200]
+    ngrid=128
+
     # compute density field
     dgrid = fiesta.sph.mpi_sph4grid3D(
         x, y, z,
-        boxsize=[200, 200, 200],
-        ngrid=128,
-        MPI=MPI,
+        boxsize,
+        ngrid,
+        MPI,
         k=32
     )
 
     # compute field
     fgrid = fiesta.sph.mpi_sph4grid3D(
-        x, y, z, f=f,
-        boxsize=[200, 200, 200],
-        ngrid=128,
-        MPI=MPI,
+        x, y, z,
+        boxsize,
+        ngrid,
+        MPI,
+        f=f,
         k=32
     )

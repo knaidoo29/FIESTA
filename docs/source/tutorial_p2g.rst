@@ -46,125 +46,185 @@ Example: 2D Grid Assignment Densities
 =====================================
 
 .. code-block:: python
+    
+    import numpy as np
+    import fiesta
+    
+    np.random.seed(0)
+    
+    x = np.random.uniform(0, 1, 10000)
+    y = np.random.uniform(0, 1, 10000)
 
-   import numpy as np
-   import fiesta
+    boxsize=1.0
+    ngrid=256
 
-   np.random.seed(0)
+    # if all points have equal weight/mass 
+    
+    dgrid = fiesta.p2g.part2grid2D(
+        x, y,
+        boxsize,
+        ngrid,
+        method="CIC"
+    )
 
-   x = np.random.uniform(0, 1, 10000)
-   y = np.random.uniform(0, 1, 10000)
-
-   # f here represent particle weights/masses, we will assume they are all equal.
-   f = np.ones_like(x)
-
-   dgrid = fiesta.part2grid2D(
-       x, y, f,
-       boxsize=1.0,
-       ngrid=256,
-       method='CIC'
-   )
+    # or if points have different weights/mass, specify
+    f = # weight
+    
+    dgrid = fiesta.p2g.part2grid2D(
+        x, y,
+        boxsize,
+        ngrid,
+        f=f,
+        method="CIC"
+    )
 
 Example: 2D Grid Assignment Fields
 ==================================
 
 .. code-block:: python
 
-   import numpy as np
-   import fiesta
+    import numpy as np
+    import fiesta
 
-   np.random.seed(0)
+    np.random.seed(0)
 
-   x = np.random.uniform(0, 1, 10000)
-   y = np.random.uniform(0, 1, 10000)
+    x = np.random.uniform(0, 1, 10000)
+    y = np.random.uniform(0, 1, 10000)
 
-   # f here represent particle weights/masses, we will assume they are all equal.
-   f = np.ones_like(x)
+    boxsize=1.0
+    ngrid=256
 
-   dgrid = fiesta.part2grid2D(
-       x, y, f,
-       boxsize=1.0,
-       ngrid=256,
-       method='CIC'
-   )
+    # if all points have equal weight/mass 
 
-   # Let's assume we have velocities and we want to compute the velocity field.
-   v = np.random.uniform(x)
+    dgrid = fiesta.p2g.part2grid2D(
+        x, y,
+        boxsize,
+        ngrid,
+        method='CIC'
+    )
 
-   vgrid = fiesta.part2grid2D(
-       x, y, v,
-       boxsize=1.0,
-       ngrid=256,
-       method='CIC'
-   )
+    # or if points have different weights/mass, specify
+    f = # weight
 
-   # vgrid is a momentum field since it weights the grid by the number of points 
-   # so we must normalise to get the correct field values.
+    dgrid = fiesta.p2g.part2grid2D(
+        x, y,
+        boxsize,
+        ngrid,
+        f=f,
+        method='CIC'
+    )
 
-   vgrid /= dgrid
+    # Let's assume we have velocities and we want to compute the velocity field.
+    v = np.random.uniform(x)
+
+    vgrid = fiesta.p2g.part2grid2D(
+        x, y,
+        boxsize,
+        ngrid,
+        f=v,
+        method='CIC'
+    )
+
+    # vgrid is a momentum field since it weights the grid by the number of points 
+    # so we must normalise to get the correct field values.
+
+    cond = np.where(dgrid > 0) # protect against division by zero
+
+    vgrid[cond] /= dgrid[cond]
+
 
 Example: 3D Grid Assignment Densities
 =====================================
 
 .. code-block:: python
 
-   import numpy as np
-   import fiesta
+    import numpy as np
+    import fiesta
 
-   np.random.seed(0)
+    np.random.seed(0)
 
-   x = np.random.uniform(0, 1, 10000)
-   y = np.random.uniform(0, 1, 10000)
-   z = np.random.uniform(0, 1, 10000)
+    x = np.random.uniform(0, 1, 10000)
+    y = np.random.uniform(0, 1, 10000)
+    z = np.random.uniform(0, 1, 10000)
 
-   # f here represent particle weights/masses, we will assume they are all equal.
-   f = np.ones_like(x)
+    boxsize=1.0
+    ngrid=256
 
-   dgrid = fiesta.part2grid3D(
-       x, y, z, f,
-       boxsize=1.0,
-       ngrid=256,
-       method='TSC'
-   )
+    # if all points have equal weight/mass 
+
+    dgrid = fiesta.p2g.part2grid3D(
+        x, y, z,
+        boxsize,
+        ngrid,
+        method="TSC"
+    )
+
+    # or if points have different weights/mass, specify
+    f = # weight
+
+    dgrid = fiesta.p2g.part2grid3D(
+        x, y, z,
+        boxsize,
+        ngrid,
+        f=f,
+        method='TSC'
+    )
 
 Example: 3D Grid Assignment Fields
 ==================================
 
 .. code-block:: python
 
-   import numpy as np
-   import fiesta
+    import numpy as np
+    import fiesta
 
-   np.random.seed(0)
+    np.random.seed(0)
 
-   x = np.random.uniform(0, 1, 10000)
-   y = np.random.uniform(0, 1, 10000)
-   z = np.random.uniform(0, 1, 10000)
+    x = np.random.uniform(0, 1, 10000)
+    y = np.random.uniform(0, 1, 10000)
+    z = np.random.uniform(0, 1, 10000)
 
-   # f here represent particle weights/masses, we will assume they are all equal.
-   f = np.ones_like(x)
+    boxsize=1.0
+    ngrid=256
 
-   dgrid = fiesta.part2grid3D(
-       x, y, z, f,
-       boxsize=1.0,
-       ngrid=256,
-       method='TSC'
-   )
+    # if all points have equal weight/mass 
 
-   # Let's assume we have velocities and we want to compute the velocity field.
-   v = np.random.uniform(x)
+    dgrid = fiesta.p2g.part2grid3D(
+        x, y, z,
+        boxsize,
+        ngrid,
+        method="TSC"
+    )
 
-   vgrid = fiesta.part2grid3D(
-       x, y, z, v,
-       boxsize=1.0,
-       ngrid=256,
-       method='TSC'
-   )
+    # or if points have different weights/mass, specify
+    f = # weight
 
-   # vgrid is a momentum field since it weights the grid by the number of points 
-   # so we must normalise to get the correct field values.
+    dgrid = fiesta.p2g.part2grid3D(
+        x, y, z,
+        boxsize,
+        ngrid,
+        f=f,
+        method='TSC'
+    )
 
-   vgrid /= dgrid
+    # Let's assume we have velocities and we want to compute the velocity field.
+    v = np.random.uniform(x)
+
+    vgrid = fiesta.p2g.part2grid3D(
+        x, y, z,
+        boxsize,
+        ngrid,
+        f=v,
+        method='TSC'
+    )
+
+    # vgrid is a momentum field since it weights the grid by the number of points 
+    # so we must normalise to get the correct field values.
+
+    cond = np.where(dgrid > 0) # protect against division by zero
+
+    vgrid[cond] /= dgrid[cond]
+
 
 API Reference
 =============

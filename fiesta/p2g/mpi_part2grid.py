@@ -2,9 +2,13 @@ import numpy as np
 import shift
 
 from typing import List, Union
-from .. import coords
-from . import part2grid
 
+from . import part2grid_ngp
+from . import part2grid_cic
+from . import part2grid_tsc
+from . import part2grid_pcs
+
+from .. import coords
 
 def mpi_part2grid2D(
     x: np.ndarray,
@@ -196,7 +200,7 @@ def mpi_part2grid2D(
     if method == "NGP":
 
         if fexist:
-            fgrid = part2grid.part2grid_ngp_2d(
+            fgrid = part2grid_ngp.part2grid_ngp_2d(
                 x, y, f,
                 xlength, ylength,
                 xmin, ymin,
@@ -204,7 +208,7 @@ def mpi_part2grid2D(
                 dtype=dtype,
             )
         else:
-            fgrid = part2grid.part2grid_ngp_2d_unit(
+            fgrid = part2grid_ngp.part2grid_ngp_2d_unit(
                 x, y,
                 xlength, ylength,
                 xmin, ymin,
@@ -215,7 +219,7 @@ def mpi_part2grid2D(
     elif method == "CIC":
 
         if fexist:
-            fgrid = part2grid.part2grid_cic_2d(
+            fgrid = part2grid_cic.part2grid_cic_2d(
                 x, y, f,
                 xlength, ylength,
                 xmin, ymin,
@@ -224,7 +228,7 @@ def mpi_part2grid2D(
                 dtype=dtype,
             )
         else:
-            fgrid = part2grid.part2grid_cic_2d_unit(
+            fgrid = part2grid_cic.part2grid_cic_2d_unit(
                 x, y,
                 xlength, ylength,
                 xmin, ymin,
@@ -236,7 +240,7 @@ def mpi_part2grid2D(
     elif method == "TSC":
 
         if fexist:
-            fgrid = part2grid.part2grid_tsc_2d(
+            fgrid = part2grid_tsc.part2grid_tsc_2d(
                 x, y, f,
                 xlength, ylength,
                 xmin, ymin,
@@ -245,7 +249,7 @@ def mpi_part2grid2D(
                 dtype=dtype,
             )
         else:
-            fgrid = part2grid.part2grid_tsc_2d_unit(
+            fgrid = part2grid_tsc.part2grid_tsc_2d_unit(
                 x, y,
                 xlength, ylength,
                 xmin, ymin,
@@ -257,7 +261,7 @@ def mpi_part2grid2D(
     else:  # PCS
 
         if fexist:
-            fgrid = part2grid.part2grid_pcs_2d(
+            fgrid = part2grid_pcs.part2grid_pcs_2d(
                 x, y, f,
                 xlength, ylength,
                 xmin, ymin,
@@ -266,7 +270,7 @@ def mpi_part2grid2D(
                 dtype=dtype,
             )
         else:
-            fgrid = part2grid.part2grid_pcs_2d_unit(
+            fgrid = part2grid_pcs.part2grid_pcs_2d_unit(
                 x, y,
                 xlength, ylength,
                 xmin, ymin,
@@ -299,6 +303,7 @@ def mpi_part2grid2D(
             fgrid[-nhalo:] += fgrid_send_down
 
     return fgrid
+
 
 def mpi_part2grid3D(
     x: np.ndarray,
@@ -501,7 +506,7 @@ def mpi_part2grid3D(
     if method == "NGP":
 
         if fexist:
-            fgrid = part2grid.part2grid_ngp_3d(
+            fgrid = part2grid_ngp.part2grid_ngp_3d(
                 x,
                 y,
                 z,
@@ -518,7 +523,7 @@ def mpi_part2grid3D(
                 dtype=dtype,
             )
         else:
-            fgrid = part2grid.part2grid_ngp_3d_unit(
+            fgrid = part2grid_ngp.part2grid_ngp_3d_unit(
                 x,
                 y,
                 z,
@@ -537,7 +542,7 @@ def mpi_part2grid3D(
     elif method == "CIC":
 
         if fexist:
-            fgrid = part2grid.part2grid_cic_3d(
+            fgrid = part2grid_cic.part2grid_cic_3d(
                 x,
                 y,
                 z,
@@ -557,7 +562,7 @@ def mpi_part2grid3D(
                 dtype=dtype,
             )
         else:
-            fgrid = part2grid.part2grid_cic_3d_unit(
+            fgrid = part2grid_cic.part2grid_cic_3d_unit(
                 x,
                 y,
                 z,
@@ -579,7 +584,7 @@ def mpi_part2grid3D(
     elif method == "TSC":
 
         if fexist:
-            fgrid = part2grid.part2grid_tsc_3d(
+            fgrid = part2grid_tsc.part2grid_tsc_3d(
                 x,
                 y,
                 z,
@@ -599,7 +604,7 @@ def mpi_part2grid3D(
                 dtype=dtype,
             )
         else:
-            fgrid = part2grid.part2grid_tsc_3d_unit(
+            fgrid = part2grid_tsc.part2grid_tsc_3d_unit(
                 x,
                 y,
                 z,
@@ -621,7 +626,7 @@ def mpi_part2grid3D(
     else:  # PCS
 
         if fexist:
-            fgrid = part2grid.part2grid_pcs_3d(
+            fgrid = part2grid_pcs.part2grid_pcs_3d(
                 x,
                 y,
                 z,
@@ -641,7 +646,7 @@ def mpi_part2grid3D(
                 dtype=dtype,
             )
         else:
-            fgrid = part2grid.part2grid_pcs_3d_unit(
+            fgrid = part2grid_pcs.part2grid_pcs_3d_unit(
                 x,
                 y,
                 z,

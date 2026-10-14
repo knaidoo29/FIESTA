@@ -47,12 +47,15 @@ Minimal Example: Density
     x = np.random.uniform(0, 1000, N)
     y = np.random.uniform(0, 1000, N)
 
+    boxsize=1000.0
+    ngrid=256
+
     rho = fiesta.dtfe.mpi_delaunay_density4grid2D(
-        x=x,
-        y=y,
-        boxsize=1000.0,
-        ngrid=256,
-        MPI=MPI,
+        x,
+        y,
+        boxsize,
+        ngrid,
+        MPI,
         periodic=True
     )
 
@@ -66,14 +69,18 @@ Mass Weighting
     # Assuming correct initialisation of MPI object, see tutorial.
     import fiesta
 
-    field = fiesta.dtfe.mpi_delaunay_field4grid2D(
-        x=x,
-        y=y,
-        f=temperature,
-        mass=particle_mass,
-        boxsize=1000,
-        ngrid=256,
-        MPI=MPI
+    mass = # point masses
+
+    boxsize=1000
+    ngrid=256
+
+    field = fiesta.dtfe.mpi_delaunay_density4grid2D(
+        x,
+        y,
+        boxsize,
+        ngrid,
+        MPI,
+        mass=mass
     )
 
 With Coordinate Output
@@ -84,12 +91,15 @@ With Coordinate Output
     # Assuming correct initialisation of MPI object, see tutorial.
     import fiesta
 
+    boxsize=1000
+    ngrid=256
+
     rho, x2d, y2d = fiesta.dtfe.mpi_delaunay_density4grid2D(
         x,
         y,
-        boxsize=1000,
-        ngrid=256,
-        MPI=MPI,
+        boxsize, 
+        ngrid,
+        MPI,
         outputgrid=True
     )
 
@@ -101,7 +111,19 @@ this function uses particle field values:
 
 .. code-block:: python
     
-    f
+    f = # field values of points.
+
+    boxsize=1000
+    ngrid=256
+
+    field = fiesta.dtfe.mpi_delaunay_field4grid2D(
+        x,
+        y,
+        f,
+        boxsize,
+        ngrid,
+        MPI
+    )
 
 Example: Temperature Interpolation
 ----------------------------------
@@ -112,15 +134,18 @@ Example: Temperature Interpolation
     import numpy as np
     import fiesta
 
+    boxsize=1000
+    ngrid=256
+    
     temperature = np.sin(x / 100.0) * np.cos(y / 100.0)
 
     field = fiesta.dtfe.mpi_delaunay_field4grid2D(
-        x=x,
-        y=y,
-        f=temperature,
-        boxsize=1000,
-        ngrid=256,
-        MPI=MPI,
+        x,
+        y,
+        temperature,
+        boxsize,
+        ngrid,
+        MPI,
         periodic=True
     )
 
@@ -145,13 +170,16 @@ Example
     y = np.random.uniform(0, 500, N)
     z = np.random.uniform(0, 500, N)
 
+    boxsize=500.0
+    ngrid=256
+    
     rho = fiesta.dtfe.mpi_delaunay_density4grid3D(
-        x=x,
-        y=y,
-        z=z,
-        boxsize=500.0,
-        ngrid=256,
-        MPI=MPI,
+        x,
+        y,
+        z,
+        boxsize,
+        ngrid,
+        MPI,
         periodic=True,
         subsampling=2
     )
@@ -178,16 +206,19 @@ Example
     import numpy as np
     import fiesta
 
+    boxsize=500
+    ngrid=256
+
     velocity_divergence = np.random.normal(size=N)
 
     field = fiesta.dtfe.mpi_delaunay_field4grid3D(
-        x=x,
-        y=y,
-        z=z,
-        f=velocity_divergence,
-        boxsize=500,
-        ngrid=256,
-        MPI=MPI,
+        x,
+        y,
+        z,
+        velocity_divergence,
+        boxsize,
+        ngrid,
+        MPI,
         periodic=True
     )
 
@@ -269,5 +300,5 @@ API Reference
 .. autofunction:: fiesta.dtfe.mpi_delaunay_density4grid3D
     :no-index:
 
-.. autofunction:: fiesta.dtfe.mpi_delaunay_field4grid2D
+.. autofunction:: fiesta.dtfe.mpi_delaunay_field4grid3D
     :no-index:

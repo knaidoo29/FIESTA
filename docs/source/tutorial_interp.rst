@@ -107,11 +107,13 @@ Example:
 
 .. code-block:: python
 
+    boxsize=[10.0, 20.0]
+
     f = fiesta.interp.bilinear(
         fgrid,
-        boxsize=[10.0, 20.0],
-        x=x,
-        y=y,
+        boxsize,
+        x,
+        y,
         periodic=[True, False],
     )
 
@@ -122,11 +124,13 @@ Shift the coordinate system origin.
 
 .. code-block:: python
 
+    boxsize=10.0
+
     f = fiesta.interp.bilinear(
         fgrid,
-        boxsize=10.0,
-        x=x,
-        y=y,
+        boxsize,
+        x,
+        y,
         origin=-5.0,
     )
 
@@ -149,11 +153,13 @@ Example:
 
     x = np.array([-1.0, 5.0, 12.0])
 
+    boxsize=10.0,
+
     f = fiesta.interp.bilinear(
         fgrid,
-        boxsize=10.0,
-        x=x,
-        y=y,
+        boxsize,
+        x,
+        y,
         periodic=False,
         fill_value=np.nan,
     )
@@ -266,12 +272,14 @@ Example:
 
 .. code-block:: python
 
+    boxsize=[10.0, 10.0, 50.0]
+
     f = fiesta.interp.trilinear(
         fgrid,
-        boxsize=[10.0, 10.0, 50.0],
-        x=x,
-        y=y,
-        z=z,
+        boxsize,
+        x,
+        y,
+        z,
         periodic=[True, True, False],
     )
 
@@ -280,12 +288,14 @@ Using Custom Origins
 
 .. code-block:: python
 
+    boxsize=10.0
+
     f = fiesta.interp.trilinear(
         fgrid,
-        boxsize=10.0,
-        x=x,
-        y=y,
-        z=z,
+        boxsize,
+        x,
+        y,
+        z,
         origin=-5.0,
     )
 

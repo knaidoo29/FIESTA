@@ -409,8 +409,8 @@ class Delaunay3D:
                 & (np.abs(D) > 1e-12 * scale)
             )[0]
 
-            if len(cond) == 0:
-                continue
+            if len(cond) == 0: # pragma: no cover
+                continue 
 
             # Calculate the circumcircle centre and radius
             offset = np.linalg.solve(A[cond], B[cond, :, None])[:, :, 0]

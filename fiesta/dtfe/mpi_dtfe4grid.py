@@ -23,7 +23,7 @@ def mpi_delaunay_density4grid2D(
     fbuffer: float = 0.5,
     subsampling: int = 1,
     outputgrid: bool = False,
-    check_distributed: bool = False
+    check_distributed: bool = True
 ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
     """
     Returns the Delaunay tesselation density on a grid.

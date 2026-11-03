@@ -1006,6 +1006,12 @@ def delaunay_density4grid3D(
                 pixID = np.delete(pixID, cond[cond2])
                 count = np.delete(count, cond[cond2])
 
+                border = dtfe.get_border()
+
+                if border["simplices"].size:
+                    assert np.all(border["simplices"] >= 0)
+                    assert np.max(border["simplices"]) < len(border["x"])
+                
                 dict_boundary2.append(dtfe.get_border())
 
             dtfe.clean()
@@ -1049,6 +1055,12 @@ def delaunay_density4grid3D(
             cond2 = np.where(count[cond] == len(dx3d))[0]
             pixID = np.delete(pixID, cond[cond2])
             count = np.delete(count, cond[cond2])
+                
+            border = dtfe.get_border()
+            
+            if border["simplices"].size:
+                assert np.all(border["simplices"] >= 0)
+                assert np.max(border["simplices"]) < len(border["x"])
 
             dict_boundary3.append(dtfe.get_border())
 
@@ -1094,6 +1106,12 @@ def delaunay_density4grid3D(
         pixID = np.delete(pixID, cond[cond2])
         count = np.delete(count, cond[cond2])
 
+        border = dtfe.get_border()
+
+        if border["simplices"].size:
+            assert np.all(border["simplices"] >= 0)
+            assert np.max(border["simplices"]) < len(border["x"])
+        
         exterior_border = dtfe.get_border()
 
     else:
@@ -1145,6 +1163,7 @@ def delaunay_density4grid3D(
 
         dtfe.run(boundary, apply_filter=True)
 
+        # Continue with your existing interpolation
         cond = np.where(
             (x3d[pixID] >= boundary[0])
             & (x3d[pixID] < boundary[1])
@@ -1170,8 +1189,14 @@ def delaunay_density4grid3D(
         pixID = np.delete(pixID, cond[cond2])
         count = np.delete(count, cond[cond2])
 
+        border = dtfe.get_border()
+        
+        if border["simplices"].size:
+            assert np.all(border["simplices"] >= 0)
+            assert np.max(border["simplices"]) < len(border["x"])
+        
         exterior_border = dtfe.get_border()
-
+    
     if normalise:
         dens /= len(dx3d)
         cond = np.where(count == 0.0)[0]

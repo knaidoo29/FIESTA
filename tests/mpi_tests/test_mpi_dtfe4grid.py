@@ -243,3 +243,81 @@ def test_mpi_delaunay_field4grid3D_outputgrid_returns_local_grid_and_coords():
     assert np.all(np.isfinite(x3d))
     assert np.all(np.isfinite(y3d))
     assert np.all(np.isfinite(z3d))
+
+
+@pytest.mark.parametrize(
+    "ndim, field_mode",
+    [
+        (2, False),
+        (2, True),
+        (3, False),
+        (3, True),
+    ],
+)
+def test_mpi_delaunay_root_only_input(ndim, field_mode):
+    """Test particle redistribution when only rank 0 supplies data."""
+    mpi = MPI()
+
+    if mpi.size == 1:
+        pytest.skip("Requires at least two MPI ranks.")
+
+    rng = np.random.default_rng(1234)
+    ngrid = max(8, 2 * mpi.size)
+
+    if mpi.rank == 0:
+        npart = 256 if ndim == 2 else 800
+        x = rng.random(npart)
+        y = rng.random(npart)
+        z = rng.random(npart) if ndim == 3 else None
+        f = np.ones(npart)
+    else:
+        x = None
+        y = None
+        z = None
+        f = None
+
+    kwargs = {
+        "partition": 1,
+        "periodic": [False] * ndim,
+        "fbuffer": 0.25,
+        "subsampling": 1,
+        "outputgrid": True,
+        "check_distributed": True,
+    }
+
+    if ndim == 2:
+        if field_mode:
+            result = mpi_delaunay_field4grid2D(
+                x, y, f, 1.0, ngrid, mpi, **kwargs
+            )
+        else:
+            result = mpi_delaunay_density4grid2D(
+                x, y, 1.0, ngrid, mpi, **kwargs
+            )
+    else:
+        if field_mode:
+            result = mpi_delaunay_field4grid3D(
+                x, y, z, f, 1.0, ngrid, mpi, **kwargs
+            )
+        else:
+            result = mpi_delaunay_density4grid3D(
+                x, y, z, 1.0, ngrid, mpi, **kwargs
+            )
+
+    grid, *coordinates = result
+
+    assert_mpi_local_shape(grid, [ngrid] * ndim, mpi)
+    assert np.all(np.isfinite(grid))
+    assert len(coordinates) == ndim
+
+    for coord in coordinates:
+        assert coord.ndim == 1
+        assert coord.size == grid.size
+        assert np.all(np.isfinite(coord))
+
+    # Ensure that the redistributed particles produce a nonzero field.
+    local_nonzero = np.count_nonzero(grid)
+    total_nonzero = mpi.Sum(local_nonzero)
+    total_nonzero = mpi.bcast(total_nonzero)
+
+    assert total_nonzero > 0

@@ -251,6 +251,7 @@ def delaunay_estimate_3d(
 
 class Delaunay3D:
 
+
     def __init__(self) -> None:
         """
         Initialises the class function.
@@ -278,6 +279,7 @@ class Delaunay3D:
         self.f0 = None
         self.delf0 = None
         self.verbose = True
+
 
     def setup(
         self,
@@ -313,6 +315,7 @@ class Delaunay3D:
             self.mass = mass
         self.points = coords.coord2points([self.x, self.y, self.z])
 
+
     def _check_delaunay(self) -> None:
         """
         This will test whether the delaunay tesselation is fully connected, and test and correct
@@ -336,6 +339,7 @@ class Delaunay3D:
                 self.mass[idxnearest] += self.mass[idx]
                 self.mass[idx] = 0.0
 
+
     def construct(self) -> None:
         """
         Construct Delaunay triangulation.
@@ -344,108 +348,80 @@ class Delaunay3D:
         self.simplices = self.delaunay.simplices
         self._check_delaunay()
 
-    def get_circumcircles(self) -> None:
+
+    def get_circumsphere(self) -> None:
         """
-        Computes the circumcirles centers and radius for all simplices.
+        Computes the circumcircle centres and radii for all simplices.
         """
-        x0, y0, z0 = (
-            self.x[self.simplices[:, 0]],
-            self.y[self.simplices[:, 0]],
-            self.z[self.simplices[:, 0]],
-        )
-        x1, y1, z1 = (
-            self.x[self.simplices[:, 1]],
-            self.y[self.simplices[:, 1]],
-            self.z[self.simplices[:, 1]],
-        )
-        x2, y2, z2 = (
-            self.x[self.simplices[:, 2]],
-            self.y[self.simplices[:, 2]],
-            self.z[self.simplices[:, 2]],
-        )
-        x3, y3, z3 = (
-            self.x[self.simplices[:, 3]],
-            self.y[self.simplices[:, 3]],
-            self.z[self.simplices[:, 3]],
-        )
-        one = np.ones(len(x0))
-        D = 2 * maths.det4by4(
-            x0, y0, z0, one, x1, y1, z1, one, x2, y2, z2, one, x3, y3, z3, one
-        )
-        cond = np.where(D != 0.0)[0]
-        A0 = x0**2 + y0**2 + z0**2
-        A1 = x1**2 + y1**2 + z1**2
-        A2 = x2**2 + y2**2 + z2**2
-        A3 = x3**2 + y3**2 + z3**2
-        self.circumcircles = np.nan * np.ones((len(x0), 4))
-        self.circumcircles[cond, 0] = (
-            maths.det4by4(
-                A0[cond],
-                y0[cond],
-                z0[cond],
-                one[cond],
-                A1[cond],
-                y1[cond],
-                z1[cond],
-                one[cond],
-                A2[cond],
-                y2[cond],
-                z2[cond],
-                one[cond],
-                A3[cond],
-                y3[cond],
-                z3[cond],
-                one[cond],
+        nsimp = len(self.simplices)
+        self.circumcircles = np.nan * np.ones((nsimp, 4))
+
+        batch_size = 50000
+
+        for i in range(0, nsimp, batch_size):
+            simplices = self.simplices[i:i + batch_size]
+
+            x0, y0, z0 = (
+                self.x[simplices[:, 0]],
+                self.y[simplices[:, 0]],
+                self.z[simplices[:, 0]],
             )
-            / D[cond]
-        )
-        self.circumcircles[cond, 1] = (
-            maths.det4by4(
-                x0[cond],
-                A0[cond],
-                z0[cond],
-                one[cond],
-                x1[cond],
-                A1[cond],
-                z1[cond],
-                one[cond],
-                x2[cond],
-                A2[cond],
-                z2[cond],
-                one[cond],
-                x3[cond],
-                A3[cond],
-                z3[cond],
-                one[cond],
+            x1, y1, z1 = (
+                self.x[simplices[:, 1]],
+                self.y[simplices[:, 1]],
+                self.z[simplices[:, 1]],
             )
-            / D[cond]
-        )
-        self.circumcircles[cond, 2] = (
-            maths.det4by4(
-                x0[cond],
-                y0[cond],
-                A0[cond],
-                one[cond],
-                x1[cond],
-                y1[cond],
-                A1[cond],
-                one[cond],
-                x2[cond],
-                y2[cond],
-                A2[cond],
-                one[cond],
-                x3[cond],
-                y3[cond],
-                A3[cond],
-                one[cond],
+            x2, y2, z2 = (
+                self.x[simplices[:, 2]],
+                self.y[simplices[:, 2]],
+                self.z[simplices[:, 2]],
             )
-            / D[cond]
-        )
-        self.circumcircles[cond, 3] = np.sqrt(
-            (x0[cond] - self.circumcircles[cond, 0]) ** 2
-            + (y0[cond] - self.circumcircles[cond, 1]) ** 2
-            + (z0[cond] - self.circumcircles[cond, 2]) ** 2
-        )
+            x3, y3, z3 = (
+                self.x[simplices[:, 3]],
+                self.y[simplices[:, 3]],
+                self.z[simplices[:, 3]],
+            )
+
+            # Coordinates relative to the first vertex
+            a = np.column_stack((x1 - x0, y1 - y0, z1 - z0))
+            b = np.column_stack((x2 - x0, y2 - y0, z2 - z0))
+            c = np.column_stack((x3 - x0, y3 - y0, z3 - z0))
+
+            # Construct the linear system
+            A = np.stack((a, b, c), axis=1)
+            B = 0.5 * np.column_stack((
+                np.sum(a**2, axis=1),
+                np.sum(b**2, axis=1),
+                np.sum(c**2, axis=1),
+            ))
+
+            # Identify non-degenerate simplices
+            D = np.linalg.det(A)
+            scale = (
+                np.linalg.norm(a, axis=1)
+                * np.linalg.norm(b, axis=1)
+                * np.linalg.norm(c, axis=1)
+            )
+
+            cond = np.where(
+                np.isfinite(D)
+                & np.isfinite(scale)
+                & (np.abs(D) > 1e-12 * scale)
+            )[0]
+
+            if len(cond) == 0: # pragma: no cover
+                continue 
+
+            # Calculate the circumcircle centre and radius
+            offset = np.linalg.solve(A[cond], B[cond, :, None])[:, :, 0]
+
+            idx = i + cond
+
+            self.circumcircles[idx, 0] = x0[cond] + offset[:, 0]
+            self.circumcircles[idx, 1] = y0[cond] + offset[:, 1]
+            self.circumcircles[idx, 2] = z0[cond] + offset[:, 2]
+            self.circumcircles[idx, 3] = np.linalg.norm(offset, axis=1)
+
 
     def get_solid_angle(
         self,
@@ -532,6 +508,7 @@ class Delaunay3D:
         solid_angle = 2 * abs(np.arctan2(num, den))
         return solid_angle
 
+
     def get_solid_angle_total(self) -> None:
         """
         Determines the total solid angle subtended by simplices attached to each points.
@@ -570,6 +547,7 @@ class Delaunay3D:
         )
         np.add.at(self.solid_angle_total, id3, solid_angle)
 
+
     def get_boundary_simplex(self) -> None:
         """
         Determines whether a simplex circumcircle crosses boundaries.
@@ -593,6 +571,7 @@ class Delaunay3D:
         self.cross_boundary[cond, 4] = 1.0
         cond = np.where(zc + r >= self.boundary[5])[0]
         self.cross_boundary[cond, 5] = 1.0
+
 
     def determine_delaunay_boundary(self) -> None:
         """
@@ -637,15 +616,17 @@ class Delaunay3D:
         cond = np.where(self.point_type[idxs] != -1)[0]
         self.point_type[idxs[cond]] = 0.0
 
+
     def run(self) -> None:
         """
         Run Delaunay tesselation and compute boundary information.
         """
         self.construct()
-        self.get_circumcircles()
+        self.get_circumsphere()
         self.get_solid_angle_total()
         self.get_boundary_simplex()
         self.determine_delaunay_boundary()
+
 
     def get_volume(self) -> None:
         """
@@ -659,6 +640,7 @@ class Delaunay3D:
         self.delaunay_volume = delaunay_volume_3d(
             x, y, z, del_vert0, del_vert1, del_vert2, del_vert3
         )
+
 
     def get_dens(self) -> None:
         """
@@ -679,6 +661,7 @@ class Delaunay3D:
             len(self.points),
         )
         self.point_dens = self.mass / point_volume
+
 
     def set_field(self, f: np.ndarray) -> None:
         """
@@ -707,12 +690,14 @@ class Delaunay3D:
         )
         self.dtfe_mode = "field"
 
+
     def set_field2dens(self) -> None:
         """
         Sets the field values to the density.
         """
         self.set_field(self.point_dens)
         self.dtfe_mode = "density"
+
 
     def find_simplex(
         self,
@@ -740,6 +725,7 @@ class Delaunay3D:
         points = coords.xyz2points(x, y, z)
         simplices = self.delaunay.find_simplex(points)
         return simplices
+
 
     def estimate(
         self,
@@ -790,6 +776,7 @@ class Delaunay3D:
         )
         return f_est
 
+
     def get_border(self) -> dict:
         """
         Returns border points and simplices.
@@ -813,10 +800,29 @@ class Delaunay3D:
         else:
             border["f"] = self.f[cond]
         border["dtfe_mode"] = self.dtfe_mode
+
+        # Verify that all vertices of exported simplices
+        # are also included among exported particles.
         cond = np.where(self.simptypes != 1)[0]
-        border["simplices"] = keep_idx[self.simplices[cond]]
+
+        simplices = self.simplices[cond]
+        mapped = keep_idx[simplices]
+
+        if np.any(mapped < 0):
+            missing = np.unique(
+                simplices[mapped < 0]
+            )
+
+            raise RuntimeError(
+                f"Invalid Delaunay border: {len(missing)} "
+                f"vertices are missing from the exported particles."
+            )
+
+        border["simplices"] = mapped
         border["simptypes"] = self.simptypes[cond]
+        
         return border
+
 
     def clean(self) -> None:
         """
@@ -826,6 +832,7 @@ class Delaunay3D:
 
 
 class DelaunayMerger3D:
+
 
     def __init__(self) -> None:
         """
@@ -844,6 +851,7 @@ class DelaunayMerger3D:
         self.simptypes = []
         self.dtfe_mode = None
         self.dtfe = None
+
 
     def add_border(self, border: dict) -> None:
         """
@@ -873,6 +881,7 @@ class DelaunayMerger3D:
         self.simplices.append(idx2globalidx[border["simplices"]])
         self.simptypes.append(border["simptypes"])
 
+
     def _concatenate(self) -> None:
         """
         Concatenates all border points and simplices.
@@ -886,6 +895,7 @@ class DelaunayMerger3D:
         self.ptypes = np.concatenate(self.ptypes)
         self.simplices = np.concatenate(self.simplices)
         self.simptypes = np.concatenate(self.simptypes)
+
 
     def _filter(self, boundary: List[float]) -> None:
         """
@@ -923,6 +933,7 @@ class DelaunayMerger3D:
         )[0]
         self.simplices = keep_idx[self.simplices[cond]]
         self.simptypes = self.simptypes[cond]
+
 
     def run(self, boundary: List[float], apply_filter: bool = False) -> None:
         """
@@ -964,7 +975,22 @@ class DelaunayMerger3D:
             & (self.ptypes[self.dtfe.simplices[:, 2]] == 0.0)
             & (self.ptypes[self.dtfe.simplices[:, 3]] == 0.0)
         )[0]
+
+        # Exclude previously established simplices.
         self.dtfe.simptypes[cond] = -1.0
+
+        # Ensure all vertices of these simplices are retained
+        # when exporting the exterior border.
+        if len(cond) > 0:
+            vertices = np.unique(
+                self.dtfe.simplices[cond].flatten()
+            )
+
+            # Convert type 1 to type 0, preserving types 0 and -1.
+            self.dtfe.point_type[vertices] = np.minimum(
+                self.dtfe.point_type[vertices], 0.0
+            )
+
 
     def estimate(
         self,
@@ -987,11 +1013,13 @@ class DelaunayMerger3D:
         """
         return self.dtfe.estimate(x, y, z)
 
+
     def get_border(self) -> dict:
         """
         Returns border points and simplices from a merged delaunay tesselation.
         """
         return self.dtfe.get_border()
+
 
     def clean(self) -> None:
         """

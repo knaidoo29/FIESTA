@@ -197,6 +197,7 @@ def delaunay_estimate_2d(
 
 class Delaunay2D:
 
+
     def __init__(self) -> None:
         """
         Initialises the class function.
@@ -222,6 +223,7 @@ class Delaunay2D:
         self.f0 = None
         self.delf0 = None
         self.verbose = True
+
 
     def setup(
         self,
@@ -253,6 +255,7 @@ class Delaunay2D:
             self.mass = mass
         self.points = coords.coord2points([self.x, self.y])
 
+
     def _check_delaunay(self) -> None:
         """
         This will test whether the delaunay tesselation is fully connected, and test and correct
@@ -274,6 +277,7 @@ class Delaunay2D:
                 self.mass[idxnearest] += self.mass[idx]
                 self.mass[idx] = 0.0
 
+
     def construct(self) -> None:
         """
         Construct Delaunay triangulation.
@@ -281,6 +285,7 @@ class Delaunay2D:
         self.delaunay = scDelaunay(self.points)
         self.simplices = self.delaunay.simplices
         self._check_delaunay()
+
 
     def get_circumcircles(self) -> None:
         """
@@ -329,6 +334,7 @@ class Delaunay2D:
             + (y0[cond] - self.circumcircles[cond, 1]) ** 2
         )
 
+
     def get_angle(
         self,
         px0: Union[float, np.ndarray],
@@ -368,6 +374,7 @@ class Delaunay2D:
         angle = abs(np.arctan2(dx1 * dy2 - dy1 * dx2, dx1 * dx2 + dy1 * dy2))
         return angle
 
+
     def get_angle_total(self) -> None:
         """
         Determines the total angle subtended by simplices attached to each points.
@@ -389,6 +396,7 @@ class Delaunay2D:
         angle = self.get_angle(x2, y2, x0, y0, x1, y1)
         np.add.at(self.angle_total, id2, angle)
 
+
     def get_boundary_simplex(self) -> None:
         """
         Determines whether a simplex circumcircle crosses boundaries.
@@ -407,6 +415,7 @@ class Delaunay2D:
         self.cross_boundary[cond, 2] = 1.0
         cond = np.where(yc + r >= self.boundary[3])[0]
         self.cross_boundary[cond, 3] = 1.0
+
 
     def determine_delaunay_boundary(self) -> None:
         """
@@ -447,6 +456,7 @@ class Delaunay2D:
         cond = np.where(self.point_type[idxs] != -1)[0]
         self.point_type[idxs[cond]] = 0.0
 
+
     def run(self) -> None:
         """
         Run Delaunay tesselation and compute boundary information.
@@ -457,6 +467,7 @@ class Delaunay2D:
         self.get_boundary_simplex()
         self.determine_delaunay_boundary()
 
+
     def get_area(self) -> None:
         """
         Calculates the area of the delaunay simplex.
@@ -466,6 +477,7 @@ class Delaunay2D:
         del_vert1 = self.simplices[:, 1]
         del_vert2 = self.simplices[:, 2]
         self.delaunay_area = delaunay_area_2d(x, y, del_vert0, del_vert1, del_vert2)
+
 
     def get_dens(self) -> None:
         """
@@ -480,6 +492,7 @@ class Delaunay2D:
             self.delaunay_area, del_vert0, del_vert1, del_vert2, len(self.points)
         )
         self.point_dens = self.mass / point_area
+
 
     def set_field(self, f: np.ndarray) -> None:
         """Sets the field values of the input points.
@@ -503,12 +516,14 @@ class Delaunay2D:
         self.delf0 = get_delf0_2d(x, y, f, del_vert0, del_vert1, del_vert2)
         self.dtfe_mode = "field"
 
+
     def set_field2dens(self) -> None:
         """
         Sets the field values to the density.
         """
         self.set_field(self.point_dens)
         self.dtfe_mode = "density"
+
 
     def find_simplex(
         self, x: Union[float, np.ndarray], y: Union[float, np.ndarray]
@@ -519,6 +534,7 @@ class Delaunay2D:
         points = coords.xy2points(x, y)
         simplices = self.delaunay.find_simplex(points)
         return simplices
+
 
     def estimate(
         self,
@@ -557,6 +573,7 @@ class Delaunay2D:
         )
         return f_est
 
+
     def get_border(self) -> dict:
         """
         Returns border points and simplices.
@@ -584,6 +601,7 @@ class Delaunay2D:
         border["simptypes"] = self.simptypes[cond]
         return border
 
+
     def clean(self) -> None:
         """
         Reinitialises the class.
@@ -592,6 +610,7 @@ class Delaunay2D:
 
 
 class DelaunayMerger2D:
+
 
     def __init__(self) -> None:
         """
@@ -609,6 +628,7 @@ class DelaunayMerger2D:
         self.simptypes = []
         self.dtfe_mode = None
         self.dtfe = None
+
 
     def add_border(self, border: dict) -> None:
         """
@@ -637,6 +657,7 @@ class DelaunayMerger2D:
         self.simplices.append(idx2globalidx[border["simplices"]])
         self.simptypes.append(border["simptypes"])
 
+
     def _concatenate(self) -> None:
         """
         Concatenates all border points and simplices.
@@ -649,6 +670,7 @@ class DelaunayMerger2D:
         self.ptypes = np.concatenate(self.ptypes)
         self.simplices = np.concatenate(self.simplices)
         self.simptypes = np.concatenate(self.simptypes)
+
 
     def _filter(self, boundary: List[float]) -> None:
         """
@@ -682,6 +704,7 @@ class DelaunayMerger2D:
         )[0]
         self.simplices = keep_idx[self.simplices[cond]]
         self.simptypes = self.simptypes[cond]
+
 
     def run(self, boundary: List[float], apply_filter: bool = False) -> None:
         """
@@ -720,6 +743,7 @@ class DelaunayMerger2D:
         )[0]
         self.dtfe.simptypes[cond] = -1.0
 
+
     def estimate(
         self, x: Union[float, np.ndarray], y: Union[float, np.ndarray]
     ) -> Union[float, np.ndarray]:
@@ -736,11 +760,13 @@ class DelaunayMerger2D:
         """
         return self.dtfe.estimate(x, y)
 
+
     def get_border(self) -> dict:
         """
         Returns border points and simplices from a merged delaunay tesselation.
         """
         return self.dtfe.get_border()
+
 
     def clean(self) -> None:
         """

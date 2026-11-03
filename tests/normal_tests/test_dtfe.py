@@ -158,6 +158,33 @@ class TestDTFE:
         delaunay.get_dens()
         assert delaunay.point_dens is not None
 
+    def test_delaunay3d_get_border_invalid_connectivity(self):
+        """Test that missing border vertices raise a RuntimeError."""
+        np.random.seed(0)
+        x = np.random.rand(10)
+        y = np.random.rand(10)
+        z = np.random.rand(10)
+        delaunay = Delaunay3D()
+        delaunay.setup(x, y, z, boundary=[0, 1, 0, 1, 0, 1])
+        delaunay.construct()
+
+        # Create a simplex whose first vertex is excluded from the border.
+        delaunay.point_type = np.zeros(len(x))
+        delaunay.simptypes = np.ones(len(delaunay.simplices))
+        delaunay.simptypes[0] = -1.0
+        missing_vertex = delaunay.simplices[0, 0]
+        delaunay.point_type[missing_vertex] = 1.0
+
+        with pytest.raises(RuntimeError, match="Invalid Delaunay border: 1 vertices"):
+            delaunay.get_border()
+
+        # Restoring the missing vertex should allow valid border export.
+        delaunay.point_type[missing_vertex] = 0.0
+        border = delaunay.get_border()
+        assert len(border["simplices"]) == 1
+        assert np.all(border["simplices"] >= 0)
+        assert np.all(border["simplices"] < len(border["x"]))
+
     def test_delaunay3d_estimate(self):
         np.random.seed(0)
         x = np.random.rand(10) * 0.6 + 0.2

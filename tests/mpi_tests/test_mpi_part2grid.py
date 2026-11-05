@@ -311,3 +311,85 @@ def test_mpi_part2grid3d_invalid_method():
             periodic=True,
             origin=0.0,
         )
+
+
+
+@pytest.mark.parametrize(
+    "case", ["missing_weights", "weights_without_coordinates"]
+)
+def test_mpi_part2grid2d_invalid_weights(case):
+    mpi = MPI()
+
+    if mpi.size < 2:
+        pytest.skip("Requires at least 2 MPI ranks")
+
+    x = np.array([0.25, 0.75])
+    y = np.array([0.25, 0.75])
+    f = np.array([1.0, 2.0])
+
+    if case == "missing_weights":
+        # All ranks have coordinates, but only rank 0 has weights.
+        if mpi.rank != 0:
+            f = None
+
+    elif case == "weights_without_coordinates":
+        # All ranks have weights, but only rank 0 has coordinates.
+        if mpi.rank != 0:
+            x = None
+            y = None
+
+    with pytest.raises(
+        ValueError,
+        match="Particle weights must be provided",
+    ):
+        mpi_part2grid2D(
+            x,
+            y,
+            1.0,
+            8,
+            mpi,
+            f=f,
+            method="NGP",
+        )
+
+
+@pytest.mark.parametrize(
+    "case", ["missing_weights", "weights_without_coordinates"]
+)
+def test_mpi_part2grid3d_invalid_weights(case):
+    mpi = MPI()
+
+    if mpi.size < 2:
+        pytest.skip("Requires at least 2 MPI ranks")
+
+    x = np.array([0.25, 0.75])
+    y = np.array([0.25, 0.75])
+    z = np.array([0.25, 0.75])
+    f = np.array([1.0, 2.0])
+
+    if case == "missing_weights":
+        # All ranks have coordinates, but only rank 0 has weights.
+        if mpi.rank != 0:
+            f = None
+
+    elif case == "weights_without_coordinates":
+        # All ranks have weights, but only rank 0 has coordinates.
+        if mpi.rank != 0:
+            x = None
+            y = None
+            z = None
+
+    with pytest.raises(
+        ValueError,
+        match="Particle weights must be provided",
+    ):
+        mpi_part2grid3D(
+            x,
+            y,
+            z,
+            1.0,
+            8,
+            mpi,
+            f=f,
+            method="NGP",
+        )

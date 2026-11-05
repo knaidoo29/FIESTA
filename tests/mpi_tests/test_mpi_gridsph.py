@@ -5,8 +5,31 @@ from fiesta.gridsph.mpi_gridsph import mpi_gridSPH2D, mpi_gridSPH3D
 from shift.mpiutils import MPI
 
 
+def uneven_grid_size(mpi, ngrid=20):
+    """Choose a grid size that gives uneven, nonempty MPI partitions."""
+    ngrid = max(ngrid, mpi.size + 1)
+
+    if mpi.size > 1 and ngrid % mpi.size == 0:
+        ngrid += 1
+
+    return ngrid
+
+
+def assert_mpi_grid(grid, mpi, ngrid, ndim):
+    """Check the shape and finiteness of a distributed grid."""
+    base, remainder = divmod(ngrid, mpi.size)
+    expected_nx = base + (mpi.rank < remainder)
+
+    expected_shape = (expected_nx,) + (ngrid,) * (ndim - 1)
+
+    assert isinstance(grid, np.ndarray)
+    assert grid.shape == expected_shape
+    assert np.all(np.isfinite(grid))
+
+
 def test_mpi_gridSPH2D():
     mpi = MPI()
+    ngrid = uneven_grid_size(mpi)
 
     x = np.linspace(0.1, 0.9, 50)
     y = np.linspace(0.1, 0.9, 50)
@@ -17,38 +40,29 @@ def test_mpi_gridSPH2D():
         x2d.ravel(),
         y2d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         minpart=1,
     )
 
-    assert isinstance(dgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert dgrid.shape == (7, 20)
-    else:
-        assert dgrid.shape == (6, 20)
-    assert np.all(np.isfinite(dgrid))
+    assert_mpi_grid(dgrid, mpi, ngrid, ndim=2)
 
     dgrid = mpi_gridSPH2D(
         x2d.ravel(),
         y2d.ravel(),
         [1.0, 1.0],
-        [20, 20],
+        [ngrid, ngrid],
         mpi,
         minpart=1,
         periodic=[False, True],
     )
 
-    assert isinstance(dgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert dgrid.shape == (7, 20)
-    else:
-        assert dgrid.shape == (6, 20)
-    assert np.all(np.isfinite(dgrid))
+    assert_mpi_grid(dgrid, mpi, ngrid, ndim=2)
 
 
 def test_mpi_gridSPH2D_pregrid():
     mpi = MPI()
+    ngrid = uneven_grid_size(mpi)
 
     x = np.linspace(0.1, 0.9, 50)
     y = np.linspace(0.1, 0.9, 50)
@@ -59,7 +73,7 @@ def test_mpi_gridSPH2D_pregrid():
         x2d.ravel(),
         y2d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         f=np.ones(len(x2d.ravel())),
         method="NGP",
@@ -71,22 +85,18 @@ def test_mpi_gridSPH2D_pregrid():
         x2d.ravel(),
         y2d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         minpart=1,
         dgrid=dgrid_per,
     )
 
-    assert isinstance(dgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert dgrid.shape == (7, 20)
-    else:
-        assert dgrid.shape == (6, 20)
-    assert np.all(np.isfinite(dgrid))
+    assert_mpi_grid(dgrid, mpi, ngrid, ndim=2)
 
 
 def test_mpi_gridSPH2D_field():
     mpi = MPI()
+    ngrid = uneven_grid_size(mpi)
 
     x = np.linspace(0.1, 0.9, 50)
     y = np.linspace(0.1, 0.9, 50)
@@ -99,40 +109,31 @@ def test_mpi_gridSPH2D_field():
         x2d.ravel(),
         y2d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         minpart=1,
         f=f,
     )
 
-    assert isinstance(fgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert fgrid.shape == (7, 20)
-    else:
-        assert fgrid.shape == (6, 20)
-    assert np.all(np.isfinite(fgrid))
+    assert_mpi_grid(fgrid, mpi, ngrid, ndim=2)
 
     fgrid = mpi_gridSPH2D(
         x2d.ravel(),
         y2d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         minpart=1,
         f=f,
-        periodic=[False, True]
+        periodic=[False, True],
     )
 
-    assert isinstance(fgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert fgrid.shape == (7, 20)
-    else:
-        assert fgrid.shape == (6, 20)
-    assert np.all(np.isfinite(fgrid))
+    assert_mpi_grid(fgrid, mpi, ngrid, ndim=2)
 
 
 def test_mpi_gridSPH2D_pregrid_field():
     mpi = MPI()
+    ngrid = uneven_grid_size(mpi)
 
     x = np.linspace(0.1, 0.9, 50)
     y = np.linspace(0.1, 0.9, 50)
@@ -145,7 +146,7 @@ def test_mpi_gridSPH2D_pregrid_field():
         x2d.ravel(),
         y2d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         f=np.ones(len(x2d.ravel())),
         method="NGP",
@@ -157,7 +158,7 @@ def test_mpi_gridSPH2D_pregrid_field():
         x2d.ravel(),
         y2d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         f=f,
         method="NGP",
@@ -169,7 +170,7 @@ def test_mpi_gridSPH2D_pregrid_field():
         x2d.ravel(),
         y2d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         minpart=1,
         f=f,
@@ -177,16 +178,12 @@ def test_mpi_gridSPH2D_pregrid_field():
         fgrid=fgrid_pre,
     )
 
-    assert isinstance(fgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert fgrid.shape == (7, 20)
-    else:
-        assert fgrid.shape == (6, 20)
-    assert np.all(np.isfinite(fgrid))
+    assert_mpi_grid(fgrid, mpi, ngrid, ndim=2)
 
 
 def test_mpi_gridSPH3D():
     mpi = MPI()
+    ngrid = uneven_grid_size(mpi)
 
     x = np.linspace(0.1, 0.9, 50)
     y = np.linspace(0.1, 0.9, 50)
@@ -199,39 +196,30 @@ def test_mpi_gridSPH3D():
         y3d.ravel(),
         z3d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         minpart=1,
     )
 
-    assert isinstance(dgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert dgrid.shape == (7, 20, 20)
-    else:
-        assert dgrid.shape == (6, 20, 20)
-    assert np.all(np.isfinite(dgrid))
+    assert_mpi_grid(dgrid, mpi, ngrid, ndim=3)
 
     dgrid = mpi_gridSPH3D(
         x3d.ravel(),
         y3d.ravel(),
         z3d.ravel(),
         [1.0, 1.0, 1.0],
-        [20, 20, 20],
+        [ngrid, ngrid, ngrid],
         mpi,
         minpart=1,
         periodic=[False, True, True],
     )
 
-    assert isinstance(dgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert dgrid.shape == (7, 20, 20)
-    else:
-        assert dgrid.shape == (6, 20, 20)
-    assert np.all(np.isfinite(dgrid))
+    assert_mpi_grid(dgrid, mpi, ngrid, ndim=3)
 
 
 def test_mpi_pregrid_gridSPH3D():
     mpi = MPI()
+    ngrid = uneven_grid_size(mpi)
 
     x = np.linspace(0.1, 0.9, 50)
     y = np.linspace(0.1, 0.9, 50)
@@ -244,7 +232,7 @@ def test_mpi_pregrid_gridSPH3D():
         y3d.ravel(),
         z3d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         method="NGP",
         periodic=[False, True, True],
@@ -256,22 +244,18 @@ def test_mpi_pregrid_gridSPH3D():
         y3d.ravel(),
         z3d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         minpart=1,
         dgrid=dgrid_per,
     )
 
-    assert isinstance(dgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert dgrid.shape == (7, 20, 20)
-    else:
-        assert dgrid.shape == (6, 20, 20)
-    assert np.all(np.isfinite(dgrid))
+    assert_mpi_grid(dgrid, mpi, ngrid, ndim=3)
 
 
 def test_mpi_gridSPH3D_field():
     mpi = MPI()
+    ngrid = uneven_grid_size(mpi)
 
     x = np.linspace(0.1, 0.9, 50)
     y = np.linspace(0.1, 0.9, 50)
@@ -286,42 +270,32 @@ def test_mpi_gridSPH3D_field():
         y3d.ravel(),
         z3d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         minpart=1,
         f=f,
     )
 
-    assert isinstance(fgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert fgrid.shape == (7, 20, 20)
-    else:
-        assert fgrid.shape == (6, 20, 20)
-    assert np.all(np.isfinite(fgrid))
+    assert_mpi_grid(fgrid, mpi, ngrid, ndim=3)
 
     fgrid = mpi_gridSPH3D(
         x3d.ravel(),
         y3d.ravel(),
         z3d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         minpart=1,
         f=f,
-        periodic=[False, True, True]
+        periodic=[False, True, True],
     )
 
-    assert isinstance(fgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert fgrid.shape == (7, 20, 20)
-    else:
-        assert fgrid.shape == (6, 20, 20)
-    assert np.all(np.isfinite(fgrid))
-
+    assert_mpi_grid(fgrid, mpi, ngrid, ndim=3)
 
 
 def test_mpi_gridSPH3D_pregrid_field():
     mpi = MPI()
+    ngrid = uneven_grid_size(mpi)
 
     x = np.linspace(0.1, 0.9, 50)
     y = np.linspace(0.1, 0.9, 50)
@@ -336,7 +310,7 @@ def test_mpi_gridSPH3D_pregrid_field():
         y3d.ravel(),
         z3d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         method="NGP",
         origin=0.0,
@@ -347,7 +321,7 @@ def test_mpi_gridSPH3D_pregrid_field():
         y3d.ravel(),
         z3d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         f=f,
         method="NGP",
@@ -359,7 +333,7 @@ def test_mpi_gridSPH3D_pregrid_field():
         y3d.ravel(),
         z3d.ravel(),
         1.0,
-        20,
+        ngrid,
         mpi,
         minpart=1,
         f=f,
@@ -367,9 +341,4 @@ def test_mpi_gridSPH3D_pregrid_field():
         fgrid=grid_pre,
     )
 
-    assert isinstance(fgrid, np.ndarray)
-    if mpi.rank <= 1:
-        assert fgrid.shape == (7, 20, 20)
-    else:
-        assert fgrid.shape == (6, 20, 20)
-    assert np.all(np.isfinite(fgrid))
+    assert_mpi_grid(fgrid, mpi, ngrid, ndim=3)

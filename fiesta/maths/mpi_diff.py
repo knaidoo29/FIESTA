@@ -26,37 +26,40 @@ def mpi_dfdx(
     dfdx : array
         Numerical differentiation values for f evaluated at points x.
     """
-    dx = xgrid[1] - xgrid[0]
-    _xgrid = np.zeros(len(xgrid) + 2)
-    _xgrid[1:-1] = xgrid
-    _xgrid[0] = xgrid[0] - dx
-    _xgrid[-1] = xgrid[-1] + dx
-    shape = np.array(np.shape(f))
-    shape[0] += 2
-    _f = np.zeros(shape)
-    _f[1:-1] = f
-    f_send_up = MPI.Send_up(f[-1])
-    _f[0] = f_send_up[0]
-    f_send_down = MPI.Send_down(f[0])
-    _f[-1] = f_send_down[0]
-    if periodic is False:
-        if MPI.rank == 0:
-            _xgrid = _xgrid[1:]
-            _f = _f[1:]
-        elif MPI.rank == MPI.size - 1:
-            _xgrid = _xgrid[:-1]
-            _f = _f[:-1]
-    dfdx = diff.dfdx(_xgrid, _f, periodic=False)
-    if periodic is True:
-        dfdx = dfdx[1:-1]
+    if MPI.size == 1:
+        return diff.dfdx(xgrid, f, periodic=periodic)
     else:
-        if MPI.rank == 0:
-            dfdx = dfdx[:-1]
-        elif MPI.rank == MPI.size - 1:
-            dfdx = dfdx[1:]
-        else:
+        dx = xgrid[1] - xgrid[0]
+        _xgrid = np.zeros(len(xgrid) + 2)
+        _xgrid[1:-1] = xgrid
+        _xgrid[0] = xgrid[0] - dx
+        _xgrid[-1] = xgrid[-1] + dx
+        shape = np.array(np.shape(f))
+        shape[0] += 2
+        _f = np.zeros(shape)
+        _f[1:-1] = f
+        f_send_up = MPI.Send_up(f[-1])
+        _f[0] = f_send_up[0]
+        f_send_down = MPI.Send_down(f[0])
+        _f[-1] = f_send_down[0]
+        if periodic is False:
+            if MPI.rank == 0:
+                _xgrid = _xgrid[1:]
+                _f = _f[1:]
+            elif MPI.rank == MPI.size - 1:
+                _xgrid = _xgrid[:-1]
+                _f = _f[:-1]
+        dfdx = diff.dfdx(_xgrid, _f, periodic=False)
+        if periodic is True:
             dfdx = dfdx[1:-1]
-    return dfdx
+        else:
+            if MPI.rank == 0:
+                dfdx = dfdx[:-1]
+            elif MPI.rank == MPI.size - 1:
+                dfdx = dfdx[1:]
+            else:
+                dfdx = dfdx[1:-1]
+        return dfdx
 
 
 # TODO: MPI is kept in mpi_dfdy and mpi_dfdz to mirror mpi_dfdz, but is not used in those functions, should we removed it?

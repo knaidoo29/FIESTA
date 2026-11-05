@@ -133,6 +133,8 @@ def test_mpi_open_3D_filters_files_by_limits():
 
 def test_check_coords_at_MPI_0_detects_rank0_only():
     mpi = MPI()
+
+    # Coordinates supplied only on rank 0.
     if mpi.rank == 0:
         x = np.array([0.1, 0.2])
     else:
@@ -141,19 +143,15 @@ def test_check_coords_at_MPI_0_detects_rank0_only():
     check = check_coords_at_MPI_0(x, mpi)
 
     assert isinstance(check, bool)
-    if mpi.size == 1:
-        assert check is True
-    else:
-        assert check is True
+    assert check is True
 
-    x = np.array([0.1, 0.2])
+    # Coordinates supplied on all ranks.
+    if mpi.size > 1:
+        x = np.array([0.1, 0.2])
 
-    check = check_coords_at_MPI_0(x, mpi)
+        check = check_coords_at_MPI_0(x, mpi)
 
-    assert isinstance(check, bool)
-    if mpi.size == 1:
-        assert check is False
-    else:
+        assert isinstance(check, bool)
         assert check is False
 
 
@@ -201,10 +199,13 @@ def test_mpi_sortbyx_distribute_grid2d_preserves_values():
     sorter.limits4grid()
 
     x2d, y2d = np.meshgrid(
-        np.linspace(0.1, 0.9, 10), np.linspace(0.1, 0.9, 10), indexing="ij"
+        np.linspace(0.1, 0.9, 10),
+        np.linspace(0.1, 0.9, 10),
+        indexing="ij"
     )
     f2d = np.arange(100).reshape(10, 10)
 
+    # Case 1: Data provided on every MPI rank.
     grid = sorter.distribute_grid2D(x2d, y2d, f2d)
 
     assert isinstance(grid, np.ndarray)
@@ -212,33 +213,16 @@ def test_mpi_sortbyx_distribute_grid2d_preserves_values():
     assert grid.shape[1] == 10
     assert np.all(np.isfinite(grid))
 
-    sorter = MPI_SortByX(mpi)
-    sorter.settings(1.0, 10, origin=0.0)
-    sorter.limits4grid()
+    # Case 2: Data provided only on rank 0.
+    if mpi.rank != 0:
+        x2d, y2d, f2d = None, None, None
 
-    if mpi.rank == 0:
-        x2d, y2d = None, None
-        f2d = None
-    else:
-        x2d, y2d = np.meshgrid(
-            np.linspace(0.1, 0.9, 10), np.linspace(0.1, 0.9, 10), indexing="ij"
-        )
-        f2d = np.arange(100).reshape(10, 10)
     grid = sorter.distribute_grid2D(x2d, y2d, f2d)
 
-    sorter = MPI_SortByX(mpi)
-    sorter.settings(1.0, 10, origin=0.0)
-    sorter.limits4grid()
-
-    if mpi.rank == 0:
-        x2d, y2d = None, None
-        f2d = None
-    else:
-        x2d, y2d = np.meshgrid(
-            np.linspace(0.1, 0.9, 10), np.linspace(0.1, 0.9, 10), indexing="ij"
-        )
-        f2d = np.arange(100).reshape(10, 10)
-    grid = sorter.distribute_grid2D(x2d, y2d, f2d)
+    assert isinstance(grid, np.ndarray)
+    assert grid.ndim == 2
+    assert grid.shape[1] == 10
+    assert np.all(np.isfinite(grid))
 
 
 def test_mpi_sortbyx_distribute_grid3d_preserves_values():
@@ -262,24 +246,30 @@ def test_mpi_sortbyx_distribute_grid3d_preserves_values():
     assert grid.shape[1] == 3
     assert np.all(np.isfinite(grid))
 
-    mpi = MPI()
-    sorter = MPI_SortByX(mpi)
-    sorter.settings([1.0, 1.0, 2.0], 3, origin=[0.0, 0.0, 0.0])
-    sorter.limits4grid()
+    # Test when rank 0 has no data, but other ranks do.
+    if mpi.size > 1:
+        sorter = MPI_SortByX(mpi)
+        sorter.settings([1.0, 1.0, 2.0], 3, origin=[0.0, 0.0, 0.0])
+        sorter.limits4grid()
 
-    if mpi.rank == 0:
-        x3d, y3d, z3d = None, None, None
-        f3d = None
-    else:
-        x3d, y3d, z3d = np.meshgrid(
-            np.linspace(0.1, 0.9, 3),
-            np.linspace(0.1, 0.9, 3),
-            np.linspace(0.1, 0.9, 3),
-            indexing="ij",
-        )
-        f3d = np.arange(27).reshape(3, 3, 3)
+        if mpi.rank == 0:
+            x3d, y3d, z3d = None, None, None
+            f3d = None
+        else:
+            x3d, y3d, z3d = np.meshgrid(
+                np.linspace(0.1, 0.9, 3),
+                np.linspace(0.1, 0.9, 3),
+                np.linspace(0.1, 0.9, 3),
+                indexing="ij",
+            )
+            f3d = np.arange(27).reshape(3, 3, 3)
 
-    grid = sorter.distribute_grid3D(x3d, y3d, z3d, f3d)
+        grid = sorter.distribute_grid3D(x3d, y3d, z3d, f3d)
+
+        assert isinstance(grid, np.ndarray)
+        assert grid.ndim == 3
+        assert grid.shape[1] == 3
+        assert np.all(np.isfinite(grid))
 
 
 def test_mpi_sortbyx_clean_resets_state():

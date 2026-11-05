@@ -192,20 +192,29 @@ def test_mpi_sortbyx_distribute_roundtrip():
     distributed = sorter.distribute(include_internalbuffer=True)
 
 
-def test_mpi_sortbyx_distribute_grid2d_preserves_values():
+@pytest.mark.parametrize(
+    "boxsize, origin",
+    [
+        (1.0, 0.0),
+        ([1.0, 1.0], [0.0, 0.0]),
+    ],
+    ids=["scalar", "array"],
+)
+def test_mpi_sortbyx_distribute_grid2d_preserves_values(boxsize, origin):
     mpi = MPI()
-    sorter = MPI_SortByX(mpi)
-    sorter.settings([1.0, 1.0], 10, origin=[0.0, 0.0])
-    sorter.limits4grid()
 
     x2d, y2d = np.meshgrid(
         np.linspace(0.1, 0.9, 10),
         np.linspace(0.1, 0.9, 10),
-        indexing="ij"
+        indexing="ij",
     )
     f2d = np.arange(100).reshape(10, 10)
 
     # Case 1: Data provided on every MPI rank.
+    sorter = MPI_SortByX(mpi)
+    sorter.settings(boxsize, 10, origin=origin)
+    sorter.limits4grid()
+
     grid = sorter.distribute_grid2D(x2d, y2d, f2d)
 
     assert isinstance(grid, np.ndarray)
@@ -214,6 +223,10 @@ def test_mpi_sortbyx_distribute_grid2d_preserves_values():
     assert np.all(np.isfinite(grid))
 
     # Case 2: Data provided only on rank 0.
+    sorter = MPI_SortByX(mpi)
+    sorter.settings(boxsize, 10, origin=origin)
+    sorter.limits4grid()
+
     if mpi.rank != 0:
         x2d, y2d, f2d = None, None, None
 

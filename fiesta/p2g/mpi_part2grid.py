@@ -92,11 +92,28 @@ def mpi_part2grid2D(
 
     if check_distributed:
 
+        # Determine whether particle weights are supplied globally.
         _fexist = int(fexist)
         ftotal = MPI.Sum(_fexist)
 
         ftotal = MPI.bcast(ftotal)
         fexist = ftotal == MPI.size
+
+        fexist = ftotal > 0
+
+        # Verify that weights accompany particle coordinates
+        # on every rank when performing weighted assignment.
+        if fexist:
+            _invalid = int((x is None) != (f is None))
+
+            invalid = MPI.Sum(_invalid)
+            invalid = MPI.bcast(invalid)
+
+            if invalid > 0:
+                raise ValueError(
+                    "Particle weights must be provided on every "
+                    "rank containing particle coordinates."
+                )
 
         if x is None:
             data = None
@@ -107,11 +124,7 @@ def mpi_part2grid2D(
                 data = coords.coord2points([x, y])
         
         data = coords.distribute_points_by_x(
-            data,
-            boxsize,
-            ngrid,
-            origin,
-            MPI,
+            data, boxsize, ngrid, origin, MPI,
         )
 
         x = data[:, 0]
@@ -378,24 +391,38 @@ def mpi_part2grid3D(
     exchange rather than by the local particle-to-grid routine.
     """
     method = method.upper()
-
+    
     # Does a particle field exist?
     fexist = f is not None
-
+    
     # ------------------------------------------------------------
     # Check/distribute particles
     # ------------------------------------------------------------
 
     if check_distributed:
-
+        
+        # Determine whether particle weights are supplied globally.
         _fexist = int(fexist)
 
         ftotal = MPI.Sum(_fexist)
         ftotal = MPI.bcast(ftotal)
 
-        # Only distribute f if it exists on every rank.
-        fexist = ftotal == MPI.size
+        fexist = ftotal > 0
+        
+        # Verify that weights accompany particle coordinates
+        # on every rank when performing weighted assignment.
+        if fexist:
+            _invalid = int((x is None) != (f is None))
 
+            invalid = MPI.Sum(_invalid)
+            invalid = MPI.bcast(invalid)
+
+            if invalid > 0:
+                raise ValueError(
+                    "Particle weights must be provided on every "
+                    "rank containing particle coordinates."
+                )
+        
         if x is None:
             data = None
         else:
@@ -405,11 +432,7 @@ def mpi_part2grid3D(
                 data = coords.coord2points([x, y, z])
 
         data = coords.distribute_points_by_x(
-            data,
-            boxsize,
-            ngrid,
-            origin,
-            MPI,
+            data, boxsize, ngrid, origin, MPI,
         )
 
         x = data[:, 0]

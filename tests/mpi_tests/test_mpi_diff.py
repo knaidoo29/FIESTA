@@ -51,6 +51,100 @@ def test_mpi_dfdx_matches_serial_derivative_periodic():
         assert np.allclose(result_global, expected, atol=1e-8, rtol=1e-6)
 
 
+def test_mpi_dfdx_2d_matches_serial_derivative_nonperiodic():
+    mpi = MPI()
+    npoints = max(16, mpi.size * 4)
+    _, xgrid = shift.cart.mpi_grid1D(1.0, npoints, mpi, origin=0.0)
+
+    ygrid = np.linspace(0.0, 1.0, 8)
+    X, Y = np.meshgrid(xgrid, ygrid, indexing="ij")
+    f_local = np.sin(X) * np.cos(Y)
+
+    result_local = mpi_dfdx(xgrid, f_local, mpi, periodic=False)
+
+    assert result_local.shape == f_local.shape
+    assert np.all(np.isfinite(result_local))
+
+    x_global = collect_arrays(mpi, xgrid)
+    f_global = collect_arrays(mpi, f_local)
+    result_global = collect_arrays(mpi, result_local)
+
+    if mpi.rank == 0:
+        expected = dfdx(x_global, f_global, periodic=False)
+        assert np.allclose(result_global, expected, atol=1e-8, rtol=1e-6)
+
+
+def test_mpi_dfdx_2d_matches_serial_derivative_periodic():
+    mpi = MPI()
+    npoints = max(16, mpi.size * 4)
+    _, xgrid = shift.cart.mpi_grid1D(1.0, npoints, mpi, origin=0.0)
+
+    ygrid = np.linspace(0.0, 1.0, 8)
+    X, Y = np.meshgrid(xgrid, ygrid, indexing="ij")
+    f_local = np.sin(2.0 * np.pi * X) * np.cos(Y)
+
+    result_local = mpi_dfdx(xgrid, f_local, mpi, periodic=True)
+
+    assert result_local.shape == f_local.shape
+    assert np.all(np.isfinite(result_local))
+
+    x_global = collect_arrays(mpi, xgrid)
+    f_global = collect_arrays(mpi, f_local)
+    result_global = collect_arrays(mpi, result_local)
+
+    if mpi.rank == 0:
+        expected = dfdx(x_global, f_global, periodic=True)
+        assert np.allclose(result_global, expected, atol=1e-8, rtol=1e-6)
+
+
+def test_mpi_dfdx_3d_matches_serial_derivative_nonperiodic():
+    mpi = MPI()
+    npoints = max(16, mpi.size * 4)
+    _, xgrid = shift.cart.mpi_grid1D(1.0, npoints, mpi, origin=0.0)
+
+    ygrid = np.linspace(0.0, 1.0, 6)
+    zgrid = np.linspace(0.0, 1.0, 5)
+    X, Y, Z = np.meshgrid(xgrid, ygrid, zgrid, indexing="ij")
+    f_local = np.sin(X) * np.cos(Y) * np.cos(Z)
+
+    result_local = mpi_dfdx(xgrid, f_local, mpi, periodic=False)
+
+    assert result_local.shape == f_local.shape
+    assert np.all(np.isfinite(result_local))
+
+    x_global = collect_arrays(mpi, xgrid)
+    f_global = collect_arrays(mpi, f_local)
+    result_global = collect_arrays(mpi, result_local)
+
+    if mpi.rank == 0:
+        expected = dfdx(x_global, f_global, periodic=False)
+        assert np.allclose(result_global, expected, atol=1e-8, rtol=1e-6)
+
+
+def test_mpi_dfdx_3d_matches_serial_derivative_periodic():
+    mpi = MPI()
+    npoints = max(16, mpi.size * 4)
+    _, xgrid = shift.cart.mpi_grid1D(1.0, npoints, mpi, origin=0.0)
+
+    ygrid = np.linspace(0.0, 1.0, 6)
+    zgrid = np.linspace(0.0, 1.0, 5)
+    X, Y, Z = np.meshgrid(xgrid, ygrid, zgrid, indexing="ij")
+    f_local = np.sin(2.0 * np.pi * X) * np.cos(Y) * np.cos(Z)
+
+    result_local = mpi_dfdx(xgrid, f_local, mpi, periodic=True)
+
+    assert result_local.shape == f_local.shape
+    assert np.all(np.isfinite(result_local))
+
+    x_global = collect_arrays(mpi, xgrid)
+    f_global = collect_arrays(mpi, f_local)
+    result_global = collect_arrays(mpi, result_local)
+
+    if mpi.rank == 0:
+        expected = dfdx(x_global, f_global, periodic=True)
+        assert np.allclose(result_global, expected, atol=1e-8, rtol=1e-6)
+
+
 def test_mpi_dfdy_matches_serial_derivative_nonperiodic():
     mpi = MPI()
     ygrid = np.linspace(0.0, 1.0, 10)
@@ -72,6 +166,38 @@ def test_mpi_dfdy_matches_serial_derivative_periodic():
     xgrid = np.linspace(0.0, 1.0, 5)
     _, Y = np.meshgrid(xgrid, ygrid, indexing="ij")
     f = np.sin(Y)
+
+    result = mpi_dfdy(ygrid, f, mpi, periodic=True)
+    expected = dfdy(ygrid, f, periodic=True)
+
+    assert result.shape == expected.shape
+    assert np.all(np.isfinite(result))
+    assert np.allclose(result, expected, atol=1e-8, rtol=1e-6)
+
+
+def test_mpi_dfdy_3d_matches_serial_derivative_nonperiodic():
+    mpi = MPI()
+    ygrid = np.linspace(0.0, 1.0, 10)
+    xgrid = np.linspace(0.0, 1.0, 5)
+    zgrid = np.linspace(0.0, 1.0, 6)
+    X, Y, Z = np.meshgrid(xgrid, ygrid, zgrid, indexing="ij")
+    f = np.sin(Y) * np.cos(X) * np.cos(Z)
+
+    result = mpi_dfdy(ygrid, f, mpi, periodic=False)
+    expected = dfdy(ygrid, f, periodic=False)
+
+    assert result.shape == expected.shape
+    assert np.all(np.isfinite(result))
+    assert np.allclose(result, expected, atol=1e-8, rtol=1e-6)
+
+
+def test_mpi_dfdy_3d_matches_serial_derivative_periodic():
+    mpi = MPI()
+    ygrid = np.linspace(0.0, 2.0 * np.pi, 10, endpoint=False)
+    xgrid = np.linspace(0.0, 1.0, 5)
+    zgrid = np.linspace(0.0, 1.0, 6)
+    X, Y, Z = np.meshgrid(xgrid, ygrid, zgrid, indexing="ij")
+    f = np.sin(Y) * np.cos(X) * np.cos(Z)
 
     result = mpi_dfdy(ygrid, f, mpi, periodic=True)
     expected = dfdy(ygrid, f, periodic=True)

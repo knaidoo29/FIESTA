@@ -38,8 +38,12 @@ def mpi_dfdx(
         shape[0] += 2
         _f = np.zeros(shape)
         _f[1:-1] = f
-        _f[0] = MPI.Send_up(f[-1])
-        _f[-1] = MPI.Send_down(f[0])
+        if f.ndim == 1:
+            _f[0] = MPI.Send_up(f[-1])[0]
+            _f[-1] = MPI.Send_down(f[0])[0]
+        else:
+            _f[0] = MPI.Send_up(f[-1])
+            _f[-1] = MPI.Send_down(f[0])
         if periodic is False:
             if MPI.rank == 0:
                 _xgrid = _xgrid[1:]
